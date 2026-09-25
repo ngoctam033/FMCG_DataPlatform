@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Cron: Giả lập nhân viên tạo Phiếu Kho thủ công mỗi 30 phút -->
+        <record id="ir_cron_simulate_stock_picking" model="ir.cron">
+            <field name="name">Simulator: Auto Create Stock Picking</field>
+            <!-- Sử dụng base.model_ir_cron làm mỏ neo, không cần model_employee_simulator -->
+            <field name="model_id" ref="base.model_ir_cron"/>
+            <field name="state">code</field>
+            <!-- Gọi thẳng vào AbstractModel qua env -->
+            <field name="code">env['employee.simulator'].simulate_create_picking()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>
