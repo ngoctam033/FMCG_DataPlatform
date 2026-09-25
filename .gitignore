@@ -14,9 +14,9 @@ __pycache__/
 !.env.example
 
 # Docker volumes & data
-data/
-odoo_pgdata/
-pgdata/
+/data/
+/odoo_pgdata/
+/pgdata/
 
 # IDE & OS
 .idea/
@@ -26,7 +26,7 @@ pgdata/
 .DS_Store
 
 # Temporary files & logs
-logs/
+/logs/
 *.log
-scratch/
-tmp/
+/scratch/
+/tmp/

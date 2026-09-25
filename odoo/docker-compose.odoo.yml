@@ -1,0 +1,27 @@
+services:
+  odoo-db:
+    image: postgres:16
+    container_name: fmcg_odoo_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${ODOO_DB_NAME:-fmcg_core}
+      POSTGRES_USER: ${ODOO_DB_USER:-odoo}
+      POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD:-odoo_secret_password}
+    command: >
+      postgres 
+      -c wal_level=logical 
+      -c max_wal_senders=10 
+      -c max_replication_slots=10
+    ports:
+      - "${ODOO_DB_PORT:-5432}:5432"
+    volumes:
+      - odoo_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ODOO_DB_USER:-odoo} -d ${ODOO_DB_NAME:-fmcg_core}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  odoo_db_data:
+    driver: local
