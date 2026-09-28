@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Nhóm 1: Sữa Tươi (Dùng chiến lược FEFO, Quản lý HSD) -->
+        <record id="product_category_fmcg_milk" model="product.category">
+            <field name="name">Sữa Tươi</field>
+            <field name="parent_id" ref="product.product_category_goods"/>
+            <field name="property_cost_method">average</field>
+            <field name="property_valuation">real_time</field>
+            <field name="removal_strategy_id" ref="product_expiry.removal_fefo"/>
+        </record>
+
+        <!-- Nhóm 2: Hóa mỹ phẩm (Bổ sung: Dùng chiến lược FIFO, không cần HSD) -->
+        <!-- Sửa: parent_id dùng product_category_goods -->
+        <!-- Sửa: removal_strategy_id dùng stock.removal_fifo -->
+        <record id="product_category_fmcg_cosmetics" model="product.category">
+            <field name="name">Hóa mỹ phẩm</field>
+            <field name="parent_id" ref="product.product_category_goods"/>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">real_time</field>
+            <field name="removal_strategy_id" ref="stock.removal_fifo"/>
+        </record>
+        
+        <!-- Nhóm 3: Vật tư tiêu hao trong kho (Bổ sung: Không cần chiến lược xuất) -->
+        <record id="product_category_fmcg_consumables" model="product.category">
+            <field name="name">Vật tư kho (Consumables)</field>
+            <field name="parent_id" ref="product.product_category_goods"/>
+        </record>
+
+        <!-- Nhóm 4: Nguyên vật liệu (Raw Materials) -->
+        <record id="product_category_fmcg_raw_material" model="product.category">
+            <field name="name">Nguyên vật liệu (RM)</field>
+            <field name="parent_id" ref="product.product_category_goods"/>
+            <field name="property_cost_method">average</field>
+            <field name="property_valuation">real_time</field>
+            <field name="removal_strategy_id" ref="stock.removal_fifo"/>
+        </record>
+    </data>
+</odoo>

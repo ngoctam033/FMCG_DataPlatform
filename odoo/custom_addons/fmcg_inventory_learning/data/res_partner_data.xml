@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- ========================================== -->
+        <!-- 1. CẤU TRÚC ĐA CÔNG TY (MULTI-COMPANY)     -->
+        <!-- ========================================== -->
+        <!-- Công ty Holding (Root) -->
+        <record id="base.main_company" model="res.company">
+            <field name="name">FMCG Group (Holding)</field>
+        </record>
+
+        <!-- Công ty Sản xuất -->
+        <record id="company_fmcg_manufacturing" model="res.company">
+            <field name="name">FMCG Manufacturing (Nhà máy)</field>
+            <field name="parent_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Công ty Phân phối -->
+        <record id="company_fmcg_distribution" model="res.company">
+            <field name="name">FMCG Trading &amp; Distribution (Phân phối)</field>
+            <field name="parent_id" ref="base.main_company"/>
+        </record>
+
+        <!-- ========================================== -->
+        <!-- 2. THẺ PHÂN LOẠI (TAGS)                    -->
+        <!-- ========================================== -->
+        <record id="tag_channel_mt" model="res.partner.category"><field name="name">Modern Trade (MT)</field><field name="color" eval="1"/></record>
+        <record id="tag_channel_gt" model="res.partner.category"><field name="name">General Trade (GT)</field><field name="color" eval="2"/></record>
+        <record id="tag_channel_horeca" model="res.partner.category"><field name="name">HoReCa</field><field name="color" eval="3"/></record>
+        <record id="tag_channel_distributor" model="res.partner.category"><field name="name">Nhà phân phối (Distributor)</field><field name="color" eval="4"/></record>
+        <record id="tag_region_north" model="res.partner.category"><field name="name">Region: Miền Bắc</field><field name="color" eval="5"/></record>
+        <record id="tag_region_central" model="res.partner.category"><field name="name">Region: Miền Trung</field><field name="color" eval="6"/></record>
+        <record id="tag_region_south" model="res.partner.category"><field name="name">Region: Miền Nam</field><field name="color" eval="7"/></record>
+        <record id="tag_supplier_rm" model="res.partner.category"><field name="name">Supplier: Nguyên vật liệu</field><field name="color" eval="8"/></record>
+        <record id="tag_supplier_pkg" model="res.partner.category"><field name="name">Supplier: Bao bì</field><field name="color" eval="9"/></record>
+        <record id="tag_supplier_logistics" model="res.partner.category"><field name="name">Supplier: Vận tải</field><field name="color" eval="10"/></record>
+
+        <!-- ========================================== -->
+        <!-- 3. KHÁCH HÀNG (CUSTOMERS) & CONTACTS       -->
+        <!-- ========================================== -->
+        
+        <!-- Khách hàng MT: AEON Mall -->
+        <record id="partner_aeon_mall" model="res.partner">
+            <field name="name">Siêu thị AEON Mall</field>
+            <field name="is_company" eval="True"/>
+            <field name="customer_rank" eval="1"/>
+            <field name="category_id" eval="[(6, 0, [ref('tag_channel_mt'), ref('tag_region_south')])]"/>
+            <field name="street">30 Bờ Bao Tân Thắng, Sơn Kỳ</field>
+            <field name="city">Hồ Chí Minh</field>
+            <field name="credit_limit" eval="500000000"/>
+        </record>
+        <record id="contact_aeon_buyer" model="res.partner">
+            <field name="name">Mr. Trần Văn Mua</field>
+            <field name="function">Giám Đốc Mua Hàng FMCG</field>
+            <field name="email">buyer@aeon.example.com</field>
+            <field name="phone">0901234567</field>
+            <field name="parent_id" ref="partner_aeon_mall"/> 
+            <field name="is_company" eval="False"/>
+            <field name="type">contact</field>
+        </record>
+        <record id="contact_aeon_invoice" model="res.partner">
+            <field name="name">Phòng Kế Toán AEON</field>
+            <field name="parent_id" ref="partner_aeon_mall"/>
+            <field name="is_company" eval="False"/>
+            <field name="type">invoice</field>
+        </record>
+
+        <!-- Khách hàng HoReCa: Chuỗi Cafe -->
+        <record id="partner_the_highlands" model="res.partner">
+            <field name="name">Chuỗi Cafe The Highlands</field>
+            <field name="is_company" eval="True"/>
+            <field name="customer_rank" eval="1"/>
+            <field name="category_id" eval="[(6, 0, [ref('tag_channel_horeca'), ref('tag_region_north')])]"/>
+            <field name="city">Hà Nội</field>
+        </record>
+        <record id="contact_highlands_store" model="res.partner">
+            <field name="name">Cửa hàng trưởng - CN Hồ Gươm</field>
+            <field name="parent_id" ref="partner_the_highlands"/>
+            <field name="is_company" eval="False"/>
+            <field name="type">delivery</field> <!-- Địa chỉ nhận hàng -->
+        </record>
+
+        <!-- Khách hàng Distributor -->
+        <record id="partner_npp_hoang_gia" model="res.partner">
+            <field name="name">Nhà Phân Phối Hoàng Gia</field>
+            <field name="is_company" eval="True"/>
+            <field name="customer_rank" eval="1"/>
+            <field name="category_id" eval="[(6, 0, [ref('tag_channel_distributor'), ref('tag_region_north')])]"/>
+            <field name="street">15 Phạm Hùng, Mỹ Đình</field>
+            <field name="city">Hà Nội</field>
+            <field name="credit_limit" eval="1000000000"/>
+        </record>
+
+        <!-- Khách hàng GT (Cá nhân) -->
+        <record id="partner_tap_hoa_co_ba" model="res.partner">
+            <field name="name">Tạp hóa Cô Ba</field>
+            <field name="is_company" eval="False"/>
+            <field name="customer_rank" eval="1"/>
+            <field name="category_id" eval="[(6, 0, [ref('tag_channel_gt'), ref('tag_region_central')])]"/>
+            <field name="street">123 Trần Phú</field>
+            <field name="city">Đà Nẵng</field>
+        </record>
+
+        <!-- ========================================== -->
+        <!-- 4. NHÀ CUNG CẤP (VENDORS)                  -->
+        <!-- ========================================== -->
+        <record id="vendor_duong_quang_ngai" model="res.partner">
+            <field name="name">Công ty Đường Quảng Ngãi</field>
+            <field name="is_company" eval="True"/>
+            <field name="supplier_rank" eval="1"/>
+            <field name="category_id" eval="[(6, 0, [ref('tag_supplier_rm')])]"/>
+            <field name="city">Quảng Ngãi</field>
+        </record>
+
+        <record id="vendor_bao_bi_thang_long" model="res.partner">
+            <field name="name">Công ty Bao bì Thăng Long</field>
+            <field name="is_company" eval="True"/>
+            <field name="supplier_rank" eval="1"/>
+            <field name="category_id" eval="[(6, 0, [ref('tag_supplier_pkg')])]"/>
+            <field name="city">Bắc Ninh</field>
+        </record>
+
+        <!-- NCC Vận tải Logisitcs -->
+        <record id="vendor_ghn_logistics" model="res.partner">
+            <field name="name">Giao Hàng Nhanh Logistics (B2B)</field>
+            <field name="is_company" eval="True"/>
+            <field name="supplier_rank" eval="1"/>
+            <field name="category_id" eval="[(6, 0, [ref('tag_supplier_logistics')])]"/>
+            <field name="city">Hồ Chí Minh</field>
+        </record>
+    </data>
+</odoo>

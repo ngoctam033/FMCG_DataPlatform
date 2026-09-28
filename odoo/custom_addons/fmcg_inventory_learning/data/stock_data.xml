@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- VỊ TRÍ KHO BÃI (Tất cả đều phải gán cụ thể cho 1 Công ty) -->
+        
+        <!-- 1. Kho Lạnh -->
+        <record id="location_cold_storage" model="stock.location">
+            <field name="name">Kho Lạnh (Chilled)</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/> <!-- Thuộc Công ty 1 -->
+        </record>
+
+        <!-- 2. Kho Đồ Khô (Bổ sung) -->
+        <record id="location_dry_storage" model="stock.location">
+            <field name="name">Kho Đồ Khô (Dry)</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- 3. Khu Hàng Hỏng / Cách ly (Bổ sung) -->
+        <record id="location_quarantine" model="stock.location">
+            <field name="name">Khu Vực Phế Liệu (Scrap)</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">inventory</field> <!-- Vị trí ảo để xả kho -->
+            <field name="scrap_location">True</field> <!-- Đánh dấu là vị trí Phế liệu -->
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- QUY TẮC CẤT HÀNG (PUTAWAY RULES) -->
+        
+        <!-- Rule 1: Sữa -> Kho Lạnh -->
+        <record id="putaway_rule_milk_cold" model="stock.putaway.rule">
+            <field name="location_in_id" ref="stock.stock_location_stock"/>
+            <field name="location_out_id" ref="location_cold_storage"/>
+            <field name="category_id" ref="product_category_fmcg_milk"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Rule 2: Hóa mỹ phẩm -> Kho Đồ Khô (Bổ sung) -->
+        <record id="putaway_rule_cosmetics_dry" model="stock.putaway.rule">
+            <field name="location_in_id" ref="stock.stock_location_stock"/>
+            <field name="location_out_id" ref="location_dry_storage"/>
+            <field name="category_id" ref="product_category_fmcg_cosmetics"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- KHO NHÀ MÁY (2-STEP RECEPTION: NHẬN -> QC -> LƯU KHO) -->
+        <record id="warehouse_factory" model="stock.warehouse">
+            <field name="name">FMCG Factory WH</field>
+            <field name="code">FAC</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="reception_steps">two_steps</field> <!-- Nhận -> QC -> Kho -->
+        </record>
+    </data>
+</odoo>

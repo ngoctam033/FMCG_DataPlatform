@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- 1. Sản phẩm: Sữa Tươi (Global Data, Lưu kho, FEFO, Có HSD) -->
+        <record id="product_milk_1l" model="product.template">
+            <field name="name">Sữa Tươi Tiệt Trùng 1L Demo</field>
+            <field name="type">consu</field>
+            <field name="is_storable">True</field> <!-- Hàng lưu kho -->
+            <field name="categ_id" ref="product_category_fmcg_milk"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="tracking">lot</field>
+            <field name="use_expiration_date">True</field>
+            <field name="expiration_time">180</field>
+            <field name="removal_time">160</field>
+            <!-- Bỏ trống company_id => Mọi chi nhánh đều có thể bán sản phẩm này -->
+        </record>
+
+        <!-- 2. Sản phẩm: Dầu gội (Company-specific, Lưu kho, FIFO, Lô nhưng Không HSD) -->
+        <record id="product_shampoo" model="product.template">
+            <field name="name">Dầu gội Clear 600g</field>
+            <field name="type">consu</field>
+            <field name="is_storable">True</field> <!-- Hàng lưu kho -->
+            <field name="categ_id" ref="product_category_fmcg_cosmetics"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="tracking">lot</field> <!-- Quản lý lô sx nhưng không cần Date -->
+            <field name="use_expiration_date">False</field>
+            <!-- CHỐT CHẶN: Chỉ Công ty 1 mới kinh doanh mặt hàng này -->
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- 3. Sản phẩm: Băng keo dán thùng (Global, Tiêu hao, Không quét mã) -->
+        <record id="product_tape" model="product.template">
+            <field name="name">Băng keo dán thùng 5cm</field>
+            <field name="type">consu</field> <!-- Hàng tiêu hao, không tính số tồn kho -->
+            <field name="categ_id" ref="product_category_fmcg_consumables"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="tracking">none</field> <!-- Không cần quét mã vạch khi nhập/xuất -->
+        </record>
+
+        <!-- 4. Sản phẩm: Đường Cát (Nguyên vật liệu) -->
+        <record id="product_raw_sugar" model="product.template">
+            <field name="name">Đường Cát (Nguyên vật liệu)</field>
+            <field name="type">consu</field>
+            <field name="is_storable">True</field>
+            <field name="categ_id" ref="product_category_fmcg_raw_material"/>
+            <!-- Sử dụng đơn vị Kg -->
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="tracking">lot</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+    </data>
+</odoo>
