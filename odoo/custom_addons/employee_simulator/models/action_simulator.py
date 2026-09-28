@@ -2,6 +2,7 @@ from odoo import models, api, fields
 import random
 import logging
 from datetime import timedelta
+from odoo import Command
 
 _logger = logging.getLogger(__name__)
 
@@ -15,47 +16,46 @@ class EmployeeSimulator(models.AbstractModel):
         """
         Giả lập hành vi: Nhân viên kho vào hệ thống tạo thủ công một Phiếu kho.
         """
+        now = fields.Datetime.now()
+        minute = now.minute
+        second = now.second
         
         users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
-            
-        random_user = random.choice(users)
+        selected_user = users[minute % len(users)]
+
+        company_domain = ['|', ('company_id', '=', selected_user.company_id.id), ('company_id', '=', False)]
         
-        # Tìm picking type
-        picking_type = self.env['stock.picking.type'].search([], limit=1)
-        
-        if not picking_type:
-            picking_type = self.env['stock.picking.type'].search([], limit=1)
+        picking_types = self.env['stock.picking.type'].search(company_domain)
+        selected_picking_type = picking_types[(minute + second) % len(picking_types)]
             
         products = self.env['product.product'].search([], limit=20)
         partners = self.env['res.partner'].search([], limit=50)
         
-        simulated_env = self.env['stock.picking'].with_user(random_user.id)
-        now = fields.Datetime.now()
+        move_commands = []
+        for i in range((minute % 3) + 1):
+            selected_product = products[(minute + i) % len(products)]
+            demand_qty = 5 + ((second + i) % 45)
+            
+            if (minute + i) % 3 == 0:
+                done_qty = max(0, demand_qty - (((second + i) % 4) + 1))
+            else:
+                done_qty = demand_qty
+            
+            move_commands.append(Command.create({
+                'description_picking': f"Chi tiết giả lập: {selected_product.name}",
+                'product_id': selected_product.id,
+                'product_uom_qty': demand_qty,
+                'quantity': done_qty,
+                'product_uom': selected_product.uom_id.id,
+            }))
         
-        # Tạo Phiếu kho (Kèm các field như trên UI)
-        picking = simulated_env.create({
-            'picking_type_id': picking_type.id,
-            'origin': f'SIM-MANUAL-{random.randint(100, 999)}',
-            'partner_id': random.choice(partners).id if partners else False,
-            'scheduled_date': now + timedelta(days=random.randint(1, 3)),
-            'date_deadline': now + timedelta(days=random.randint(4, 7)),
+        picking = self.env['stock.picking'].with_user(selected_user.id).create({
+            'picking_type_id': selected_picking_type.id,
+            'origin': f'SIM-MANUAL-{now.strftime("%Y%m%d%H%M%S")}',
+            'partner_id': partners[minute % len(partners)].id if partners else False,
+            'scheduled_date': now + timedelta(days=(minute % 3) + 1),
+            'date_deadline': now + timedelta(days=(minute % 4) + 4),
+            'move_ids': move_commands,
         })
         
-        # Tạo Chi tiết Dòng sản phẩm (Kèm diễn giải và số lượng kiểm đếm)
-        move_env = self.env['stock.move'].with_user(random_user.id)
-        for _ in range(random.randint(1, 3)):
-            random_product = random.choice(products)
-            demand_qty = random.randint(5, 50)
-            
-            move_env.create({
-                'product_id': random_product.id,
-                'description_picking': f"Chi tiết giả lập: {random_product.name}",
-                'product_uom_qty': demand_qty,
-                'quantity': max(0, demand_qty - random.choice([0, 0, random.randint(1, 4)])), # Ngẫu nhiên đếm đủ hoặc thiếu
-                'product_uom': random_product.uom_id.id,
-                'picking_id': picking.id,
-                'location_id': picking.location_id.id,
-                'location_dest_id': picking.location_dest_id.id,
-            })
-            
         return picking.id
