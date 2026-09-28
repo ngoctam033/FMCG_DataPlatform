@@ -87,3 +87,19 @@ class EmployeeSimulator(models.AbstractModel):
             
         if record_count == 1 and created_picking_ids:
             return created_picking_ids[0]
+
+    @api.model
+    def simulate_confirm_picking(self):
+        """
+        Cron 2: Giả lập nhân viên thao tác Xác nhận (Confirm) các phiếu kho đang Nháp.
+        """
+        # Lấy một user ngẫu nhiên để ghi nhận lịch sử thao tác
+        users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
+        random_user = random.choice(users) if users else self.env.user
+
+        pickings = self.env['stock.picking'].search([], limit=20)
+
+        for picking in pickings:
+
+            simulated_picking = picking.with_user(random_user.id)
+            simulated_picking.action_confirm()
