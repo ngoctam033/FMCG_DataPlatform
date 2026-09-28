@@ -1,0 +1,3 @@
+include:
+  - path: ./odoo/docker-compose.odoo.yml
+    env_file: .env
