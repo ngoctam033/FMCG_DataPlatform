@@ -1,0 +1,22 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "10000000000000000008",
+  "position": { "x": 690, "y": 570, "z": 8000, "height": 480, "width": 1206, "tabOrder": 8000 },
+  "visual": {
+    "visualType": "tableEx",
+    "query": { "queryState": { "Values": { "projections": [
+      { "field": { "Column": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Phiếu nhập" } }, "queryRef": "FactNhapKho.Phiếu nhập", "nativeQueryRef": "Phiếu nhập" },
+      { "field": { "Column": { "Expression": { "SourceRef": { "Entity": "DimNhaCungCap" } }, "Property": "Nhà cung cấp" } }, "queryRef": "DimNhaCungCap.Nhà cung cấp", "nativeQueryRef": "Nhà cung cấp" },
+      { "field": { "Column": { "Expression": { "SourceRef": { "Entity": "DimSanPham" } }, "Property": "Sản phẩm" } }, "queryRef": "DimSanPham.Sản phẩm", "nativeQueryRef": "Sản phẩm" },
+      { "field": { "Aggregation": { "Expression": { "Column": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Số lượng yêu cầu" } }, "Function": 0 } }, "queryRef": "Sum(FactNhapKho.Số lượng yêu cầu)", "nativeQueryRef": "Số lượng yêu cầu" },
+      { "field": { "Aggregation": { "Expression": { "Column": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Số lượng đã nhận" } }, "Function": 0 } }, "queryRef": "Sum(FactNhapKho.Số lượng đã nhận)", "nativeQueryRef": "Số lượng đã nhận" },
+      { "field": { "Aggregation": { "Expression": { "Column": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Số lượng còn thiếu" } }, "Function": 0 } }, "queryRef": "Sum(FactNhapKho.Số lượng còn thiếu)", "nativeQueryRef": "Số lượng còn thiếu" },
+      { "field": { "Column": { "Expression": { "SourceRef": { "Entity": "DimTrangThai" } }, "Property": "Trạng thái" } }, "queryRef": "DimTrangThai.Trạng thái", "nativeQueryRef": "Trạng thái" },
+      { "field": { "Column": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Ngày dự kiến" } }, "queryRef": "FactNhapKho.Ngày dự kiến", "nativeQueryRef": "Ngày dự kiến" }
+    ] } } },
+    "visualContainerObjects": { "title": [{ "properties": {
+      "show": { "expr": { "Literal": { "Value": "true" } } },
+      "text": { "expr": { "Literal": { "Value": "'Chi tiết phiếu nhập kho'" } } }
+    } }] }
+  }
+}

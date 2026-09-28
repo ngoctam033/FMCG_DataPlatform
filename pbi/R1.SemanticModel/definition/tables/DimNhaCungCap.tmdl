@@ -1,0 +1,33 @@
+/// Danh mục nhà cung cấp; bản ghi -1 đại diện cho phiếu chưa gán nhà cung cấp.
+table DimNhaCungCap
+
+	column 'Mã nhà cung cấp'
+		dataType: int64
+		isKey
+		sourceColumn: supplier_id
+		summarizeBy: none
+
+	column 'Nhà cung cấp'
+		dataType: string
+		sourceColumn: supplier_name
+		summarizeBy: none
+
+	partition DimNhaCungCap = m
+		mode: import
+		source =
+			let
+				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
+				NativeResult = Value.NativeQuery(
+					Source,
+					"SELECT -1::bigint AS supplier_id, '(Không có nhà cung cấp)'::text AS supplier_name
+					UNION ALL
+					SELECT
+					    rp.id::bigint AS supplier_id,
+					    COALESCE(rp.name, '(Nhà cung cấp chưa đặt tên)')::text AS supplier_name
+					FROM res_partner AS rp
+					WHERE rp.supplier_rank > 0",
+					null,
+					[EnableFolding = true]
+				)
+			in
+				NativeResult

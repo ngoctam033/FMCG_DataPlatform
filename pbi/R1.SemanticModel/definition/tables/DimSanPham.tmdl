@@ -1,0 +1,46 @@
+/// Danh mục sản phẩm và nhóm sản phẩm từ Odoo.
+table DimSanPham
+
+	column 'Mã sản phẩm'
+		dataType: int64
+		isKey
+		sourceColumn: product_id
+		summarizeBy: none
+
+	column 'Sản phẩm'
+		dataType: string
+		sourceColumn: product_name
+		summarizeBy: none
+
+	column 'Nhóm sản phẩm'
+		dataType: string
+		sourceColumn: category_name
+		summarizeBy: none
+
+	column 'Có thể mua'
+		dataType: boolean
+		sourceColumn: purchase_ok
+		summarizeBy: none
+
+	partition DimSanPham = m
+		mode: import
+		source =
+			let
+				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
+				NativeResult = Value.NativeQuery(
+					Source,
+					"SELECT
+					    pp.id::bigint AS product_id,
+					    COALESCE(pt.name->>'en_US', '(Sản phẩm chưa đặt tên)')::text AS product_name,
+					    COALESCE(pc.name, '(Chưa phân nhóm)')::text AS category_name,
+					    COALESCE(pt.purchase_ok, false) AS purchase_ok
+					FROM product_product AS pp
+					INNER JOIN product_template AS pt
+					    ON pt.id = pp.product_tmpl_id
+					LEFT JOIN product_category AS pc
+					    ON pc.id = pt.categ_id",
+					null,
+					[EnableFolding = true]
+				)
+			in
+				NativeResult

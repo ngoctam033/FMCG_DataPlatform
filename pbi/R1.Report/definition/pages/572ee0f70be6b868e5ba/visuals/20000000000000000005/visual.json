@@ -1,0 +1,77 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "20000000000000000005",
+  "position": {
+    "x": 24,
+    "y": 570,
+    "z": 5000,
+    "height": 480,
+    "width": 780,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimSanPham"
+                    }
+                  },
+                  "Property": "Sản phẩm"
+                }
+              },
+              "queryRef": "DimSanPham.Sản phẩm",
+              "nativeQueryRef": "Sản phẩm"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "Giá trị hàng rủi ro"
+                }
+              },
+              "queryRef": "FactLoHanDung.Giá trị hàng rủi ro",
+              "nativeQueryRef": "Giá trị hàng rủi ro"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Giá trị hàng rủi ro theo sản phẩm'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

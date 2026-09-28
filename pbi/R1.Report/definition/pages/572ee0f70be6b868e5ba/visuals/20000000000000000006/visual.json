@@ -1,0 +1,163 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "20000000000000000006",
+  "position": {
+    "x": 820,
+    "y": 570,
+    "z": 6000,
+    "height": 480,
+    "width": 1076,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimSanPham"
+                    }
+                  },
+                  "Property": "Sản phẩm"
+                }
+              },
+              "queryRef": "DimSanPham.Sản phẩm",
+              "nativeQueryRef": "Sản phẩm"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimViTriKho"
+                    }
+                  },
+                  "Property": "Vị trí kho"
+                }
+              },
+              "queryRef": "DimViTriKho.Vị trí kho",
+              "nativeQueryRef": "Vị trí kho"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactBoSungHang"
+                    }
+                  },
+                  "Property": "Trạng thái cảnh báo"
+                }
+              },
+              "queryRef": "FactBoSungHang.Trạng thái cảnh báo",
+              "nativeQueryRef": "Trạng thái cảnh báo"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "FactBoSungHang"
+                        }
+                      },
+                      "Property": "Tồn khả dụng"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(FactBoSungHang.Tồn khả dụng)",
+              "nativeQueryRef": "Tồn khả dụng"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "FactBoSungHang"
+                        }
+                      },
+                      "Property": "Mức tồn tối thiểu"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(FactBoSungHang.Mức tồn tối thiểu)",
+              "nativeQueryRef": "Mức tồn tối thiểu"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "FactBoSungHang"
+                        }
+                      },
+                      "Property": "Mức tồn tối đa"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(FactBoSungHang.Mức tồn tối đa)",
+              "nativeQueryRef": "Mức tồn tối đa"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "FactBoSungHang"
+                        }
+                      },
+                      "Property": "SL đề xuất tới mức tối đa"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(FactBoSungHang.SL đề xuất tới mức tối đa)",
+              "nativeQueryRef": "SL đề xuất tới mức tối đa"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Danh sách cảnh báo tồn kho ưu tiên'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

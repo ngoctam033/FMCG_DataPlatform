@@ -1,0 +1,62 @@
+relationship 1c523b38-c6a4-4c96-b56d-b32aa056c7f1
+	fromColumn: FactNhapKho.'Mã sản phẩm'
+	toColumn: DimSanPham.'Mã sản phẩm'
+
+relationship 25f86f99-977c-4be3-b30e-93ddd89ce078
+	fromColumn: FactNhapKho.'Mã nhà cung cấp'
+	toColumn: DimNhaCungCap.'Mã nhà cung cấp'
+
+relationship 33bc0db1-acde-4481-a86f-93a475be4236
+	fromColumn: FactNhapKho.'Mã nhân viên'
+	toColumn: DimNhanVien.'Mã nhân viên'
+
+relationship 4a1dcbee-42c7-4644-b12d-8b357a90fddf
+	fromColumn: FactNhapKho.'Mã kho nhận'
+	toColumn: DimViTriKho.'Mã vị trí'
+
+relationship 5ec757c2-79df-49f8-b3bc-5d1bff37b727
+	isActive: false
+	fromColumn: FactNhapKho.'Mã vị trí nguồn'
+	toColumn: DimViTriKho.'Mã vị trí'
+
+relationship 6e68e8fb-e72b-4576-9039-2f2a78a16b86
+	fromColumn: FactNhapKho.'Mã trạng thái'
+	toColumn: DimTrangThai.'Mã trạng thái'
+
+relationship 77b40a08-687f-4d15-8521-f12fa33af675
+	fromColumn: FactNhapKho.'Ngày tạo phiếu'
+	toColumn: DimNgay.'Ngày'
+
+relationship 8b8127ae-95e3-47fb-8972-2d731fbb6e31
+	isActive: false
+	fromColumn: FactNhapKho.'Ngày dự kiến'
+	toColumn: DimNgay.'Ngày'
+
+relationship 9fb2e525-9491-4edb-b2c8-1bfdb15154c3
+	isActive: false
+	fromColumn: FactNhapKho.'Ngày hoàn tất'
+	toColumn: DimNgay.'Ngày'
+
+relationship a12f1e40-4071-4c75-9961-0ae7fd3f3101
+	fromColumn: FactTonKho.'Mã sản phẩm'
+	toColumn: DimSanPham.'Mã sản phẩm'
+
+relationship a12f1e40-4071-4c75-9961-0ae7fd3f3102
+	fromColumn: FactTonKho.'Mã vị trí'
+	toColumn: DimViTriKho.'Mã vị trí'
+
+relationship a12f1e40-4071-4c75-9961-0ae7fd3f3103
+	fromColumn: FactBoSungHang.'Mã sản phẩm'
+	toColumn: DimSanPham.'Mã sản phẩm'
+
+relationship a12f1e40-4071-4c75-9961-0ae7fd3f3104
+	fromColumn: FactBoSungHang.'Mã vị trí'
+	toColumn: DimViTriKho.'Mã vị trí'
+
+relationship a12f1e40-4071-4c75-9961-0ae7fd3f3105
+	fromColumn: FactLoHanDung.'Mã sản phẩm'
+	toColumn: DimSanPham.'Mã sản phẩm'
+
+relationship a12f1e40-4071-4c75-9961-0ae7fd3f3106
+	fromColumn: FactLoHanDung.'Mã vị trí'
+	toColumn: DimViTriKho.'Mã vị trí'

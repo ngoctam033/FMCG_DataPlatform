@@ -1,0 +1,116 @@
+/// Chính sách min/max và nhu cầu bổ sung tại từng sản phẩm-vị trí.
+table FactBoSungHang
+
+	measure 'SKU cần bổ sung' = CALCULATE(DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), FactBoSungHang[Cần bổ sung] = TRUE())
+		formatString: #,0
+
+	measure 'Tổng SL cần bổ sung tối thiểu' = SUM(FactBoSungHang[SL cần bổ sung tối thiểu])
+		formatString: #,0.00
+
+	measure 'Tổng SL đề xuất tới mức tối đa' = SUM(FactBoSungHang[SL đề xuất tới mức tối đa])
+		formatString: #,0.00
+
+	measure 'Tỷ lệ SKU dưới Min' = DIVIDE([SKU cần bổ sung], DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), 0)
+		formatString: 0.0%
+
+	/// Khẩn cấp: không còn lượng khả dụng.
+	measure '🔴 SKU hết hàng' = CALCULATE(DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), FactBoSungHang[Tồn khả dụng] <= 0)
+		formatString: #,0
+
+	/// Cảnh báo: còn hàng nhưng thấp hơn mức tồn tối thiểu.
+	measure '🟠 SKU dưới Min' = CALCULATE(DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), FactBoSungHang[Tồn khả dụng] > 0, FactBoSungHang[Tồn khả dụng] < FactBoSungHang[Mức tồn tối thiểu])
+		formatString: #,0
+
+	/// Theo dõi: tồn từ Min đến Min cộng biên an toàn 20%.
+	measure '🔵 SKU gần Min' = CALCULATE(DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), FactBoSungHang[Mức tồn tối thiểu] > 0, FactBoSungHang[Tồn khả dụng] >= FactBoSungHang[Mức tồn tối thiểu], FactBoSungHang[Tồn khả dụng] <= FactBoSungHang[Mức tồn tối thiểu] * 1.2)
+		formatString: #,0
+
+	/// Cảnh báo dư hàng: tồn cao hơn Max nhưng chưa vượt 120% Max.
+	measure '🟠 SKU vượt Max' = CALCULATE(DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), FactBoSungHang[Mức tồn tối đa] > 0, FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa], FactBoSungHang[Tồn khả dụng] <= FactBoSungHang[Mức tồn tối đa] * 1.2)
+		formatString: #,0
+
+	/// Khẩn cấp dư hàng: tồn cao hơn 120% Max.
+	measure '🔴 SKU vượt 120% Max' = CALCULATE(DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), FactBoSungHang[Mức tồn tối đa] > 0, FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa] * 1.2)
+		formatString: #,0
+
+	column 'Mã quy tắc'
+		dataType: int64
+		isHidden
+		sourceColumn: orderpoint_id
+		summarizeBy: none
+
+	column 'Quy tắc bổ sung'
+		dataType: string
+		sourceColumn: orderpoint_name
+		summarizeBy: none
+
+	column 'Mã sản phẩm'
+		dataType: int64
+		isHidden
+		sourceColumn: product_id
+		summarizeBy: none
+
+	column 'Mã vị trí'
+		dataType: int64
+		isHidden
+		sourceColumn: location_id
+		summarizeBy: none
+
+	column 'Tồn khả dụng'
+		dataType: double
+		sourceColumn: available_qty
+		summarizeBy: sum
+
+	column 'Mức tồn tối thiểu'
+		dataType: double
+		sourceColumn: min_qty
+		summarizeBy: sum
+
+	column 'Mức tồn tối đa'
+		dataType: double
+		sourceColumn: max_qty
+		summarizeBy: sum
+
+	column 'SL cần bổ sung tối thiểu'
+		dataType: double
+		sourceColumn: min_replenishment_qty
+		summarizeBy: sum
+
+	column 'SL đề xuất tới mức tối đa'
+		dataType: double
+		sourceColumn: target_replenishment_qty
+		summarizeBy: sum
+
+	column 'Cần bổ sung'
+		dataType: boolean
+		sourceColumn: needs_replenishment
+		summarizeBy: none
+
+	/// Nhãn trực quan dùng trong bảng và drill-through cảnh báo.
+	column 'Trạng thái cảnh báo' = SWITCH(TRUE(), FactBoSungHang[Tồn khả dụng] <= 0, "🔴 Hết hàng", FactBoSungHang[Mức tồn tối đa] > 0 && FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa] * 1.2, "🔴 Vượt 120% Max", FactBoSungHang[Tồn khả dụng] < FactBoSungHang[Mức tồn tối thiểu], "🟠 Dưới Min", FactBoSungHang[Mức tồn tối đa] > 0 && FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa], "🟠 Vượt Max", FactBoSungHang[Mức tồn tối thiểu] > 0 && FactBoSungHang[Tồn khả dụng] <= FactBoSungHang[Mức tồn tối thiểu] * 1.2, "🔵 Gần Min", "🟢 Bình thường")
+		dataType: string
+		sortByColumn: 'Thứ tự cảnh báo'
+		summarizeBy: none
+
+	column 'Thứ tự cảnh báo' = SWITCH(TRUE(), FactBoSungHang[Tồn khả dụng] <= 0, 1, FactBoSungHang[Mức tồn tối đa] > 0 && FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa] * 1.2, 2, FactBoSungHang[Tồn khả dụng] < FactBoSungHang[Mức tồn tối thiểu], 3, FactBoSungHang[Mức tồn tối đa] > 0 && FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa], 4, FactBoSungHang[Mức tồn tối thiểu] > 0 && FactBoSungHang[Tồn khả dụng] <= FactBoSungHang[Mức tồn tối thiểu] * 1.2, 5, 6)
+		dataType: int64
+		isHidden
+		summarizeBy: none
+
+	partition FactBoSungHang = m
+		mode: import
+		source =
+			let
+				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
+				NativeResult = Value.NativeQuery(
+					Source,
+					"WITH stock AS (SELECT sq.product_id, sq.location_id, SUM(COALESCE(sq.quantity, 0) - COALESCE(sq.reserved_quantity, 0)) AS available_qty FROM stock_quant sq GROUP BY sq.product_id, sq.location_id) SELECT op.id::bigint AS orderpoint_id, COALESCE(op.name, 'OP/' || op.id::text)::text AS orderpoint_name, op.product_id::bigint AS product_id, op.location_id::bigint AS location_id, COALESCE(stock.available_qty, 0)::double precision AS available_qty, COALESCE(op.product_min_qty, 0)::double precision AS min_qty, COALESCE(op.product_max_qty, 0)::double precision AS max_qty, GREATEST(COALESCE(op.product_min_qty, 0) - COALESCE(stock.available_qty, 0), 0)::double precision AS min_replenishment_qty, GREATEST(COALESCE(op.product_max_qty, 0) - COALESCE(stock.available_qty, 0), 0)::double precision AS target_replenishment_qty, (COALESCE(stock.available_qty, 0) < COALESCE(op.product_min_qty, 0)) AS needs_replenishment FROM stock_warehouse_orderpoint op LEFT JOIN stock ON stock.product_id = op.product_id AND stock.location_id = op.location_id WHERE COALESCE(op.active, true)",
+					null,
+					[EnableFolding = true]
+				)
+			in
+				NativeResult
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation

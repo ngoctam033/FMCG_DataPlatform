@@ -1,0 +1,105 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "30000000000000000004",
+  "position": {
+    "x": 24,
+    "y": 198,
+    "z": 4000,
+    "height": 350,
+    "width": 920,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimSanPham"
+                    }
+                  },
+                  "Property": "Sản phẩm"
+                }
+              },
+              "queryRef": "DimSanPham.Sản phẩm",
+              "nativeQueryRef": "Sản phẩm"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTonKho"
+                    }
+                  },
+                  "Property": "Tồn kho thực tế"
+                }
+              },
+              "queryRef": "FactTonKho.Tồn kho thực tế",
+              "nativeQueryRef": "Tồn kho thực tế"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTonKho"
+                    }
+                  },
+                  "Property": "Tổng SL giữ chỗ"
+                }
+              },
+              "queryRef": "FactTonKho.Tổng SL giữ chỗ",
+              "nativeQueryRef": "Tổng SL giữ chỗ"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTonKho"
+                    }
+                  },
+                  "Property": "Tồn kho khả dụng"
+                }
+              },
+              "queryRef": "FactTonKho.Tồn kho khả dụng",
+              "nativeQueryRef": "Tồn kho khả dụng"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Tồn thực tế, giữ chỗ và khả dụng theo sản phẩm'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

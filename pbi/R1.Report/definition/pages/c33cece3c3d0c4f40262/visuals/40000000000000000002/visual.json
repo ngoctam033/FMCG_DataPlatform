@@ -1,0 +1,59 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "40000000000000000002",
+  "position": {
+    "x": 1410,
+    "y": 24,
+    "z": 2000,
+    "height": 150,
+    "width": 230,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "Nhóm hạn dùng"
+                }
+              },
+              "queryRef": "FactLoHanDung.Nhóm hạn dùng",
+              "nativeQueryRef": "Nhóm hạn dùng"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Nhóm hạn dùng'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

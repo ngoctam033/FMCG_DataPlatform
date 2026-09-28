@@ -1,0 +1,19 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "10000000000000000005",
+  "position": { "x": 490, "y": 198, "z": 5000, "height": 350, "width": 900, "tabOrder": 5000 },
+  "visual": {
+    "visualType": "lineChart",
+    "query": { "queryState": {
+      "Category": { "projections": [{ "field": { "Column": { "Expression": { "SourceRef": { "Entity": "DimNgay" } }, "Property": "Ngày" } }, "queryRef": "DimNgay.Ngày", "nativeQueryRef": "Ngày" }] },
+      "Y": { "projections": [
+        { "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Tổng SL yêu cầu" } }, "queryRef": "FactNhapKho.Tổng SL yêu cầu", "nativeQueryRef": "Tổng SL yêu cầu" },
+        { "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Tổng SL đã nhận" } }, "queryRef": "FactNhapKho.Tổng SL đã nhận", "nativeQueryRef": "Tổng SL đã nhận" }
+      ] }
+    } },
+    "visualContainerObjects": { "title": [{ "properties": {
+      "show": { "expr": { "Literal": { "Value": "true" } } },
+      "text": { "expr": { "Literal": { "Value": "'Số lượng yêu cầu và thực nhận theo ngày'" } } }
+    } }] }
+  }
+}

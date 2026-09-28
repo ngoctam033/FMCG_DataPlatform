@@ -1,0 +1,16 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "10000000000000000006",
+  "position": { "x": 1406, "y": 198, "z": 6000, "height": 350, "width": 490, "tabOrder": 6000 },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": { "queryState": {
+      "Category": { "projections": [{ "field": { "Column": { "Expression": { "SourceRef": { "Entity": "DimNhaCungCap" } }, "Property": "Nhà cung cấp" } }, "queryRef": "DimNhaCungCap.Nhà cung cấp", "nativeQueryRef": "Nhà cung cấp" }] },
+      "Y": { "projections": [{ "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Tổng SL đã nhận" } }, "queryRef": "FactNhapKho.Tổng SL đã nhận", "nativeQueryRef": "Tổng SL đã nhận" }] }
+    } },
+    "visualContainerObjects": { "title": [{ "properties": {
+      "show": { "expr": { "Literal": { "Value": "true" } } },
+      "text": { "expr": { "Literal": { "Value": "'Số lượng đã nhận theo nhà cung cấp'" } } }
+    } }] }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "40000000000000000003",
+  "position": {
+    "x": 1650,
+    "y": 24,
+    "z": 3000,
+    "height": 150,
+    "width": 246,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimViTriKho"
+                    }
+                  },
+                  "Property": "Vị trí kho"
+                }
+              },
+              "queryRef": "DimViTriKho.Vị trí kho",
+              "nativeQueryRef": "Vị trí kho"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Vị trí kho'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

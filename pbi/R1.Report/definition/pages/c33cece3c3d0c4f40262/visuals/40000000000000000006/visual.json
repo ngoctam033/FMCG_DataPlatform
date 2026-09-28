@@ -1,0 +1,82 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "40000000000000000006",
+  "position": {
+    "x": 24,
+    "y": 570,
+    "z": 6000,
+    "height": 480,
+    "width": 650,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "Ngày hết hạn"
+                }
+              },
+              "queryRef": "FactLoHanDung.Ngày hết hạn",
+              "nativeQueryRef": "Ngày hết hạn"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "FactLoHanDung"
+                        }
+                      },
+                      "Property": "Số lượng tồn theo lô"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(FactLoHanDung.Số lượng tồn theo lô)",
+              "nativeQueryRef": "Số lượng tồn theo lô"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Lượng hàng theo ngày hết hạn'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

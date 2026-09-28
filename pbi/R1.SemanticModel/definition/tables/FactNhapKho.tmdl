@@ -1,0 +1,172 @@
+/// Bảng sự kiện nhập kho. Grain: một dòng dịch chuyển sản phẩm trong một phiếu nhập.
+table FactNhapKho
+
+	measure 'Số phiếu nhập' = DISTINCTCOUNT(FactNhapKho[Mã phiếu nhập])
+		formatString: #,0
+
+	measure 'Tổng SL yêu cầu' = SUM(FactNhapKho[Số lượng yêu cầu])
+		formatString: #,0.00
+
+	measure 'Tổng SL đã nhận' = SUM(FactNhapKho[Số lượng đã nhận])
+		formatString: #,0.00
+
+	measure 'Tổng SL còn thiếu' = SUM(FactNhapKho[Số lượng còn thiếu])
+		formatString: #,0.00
+
+	measure 'Tỷ lệ nhận hàng' = DIVIDE([Tổng SL đã nhận], [Tổng SL yêu cầu], 0)
+		formatString: 0.0%
+
+	measure 'Phiếu đang mở' = CALCULATE([Số phiếu nhập], NOT(FactNhapKho[Mã trạng thái] IN { "done", "cancel" }))
+		formatString: #,0
+
+	measure 'Phiếu nhập quá hạn' = CALCULATE([Số phiếu nhập], FILTER(FactNhapKho, NOT(FactNhapKho[Mã trạng thái] IN { "done", "cancel" }) && FactNhapKho[Ngày dự kiến] < TODAY()))
+		formatString: #,0
+
+	measure 'Dòng nhận vượt yêu cầu' = COUNTROWS(FILTER(FactNhapKho, FactNhapKho[Số lượng đã nhận] > FactNhapKho[Số lượng yêu cầu]))
+		formatString: #,0
+
+	measure 'SL nhận vượt yêu cầu' = SUMX(FILTER(FactNhapKho, FactNhapKho[Số lượng đã nhận] > FactNhapKho[Số lượng yêu cầu]), FactNhapKho[Số lượng đã nhận] - FactNhapKho[Số lượng yêu cầu])
+		formatString: #,0.00
+
+	measure 'Thời gian xử lý TB (giờ)' = AVERAGE(FactNhapKho[Thời gian xử lý (giờ)])
+		formatString: #,0.0
+
+	column 'Mã dòng nhập'
+		dataType: int64
+		isHidden
+		sourceColumn: move_id
+		summarizeBy: none
+
+	column 'Mã phiếu nhập'
+		dataType: int64
+		isHidden
+		sourceColumn: picking_id
+		summarizeBy: none
+
+	column 'Phiếu nhập'
+		dataType: string
+		sourceColumn: receipt_name
+		summarizeBy: none
+
+	column 'Ngày tạo phiếu'
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		sourceColumn: receipt_date
+		summarizeBy: none
+
+	column 'Ngày dự kiến'
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		sourceColumn: scheduled_date
+		summarizeBy: none
+
+	column 'Ngày hoàn tất'
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		sourceColumn: completed_date
+		summarizeBy: none
+
+	column 'Mã trạng thái'
+		dataType: string
+		isHidden
+		sourceColumn: state_key
+		summarizeBy: none
+
+	column 'Mã nhà cung cấp'
+		dataType: int64
+		isHidden
+		sourceColumn: supplier_id
+		summarizeBy: none
+
+	column 'Mã nhân viên'
+		dataType: int64
+		isHidden
+		sourceColumn: employee_id
+		summarizeBy: none
+
+	column 'Mã sản phẩm'
+		dataType: int64
+		isHidden
+		sourceColumn: product_id
+		summarizeBy: none
+
+	column 'Mã vị trí nguồn'
+		dataType: int64
+		isHidden
+		sourceColumn: source_location_id
+		summarizeBy: none
+
+	column 'Mã kho nhận'
+		dataType: int64
+		isHidden
+		sourceColumn: destination_location_id
+		summarizeBy: none
+
+	column 'Số lượng yêu cầu'
+		dataType: double
+		sourceColumn: requested_qty
+		summarizeBy: sum
+
+	column 'Số lượng đã nhận'
+		dataType: double
+		sourceColumn: received_qty
+		summarizeBy: sum
+
+	column 'Số lượng còn thiếu'
+		dataType: double
+		sourceColumn: remaining_qty
+		summarizeBy: sum
+
+	column 'Đã lấy hàng'
+		dataType: boolean
+		sourceColumn: is_picked
+		summarizeBy: none
+
+	column 'Thời gian xử lý (giờ)'
+		dataType: double
+		sourceColumn: cycle_hours
+		summarizeBy: average
+
+	partition FactNhapKho = m
+		mode: import
+		source =
+			let
+				Source = PostgreSQL.Database(
+					#"OdooServer" & ":" & #"OdooPort",
+					#"OdooDatabase",
+					[CreateNavigationProperties = false]
+				),
+				NativeResult = Value.NativeQuery(
+					Source,
+					"SELECT
+					    sm.id::bigint AS move_id,
+					    sp.id::bigint AS picking_id,
+					    sp.name::text AS receipt_name,
+					    sp.create_date::date AS receipt_date,
+					    sp.scheduled_date::date AS scheduled_date,
+					    sp.date_done::date AS completed_date,
+					    sp.state::text AS state_key,
+					    COALESCE(sp.partner_id, -1)::bigint AS supplier_id,
+					    COALESCE(sp.user_id, -1)::bigint AS employee_id,
+					    sm.product_id::bigint AS product_id,
+					    sm.location_id::bigint AS source_location_id,
+					    sm.location_dest_id::bigint AS destination_location_id,
+					    COALESCE(sm.product_uom_qty, 0)::double precision AS requested_qty,
+					    COALESCE(sm.quantity, 0)::double precision AS received_qty,
+					    GREATEST(
+					        COALESCE(sm.product_uom_qty, 0) - COALESCE(sm.quantity, 0),
+					        0
+					    )::double precision AS remaining_qty,
+					    COALESCE(sm.picked, false) AS is_picked,
+					    CASE WHEN sp.date_done IS NOT NULL THEN EXTRACT(EPOCH FROM (sp.date_done - sp.create_date)) / 3600.0 END::double precision AS cycle_hours
+					FROM stock_move AS sm
+					INNER JOIN stock_picking AS sp
+					    ON sp.id = sm.picking_id
+					INNER JOIN stock_picking_type AS spt
+					    ON spt.id = sp.picking_type_id
+					WHERE spt.code = 'incoming'",
+					null,
+					[EnableFolding = true]
+				)
+			in
+				NativeResult

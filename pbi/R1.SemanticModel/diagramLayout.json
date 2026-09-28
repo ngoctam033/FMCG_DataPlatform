@@ -1,0 +1,76 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 520,
+            "y": 260
+          },
+          "nodeIndex": "FactNhapKho",
+          "size": {
+            "height": 520,
+            "width": 260
+          },
+          "zIndex": 0
+        },
+        {
+          "location": { "x": 40, "y": 20 },
+          "nodeIndex": "DimNgay",
+          "size": { "height": 250, "width": 240 },
+          "zIndex": 1
+        },
+        {
+          "location": { "x": 40, "y": 330 },
+          "nodeIndex": "DimSanPham",
+          "size": { "height": 220, "width": 240 },
+          "zIndex": 2
+        },
+        {
+          "location": { "x": 40, "y": 610 },
+          "nodeIndex": "DimNhaCungCap",
+          "size": { "height": 160, "width": 240 },
+          "zIndex": 3
+        },
+        {
+          "location": { "x": 1020, "y": 20 },
+          "nodeIndex": "DimNhanVien",
+          "size": { "height": 160, "width": 240 },
+          "zIndex": 4
+        },
+        {
+          "location": { "x": 1020, "y": 260 },
+          "nodeIndex": "DimViTriKho",
+          "size": { "height": 190, "width": 240 },
+          "zIndex": 5
+        },
+        {
+          "location": { "x": 1020, "y": 530 },
+          "nodeIndex": "DimTrangThai",
+          "size": { "height": 190, "width": 240 },
+          "zIndex": 6
+        },
+        {
+          "location": { "x": 1020, "y": 800 },
+          "nodeIndex": "Odoo Database Objects",
+          "size": { "height": 128, "width": 240 },
+          "zIndex": 7
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

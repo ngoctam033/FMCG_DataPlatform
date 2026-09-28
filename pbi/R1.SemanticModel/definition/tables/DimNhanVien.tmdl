@@ -1,0 +1,34 @@
+/// Danh mục người dùng phụ trách phiếu nhập.
+table DimNhanVien
+
+	column 'Mã nhân viên'
+		dataType: int64
+		isKey
+		sourceColumn: employee_id
+		summarizeBy: none
+
+	column 'Nhân viên phụ trách'
+		dataType: string
+		sourceColumn: employee_name
+		summarizeBy: none
+
+	partition DimNhanVien = m
+		mode: import
+		source =
+			let
+				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
+				NativeResult = Value.NativeQuery(
+					Source,
+					"SELECT -1::bigint AS employee_id, '(Chưa phân công)'::text AS employee_name
+					UNION ALL
+					SELECT
+					    ru.id::bigint AS employee_id,
+					    COALESCE(rp.name, '(Người dùng chưa đặt tên)')::text AS employee_name
+					FROM res_users AS ru
+					LEFT JOIN res_partner AS rp
+					    ON rp.id = ru.partner_id",
+					null,
+					[EnableFolding = true]
+				)
+			in
+				NativeResult

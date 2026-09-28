@@ -1,0 +1,117 @@
+/// Snapshot tồn kho hiện tại tại các vị trí nội bộ. Grain: một stock.quant.
+table FactTonKho
+
+	measure 'Tồn kho thực tế' = SUM(FactTonKho[Số lượng tồn])
+		formatString: #,0.00
+
+	measure 'Tổng SL giữ chỗ' = SUM(FactTonKho[Số lượng giữ chỗ])
+		formatString: #,0.00
+
+	measure 'Tồn kho khả dụng' = SUM(FactTonKho[Số lượng khả dụng])
+		formatString: #,0.00
+
+	measure 'Giá trị tồn kho ước tính' = SUM(FactTonKho[Giá trị tồn ước tính])
+		formatString: #,0
+
+	measure 'SKU đang tồn' = CALCULATE(DISTINCTCOUNT(FactTonKho[Mã sản phẩm]), FactTonKho[Số lượng tồn] > 0)
+		formatString: #,0
+
+	measure 'SKU hết hàng' = CALCULATE(DISTINCTCOUNT(FactTonKho[Mã sản phẩm]), FactTonKho[Số lượng khả dụng] <= 0)
+		formatString: #,0
+
+	measure 'Dòng giữ chỗ vượt tồn' = COUNTROWS(FILTER(FactTonKho, FactTonKho[Số lượng giữ chỗ] > FactTonKho[Số lượng tồn]))
+		formatString: #,0
+
+	measure '🔴 Dòng giữ chỗ vượt tồn' = [Dòng giữ chỗ vượt tồn]
+		formatString: #,0
+
+	measure 'Tuổi tồn TB (ngày)' = AVERAGE(FactTonKho[Tuổi tồn (ngày)])
+		formatString: #,0.0
+
+	column 'Mã tồn kho'
+		dataType: int64
+		isHidden
+		sourceColumn: quant_id
+		summarizeBy: none
+
+	column 'Mã sản phẩm'
+		dataType: int64
+		isHidden
+		sourceColumn: product_id
+		summarizeBy: none
+
+	column 'Mã vị trí'
+		dataType: int64
+		isHidden
+		sourceColumn: location_id
+		summarizeBy: none
+
+	column 'Mã lô'
+		dataType: int64
+		isHidden
+		sourceColumn: lot_id
+		summarizeBy: none
+
+	column 'Số lô'
+		dataType: string
+		sourceColumn: lot_name
+		summarizeBy: none
+
+	column 'Ngày nhập tồn'
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		sourceColumn: in_date
+		summarizeBy: none
+
+	column 'Tuổi tồn (ngày)'
+		dataType: int64
+		sourceColumn: aging_days
+		summarizeBy: average
+
+	column 'Số lượng tồn'
+		dataType: double
+		sourceColumn: on_hand_qty
+		summarizeBy: sum
+
+	column 'Số lượng giữ chỗ'
+		dataType: double
+		sourceColumn: reserved_qty
+		summarizeBy: sum
+
+	column 'Số lượng khả dụng'
+		dataType: double
+		sourceColumn: available_qty
+		summarizeBy: sum
+
+	column 'Đơn giá tiêu chuẩn'
+		dataType: double
+		sourceColumn: standard_price
+		summarizeBy: average
+
+	column 'Giá trị tồn ước tính'
+		dataType: double
+		sourceColumn: inventory_value
+		summarizeBy: sum
+
+	column 'Giữ chỗ vượt tồn'
+		dataType: boolean
+		sourceColumn: is_over_reserved
+		summarizeBy: none
+
+	partition FactTonKho = m
+		mode: import
+		source =
+			let
+				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
+				NativeResult = Value.NativeQuery(
+					Source,
+					"SELECT sq.id::bigint AS quant_id, sq.product_id::bigint AS product_id, sq.location_id::bigint AS location_id, COALESCE(sq.lot_id, -1)::bigint AS lot_id, COALESCE(lot.name, '(Không theo dõi lô)')::text AS lot_name, sq.in_date::date AS in_date, GREATEST(CURRENT_DATE - COALESCE(sq.in_date::date, CURRENT_DATE), 0)::bigint AS aging_days, COALESCE(sq.quantity, 0)::double precision AS on_hand_qty, COALESCE(sq.reserved_quantity, 0)::double precision AS reserved_qty, (COALESCE(sq.quantity, 0) - COALESCE(sq.reserved_quantity, 0))::double precision AS available_qty, COALESCE((pp.standard_price ->> sq.company_id::text)::double precision, 0::double precision) AS standard_price, (COALESCE(sq.quantity, 0) * COALESCE((pp.standard_price ->> sq.company_id::text)::double precision, 0::double precision))::double precision AS inventory_value, (COALESCE(sq.reserved_quantity, 0) > COALESCE(sq.quantity, 0)) AS is_over_reserved FROM stock_quant sq INNER JOIN stock_location sl ON sl.id = sq.location_id LEFT JOIN stock_lot lot ON lot.id = sq.lot_id INNER JOIN product_product pp ON pp.id = sq.product_id WHERE sl.usage = 'internal'",
+					null,
+					[EnableFolding = true]
+				)
+			in
+				NativeResult
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation

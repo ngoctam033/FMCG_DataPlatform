@@ -1,0 +1,36 @@
+/// Danh mục vị trí kho, dùng đồng thời cho kho nhận và vị trí nguồn.
+table DimViTriKho
+
+	column 'Mã vị trí'
+		dataType: int64
+		isKey
+		sourceColumn: location_id
+		summarizeBy: none
+
+	column 'Vị trí kho'
+		dataType: string
+		sourceColumn: location_name
+		summarizeBy: none
+
+	column 'Loại vị trí'
+		dataType: string
+		sourceColumn: usage_type
+		summarizeBy: none
+
+	partition DimViTriKho = m
+		mode: import
+		source =
+			let
+				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
+				NativeResult = Value.NativeQuery(
+					Source,
+					"SELECT
+					    sl.id::bigint AS location_id,
+					    COALESCE(sl.complete_name, sl.name, '(Không xác định)')::text AS location_name,
+					    sl.usage::text AS usage_type
+					FROM stock_location AS sl",
+					null,
+					[EnableFolding = true]
+				)
+			in
+				NativeResult

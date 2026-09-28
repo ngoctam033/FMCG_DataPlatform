@@ -1,0 +1,181 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "40000000000000000007",
+  "position": {
+    "x": 690,
+    "y": 570,
+    "z": 7000,
+    "height": 480,
+    "width": 1206,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "Số lô"
+                }
+              },
+              "queryRef": "FactLoHanDung.Số lô",
+              "nativeQueryRef": "Số lô"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimSanPham"
+                    }
+                  },
+                  "Property": "Sản phẩm"
+                }
+              },
+              "queryRef": "DimSanPham.Sản phẩm",
+              "nativeQueryRef": "Sản phẩm"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimViTriKho"
+                    }
+                  },
+                  "Property": "Vị trí kho"
+                }
+              },
+              "queryRef": "DimViTriKho.Vị trí kho",
+              "nativeQueryRef": "Vị trí kho"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "Ngày hết hạn"
+                }
+              },
+              "queryRef": "FactLoHanDung.Ngày hết hạn",
+              "nativeQueryRef": "Ngày hết hạn"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "Số ngày tới hạn"
+                }
+              },
+              "queryRef": "FactLoHanDung.Số ngày tới hạn",
+              "nativeQueryRef": "Số ngày tới hạn"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "Nhóm hạn dùng"
+                }
+              },
+              "queryRef": "FactLoHanDung.Nhóm hạn dùng",
+              "nativeQueryRef": "Nhóm hạn dùng"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "Cảnh báo hạn dùng"
+                }
+              },
+              "queryRef": "FactLoHanDung.Cảnh báo hạn dùng",
+              "nativeQueryRef": "Cảnh báo hạn dùng"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "FactLoHanDung"
+                        }
+                      },
+                      "Property": "Số lượng tồn theo lô"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(FactLoHanDung.Số lượng tồn theo lô)",
+              "nativeQueryRef": "Số lượng tồn theo lô"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "FactLoHanDung"
+                        }
+                      },
+                      "Property": "Giá trị theo lô"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(FactLoHanDung.Giá trị theo lô)",
+              "nativeQueryRef": "Giá trị theo lô"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Danh sách lô cần xử lý'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

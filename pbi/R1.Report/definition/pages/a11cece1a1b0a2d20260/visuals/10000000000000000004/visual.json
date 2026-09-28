@@ -1,0 +1,16 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "10000000000000000004",
+  "position": { "x": 24, "y": 198, "z": 4000, "height": 350, "width": 450, "tabOrder": 4000 },
+  "visual": {
+    "visualType": "donutChart",
+    "query": { "queryState": {
+      "Category": { "projections": [{ "field": { "Column": { "Expression": { "SourceRef": { "Entity": "DimTrangThai" } }, "Property": "Trạng thái" } }, "queryRef": "DimTrangThai.Trạng thái", "nativeQueryRef": "Trạng thái" }] },
+      "Y": { "projections": [{ "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Số phiếu nhập" } }, "queryRef": "FactNhapKho.Số phiếu nhập", "nativeQueryRef": "Số phiếu nhập" }] }
+    } },
+    "visualContainerObjects": { "title": [{ "properties": {
+      "show": { "expr": { "Literal": { "Value": "true" } } },
+      "text": { "expr": { "Literal": { "Value": "'Phiếu nhập theo trạng thái'" } } }
+    } }] }
+  }
+}

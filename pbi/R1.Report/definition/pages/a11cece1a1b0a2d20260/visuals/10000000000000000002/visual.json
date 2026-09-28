@@ -1,0 +1,15 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "10000000000000000002",
+  "position": { "x": 1400, "y": 24, "z": 2000, "height": 150, "width": 230, "tabOrder": 2000 },
+  "visual": {
+    "visualType": "slicer",
+    "query": { "queryState": { "Values": { "projections": [
+      { "field": { "Column": { "Expression": { "SourceRef": { "Entity": "DimTrangThai" } }, "Property": "Trạng thái" } }, "queryRef": "DimTrangThai.Trạng thái", "nativeQueryRef": "Trạng thái" }
+    ] } } },
+    "visualContainerObjects": { "title": [{ "properties": {
+      "show": { "expr": { "Literal": { "Value": "true" } } },
+      "text": { "expr": { "Literal": { "Value": "'Trạng thái phiếu'" } } }
+    } }] }
+  }
+}

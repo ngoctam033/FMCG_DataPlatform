@@ -1,0 +1,91 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "30000000000000000005",
+  "position": {
+    "x": 960,
+    "y": 198,
+    "z": 5000,
+    "height": 350,
+    "width": 936,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimSanPham"
+                    }
+                  },
+                  "Property": "Sản phẩm"
+                }
+              },
+              "queryRef": "DimSanPham.Sản phẩm",
+              "nativeQueryRef": "Sản phẩm"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactBoSungHang"
+                    }
+                  },
+                  "Property": "Tổng SL cần bổ sung tối thiểu"
+                }
+              },
+              "queryRef": "FactBoSungHang.Tổng SL cần bổ sung tối thiểu",
+              "nativeQueryRef": "Tổng SL cần bổ sung tối thiểu"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactBoSungHang"
+                    }
+                  },
+                  "Property": "Tổng SL đề xuất tới mức tối đa"
+                }
+              },
+              "queryRef": "FactBoSungHang.Tổng SL đề xuất tới mức tối đa",
+              "nativeQueryRef": "Tổng SL đề xuất tới mức tối đa"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Nhu cầu bổ sung theo sản phẩm'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

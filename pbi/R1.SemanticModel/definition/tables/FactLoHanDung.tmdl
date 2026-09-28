@@ -1,0 +1,110 @@
+/// Tồn kho theo lô và hạn dùng tại vị trí nội bộ.
+table FactLoHanDung
+
+	measure 'Số lô đang tồn' = CALCULATE(DISTINCTCOUNT(FactLoHanDung[Mã lô]), FactLoHanDung[Số lượng tồn theo lô] > 0)
+		formatString: #,0
+
+	measure 'Lô đã hết hạn' = CALCULATE(DISTINCTCOUNT(FactLoHanDung[Mã lô]), FactLoHanDung[Nhóm hạn dùng] = "Đã hết hạn", FactLoHanDung[Số lượng tồn theo lô] > 0)
+		formatString: #,0
+
+	measure 'Lô hết hạn trong 30 ngày' = CALCULATE(DISTINCTCOUNT(FactLoHanDung[Mã lô]), FactLoHanDung[Nhóm hạn dùng] = "0-30 ngày", FactLoHanDung[Số lượng tồn theo lô] > 0)
+		formatString: #,0
+
+	measure 'SL hàng đã hết hạn' = CALCULATE(SUM(FactLoHanDung[Số lượng tồn theo lô]), FactLoHanDung[Nhóm hạn dùng] = "Đã hết hạn")
+		formatString: #,0.00
+
+	measure 'Giá trị hàng rủi ro' = CALCULATE(SUM(FactLoHanDung[Giá trị theo lô]), FactLoHanDung[Nhóm hạn dùng] IN { "Đã hết hạn", "0-30 ngày" })
+		formatString: #,0
+
+	measure '🔴 Lô đã hết hạn' = [Lô đã hết hạn]
+		formatString: #,0
+
+	measure '🟠 Lô hết hạn 0-30 ngày' = [Lô hết hạn trong 30 ngày]
+		formatString: #,0
+
+	measure '🔵 Lô hết hạn 31-60 ngày' = CALCULATE(DISTINCTCOUNT(FactLoHanDung[Mã lô]), FactLoHanDung[Nhóm hạn dùng] = "31-60 ngày", FactLoHanDung[Số lượng tồn theo lô] > 0)
+		formatString: #,0
+
+	column 'Mã dòng tồn lô'
+		dataType: int64
+		isHidden
+		sourceColumn: quant_id
+		summarizeBy: none
+
+	column 'Mã lô'
+		dataType: int64
+		isHidden
+		sourceColumn: lot_id
+		summarizeBy: none
+
+	column 'Số lô'
+		dataType: string
+		sourceColumn: lot_name
+		summarizeBy: none
+
+	column 'Mã sản phẩm'
+		dataType: int64
+		isHidden
+		sourceColumn: product_id
+		summarizeBy: none
+
+	column 'Mã vị trí'
+		dataType: int64
+		isHidden
+		sourceColumn: location_id
+		summarizeBy: none
+
+	column 'Ngày hết hạn'
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		sourceColumn: expiration_date
+		summarizeBy: none
+
+	column 'Số ngày tới hạn'
+		dataType: int64
+		sourceColumn: days_to_expiry
+		summarizeBy: none
+
+	column 'Nhóm hạn dùng'
+		dataType: string
+		sourceColumn: expiry_bucket
+		sortByColumn: 'Thứ tự nhóm hạn dùng'
+		summarizeBy: none
+
+	column 'Cảnh báo hạn dùng' = SWITCH(FactLoHanDung[Nhóm hạn dùng], "Đã hết hạn", "🔴 Đã hết hạn", "0-30 ngày", "🟠 Còn 0-30 ngày", "31-60 ngày", "🔵 Còn 31-60 ngày", "🟢 Bình thường")
+		dataType: string
+		summarizeBy: none
+
+	column 'Thứ tự nhóm hạn dùng'
+		dataType: int64
+		isHidden
+		sourceColumn: expiry_bucket_order
+		summarizeBy: none
+
+	column 'Số lượng tồn theo lô'
+		dataType: double
+		sourceColumn: lot_qty
+		summarizeBy: sum
+
+	column 'Giá trị theo lô'
+		dataType: double
+		sourceColumn: lot_value
+		summarizeBy: sum
+
+	partition FactLoHanDung = m
+		mode: import
+		source =
+			let
+				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
+				NativeResult = Value.NativeQuery(
+					Source,
+					"SELECT sq.id::bigint AS quant_id, lot.id::bigint AS lot_id, lot.name::text AS lot_name, sq.product_id::bigint AS product_id, sq.location_id::bigint AS location_id, lot.expiration_date::date AS expiration_date, (lot.expiration_date::date - CURRENT_DATE)::bigint AS days_to_expiry, CASE WHEN lot.expiration_date IS NULL THEN 'Không có hạn dùng' WHEN lot.expiration_date::date < CURRENT_DATE THEN 'Đã hết hạn' WHEN lot.expiration_date::date <= CURRENT_DATE + 30 THEN '0-30 ngày' WHEN lot.expiration_date::date <= CURRENT_DATE + 60 THEN '31-60 ngày' WHEN lot.expiration_date::date <= CURRENT_DATE + 90 THEN '61-90 ngày' ELSE 'Trên 90 ngày' END::text AS expiry_bucket, CASE WHEN lot.expiration_date IS NULL THEN 6 WHEN lot.expiration_date::date < CURRENT_DATE THEN 1 WHEN lot.expiration_date::date <= CURRENT_DATE + 30 THEN 2 WHEN lot.expiration_date::date <= CURRENT_DATE + 60 THEN 3 WHEN lot.expiration_date::date <= CURRENT_DATE + 90 THEN 4 ELSE 5 END::bigint AS expiry_bucket_order, COALESCE(sq.quantity, 0)::double precision AS lot_qty, (COALESCE(sq.quantity, 0) * COALESCE((pp.standard_price ->> sq.company_id::text)::double precision, 0::double precision))::double precision AS lot_value FROM stock_quant sq INNER JOIN stock_location sl ON sl.id = sq.location_id INNER JOIN stock_lot lot ON lot.id = sq.lot_id INNER JOIN product_product pp ON pp.id = sq.product_id WHERE sl.usage = 'internal'",
+					null,
+					[EnableFolding = true]
+				)
+			in
+				NativeResult
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation

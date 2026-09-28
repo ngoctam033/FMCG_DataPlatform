@@ -1,0 +1,42 @@
+/// Danh mục trạng thái phiếu nhập được Việt hóa.
+table DimTrangThai
+
+	column 'Mã trạng thái'
+		dataType: string
+		isKey
+		sourceColumn: state_key
+		summarizeBy: none
+
+	column 'Trạng thái'
+		dataType: string
+		sourceColumn: state_name
+		summarizeBy: none
+
+	column 'Thứ tự trạng thái'
+		dataType: int64
+		isHidden
+		sourceColumn: state_order
+		summarizeBy: none
+
+	partition DimTrangThai = m
+		mode: import
+		source =
+			let
+				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
+				NativeResult = Value.NativeQuery(
+					Source,
+					"SELECT *
+					FROM (
+					    VALUES
+					        ('draft', 'Nháp', 1),
+					        ('waiting', 'Đang chờ', 2),
+					        ('confirmed', 'Đang chờ', 3),
+					        ('assigned', 'Sẵn sàng', 4),
+					        ('done', 'Hoàn tất', 5),
+					        ('cancel', 'Đã hủy', 6)
+					) AS status(state_key, state_name, state_order)",
+					null,
+					[EnableFolding = true]
+				)
+			in
+				NativeResult

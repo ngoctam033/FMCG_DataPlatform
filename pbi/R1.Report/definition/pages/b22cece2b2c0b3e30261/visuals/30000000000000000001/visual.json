@@ -1,0 +1,129 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "30000000000000000001",
+  "position": {
+    "x": 24,
+    "y": 24,
+    "z": 1000,
+    "height": 150,
+    "width": 1370,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactBoSungHang"
+                    }
+                  },
+                  "Property": "🔴 SKU hết hàng"
+                }
+              },
+              "queryRef": "FactBoSungHang.🔴 SKU hết hàng",
+              "nativeQueryRef": "🔴 SKU hết hàng"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactBoSungHang"
+                    }
+                  },
+                  "Property": "🟠 SKU dưới Min"
+                }
+              },
+              "queryRef": "FactBoSungHang.🟠 SKU dưới Min",
+              "nativeQueryRef": "🟠 SKU dưới Min"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactBoSungHang"
+                    }
+                  },
+                  "Property": "🔵 SKU gần Min"
+                }
+              },
+              "queryRef": "FactBoSungHang.🔵 SKU gần Min",
+              "nativeQueryRef": "🔵 SKU gần Min"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactBoSungHang"
+                    }
+                  },
+                  "Property": "🟠 SKU vượt Max"
+                }
+              },
+              "queryRef": "FactBoSungHang.🟠 SKU vượt Max",
+              "nativeQueryRef": "🟠 SKU vượt Max"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactBoSungHang"
+                    }
+                  },
+                  "Property": "🔴 SKU vượt 120% Max"
+                }
+              },
+              "queryRef": "FactBoSungHang.🔴 SKU vượt 120% Max",
+              "nativeQueryRef": "🔴 SKU vượt 120% Max"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTonKho"
+                    }
+                  },
+                  "Property": "🔴 Dòng giữ chỗ vượt tồn"
+                }
+              },
+              "queryRef": "FactTonKho.🔴 Dòng giữ chỗ vượt tồn",
+              "nativeQueryRef": "🔴 Dòng giữ chỗ vượt tồn"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Cảnh báo tồn kho cần xử lý'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

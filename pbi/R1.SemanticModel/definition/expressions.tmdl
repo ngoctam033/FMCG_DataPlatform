@@ -1,0 +1,25 @@
+/// Linux host running the Odoo PostgreSQL database, reachable from the Windows
+/// VM through the VMware NAT network (vmnet8).
+expression OdooServer = "192.168.139.1" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 1956b1e9-cc42-42db-9aef-049a4cf69896
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+/// Host port published by the local Odoo PostgreSQL container.
+expression OdooPort = "5433" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: efe4ec6f-a29b-4999-8538-29a06176c3d7
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+/// Odoo PostgreSQL database name.
+expression OdooDatabase = "fmcg_erp" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: eadff919-53d0-4510-9a30-de6a6bcb6619
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+

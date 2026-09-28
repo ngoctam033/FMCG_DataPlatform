@@ -1,0 +1,21 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "10000000000000000001",
+  "position": { "x": 24, "y": 24, "z": 1000, "height": 150, "width": 1352, "tabOrder": 1000 },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": { "queryState": { "Data": { "projections": [
+      { "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Số phiếu nhập" } }, "queryRef": "FactNhapKho.Số phiếu nhập", "nativeQueryRef": "Số phiếu nhập" },
+      { "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Phiếu đang mở" } }, "queryRef": "FactNhapKho.Phiếu đang mở", "nativeQueryRef": "Phiếu đang mở" },
+      { "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Tổng SL yêu cầu" } }, "queryRef": "FactNhapKho.Tổng SL yêu cầu", "nativeQueryRef": "Tổng SL yêu cầu" },
+      { "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Tổng SL đã nhận" } }, "queryRef": "FactNhapKho.Tổng SL đã nhận", "nativeQueryRef": "Tổng SL đã nhận" },
+      { "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Tỷ lệ nhận hàng" } }, "queryRef": "FactNhapKho.Tỷ lệ nhận hàng", "nativeQueryRef": "Tỷ lệ nhận hàng" }
+      ,{ "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Phiếu nhập quá hạn" } }, "queryRef": "FactNhapKho.Phiếu nhập quá hạn", "nativeQueryRef": "Phiếu nhập quá hạn" }
+      ,{ "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "FactNhapKho" } }, "Property": "Dòng nhận vượt yêu cầu" } }, "queryRef": "FactNhapKho.Dòng nhận vượt yêu cầu", "nativeQueryRef": "Dòng nhận vượt yêu cầu" }
+    ] } } },
+    "visualContainerObjects": { "title": [{ "properties": {
+      "show": { "expr": { "Literal": { "Value": "true" } } },
+      "text": { "expr": { "Literal": { "Value": "'Tổng quan nhập kho'" } } }
+    } }] }
+  }
+}

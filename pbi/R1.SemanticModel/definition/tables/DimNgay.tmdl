@@ -1,0 +1,70 @@
+/// Lịch liên tục bao phủ toàn bộ thời gian của phiếu nhập kho.
+table DimNgay
+
+	dataCategory: Time
+
+	column 'Ngày'
+		dataType: dateTime
+		isKey
+		formatString: dd/MM/yyyy
+		sourceColumn: calendar_date
+		summarizeBy: none
+
+	column 'Năm'
+		dataType: int64
+		sourceColumn: calendar_year
+		summarizeBy: none
+
+	column 'Tháng'
+		dataType: int64
+		sourceColumn: calendar_month
+		summarizeBy: none
+
+	column 'Tên tháng'
+		dataType: string
+		sourceColumn: month_name
+		sortByColumn: 'Tháng'
+		summarizeBy: none
+
+	column 'Quý'
+		dataType: string
+		sourceColumn: calendar_quarter
+		summarizeBy: none
+
+	partition DimNgay = m
+		mode: import
+		source =
+			let
+				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
+				NativeResult = Value.NativeQuery(
+					Source,
+					"WITH receipt_range AS (
+					    SELECT
+					        COALESCE(MIN(sp.create_date::date), CURRENT_DATE) AS min_date,
+					        COALESCE(MAX(GREATEST(
+					            sp.create_date::date,
+					            COALESCE(sp.scheduled_date::date, sp.create_date::date),
+					            COALESCE(sp.date_done::date, sp.create_date::date)
+					        )), CURRENT_DATE) AS max_date
+					    FROM stock_picking AS sp
+					    INNER JOIN stock_picking_type AS spt
+					        ON spt.id = sp.picking_type_id
+					    WHERE spt.code = 'incoming'
+					)
+					SELECT
+					    day_value::date AS calendar_date,
+					    EXTRACT(YEAR FROM day_value)::bigint AS calendar_year,
+					    EXTRACT(MONTH FROM day_value)::bigint AS calendar_month,
+					    ('Tháng ' || EXTRACT(MONTH FROM day_value)::int)::text AS month_name,
+					    ('Q' || EXTRACT(QUARTER FROM day_value)::int)::text AS calendar_quarter
+					FROM receipt_range
+					CROSS JOIN LATERAL generate_series(
+					    receipt_range.min_date,
+					    receipt_range.max_date,
+					    INTERVAL '1 day'
+					) AS day_value",
+					null,
+					[EnableFolding = true]
+				)
+			in
+				NativeResult

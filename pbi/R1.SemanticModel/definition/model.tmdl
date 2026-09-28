@@ -1,0 +1,30 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_ProTooling = ["DevMode"]
+
+annotation PBI_QueryOrder = ["Odoo Database Objects","DimNgay","DimSanPham","DimNhaCungCap","DimNhanVien","DimViTriKho","DimTrangThai","FactNhapKho","FactTonKho","FactBoSungHang","FactLoHanDung","OdooServer","OdooPort","OdooDatabase"]
+
+ref table 'Odoo Database Objects'
+
+ref table DimNgay
+ref table DimSanPham
+ref table DimNhaCungCap
+ref table DimNhanVien
+ref table DimViTriKho
+ref table DimTrangThai
+ref table FactNhapKho
+ref table FactTonKho
+ref table FactBoSungHang
+ref table FactLoHanDung
+
+ref cultureInfo en-US
+

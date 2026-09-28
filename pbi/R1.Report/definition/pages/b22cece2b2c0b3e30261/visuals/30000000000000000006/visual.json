@@ -1,0 +1,77 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "30000000000000000006",
+  "position": {
+    "x": 24,
+    "y": 570,
+    "z": 6000,
+    "height": 480,
+    "width": 650,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimViTriKho"
+                    }
+                  },
+                  "Property": "Vị trí kho"
+                }
+              },
+              "queryRef": "DimViTriKho.Vị trí kho",
+              "nativeQueryRef": "Vị trí kho"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTonKho"
+                    }
+                  },
+                  "Property": "Tồn kho khả dụng"
+                }
+              },
+              "queryRef": "FactTonKho.Tồn kho khả dụng",
+              "nativeQueryRef": "Tồn kho khả dụng"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Tồn khả dụng theo vị trí kho'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

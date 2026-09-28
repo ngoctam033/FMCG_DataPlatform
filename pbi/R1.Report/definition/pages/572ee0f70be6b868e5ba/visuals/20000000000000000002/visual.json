@@ -1,0 +1,91 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "20000000000000000002",
+  "position": {
+    "x": 24,
+    "y": 198,
+    "z": 2000,
+    "height": 350,
+    "width": 600,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimSanPham"
+                    }
+                  },
+                  "Property": "Nhóm sản phẩm"
+                }
+              },
+              "queryRef": "DimSanPham.Nhóm sản phẩm",
+              "nativeQueryRef": "Nhóm sản phẩm"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTonKho"
+                    }
+                  },
+                  "Property": "Tồn kho thực tế"
+                }
+              },
+              "queryRef": "FactTonKho.Tồn kho thực tế",
+              "nativeQueryRef": "Tồn kho thực tế"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTonKho"
+                    }
+                  },
+                  "Property": "Tồn kho khả dụng"
+                }
+              },
+              "queryRef": "FactTonKho.Tồn kho khả dụng",
+              "nativeQueryRef": "Tồn kho khả dụng"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Tồn kho theo nhóm sản phẩm'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

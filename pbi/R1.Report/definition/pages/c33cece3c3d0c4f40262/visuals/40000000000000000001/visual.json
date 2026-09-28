@@ -1,0 +1,115 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "40000000000000000001",
+  "position": {
+    "x": 24,
+    "y": 24,
+    "z": 1000,
+    "height": 150,
+    "width": 1370,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "Số lô đang tồn"
+                }
+              },
+              "queryRef": "FactLoHanDung.Số lô đang tồn",
+              "nativeQueryRef": "Số lô đang tồn"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "🔴 Lô đã hết hạn"
+                }
+              },
+              "queryRef": "FactLoHanDung.🔴 Lô đã hết hạn",
+              "nativeQueryRef": "🔴 Lô đã hết hạn"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "🟠 Lô hết hạn 0-30 ngày"
+                }
+              },
+              "queryRef": "FactLoHanDung.🟠 Lô hết hạn 0-30 ngày",
+              "nativeQueryRef": "🟠 Lô hết hạn 0-30 ngày"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "🔵 Lô hết hạn 31-60 ngày"
+                }
+              },
+              "queryRef": "FactLoHanDung.🔵 Lô hết hạn 31-60 ngày",
+              "nativeQueryRef": "🔵 Lô hết hạn 31-60 ngày"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactLoHanDung"
+                    }
+                  },
+                  "Property": "Giá trị hàng rủi ro"
+                }
+              },
+              "queryRef": "FactLoHanDung.Giá trị hàng rủi ro",
+              "nativeQueryRef": "Giá trị hàng rủi ro"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Cảnh báo lô và hạn sử dụng'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

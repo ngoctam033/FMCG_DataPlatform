@@ -1,0 +1,39 @@
+/// Connection diagnostic that lists the Odoo tables visible to the Power BI
+/// PostgreSQL credential. It intentionally contains no username or password.
+table 'Odoo Database Objects'
+	lineageTag: 7c2534a6-3f07-46d0-82aa-05e9d42a9bfb
+
+	column Schema
+		dataType: string
+		lineageTag: a69de22b-f714-4fab-98c1-0c20fbdabaa8
+		summarizeBy: none
+		sourceColumn: schema_name
+
+	column Table
+		dataType: string
+		lineageTag: 1c35792a-4416-4589-bff5-bfab38a62f68
+		summarizeBy: none
+		sourceColumn: table_name
+
+	partition 'Odoo Database Objects' = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database(
+						#"OdooServer" & ":" & #"OdooPort",
+						#"OdooDatabase",
+						[CreateNavigationProperties = false]
+					),
+					DatabaseObjects = Value.NativeQuery(
+						Source,
+						"select table_schema::text as schema_name, table_name::text as table_name from information_schema.tables where table_schema = 'public' and table_type = 'BASE TABLE' order by table_name",
+						null,
+						[EnableFolding = true]
+					)
+				in
+					DatabaseObjects
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
