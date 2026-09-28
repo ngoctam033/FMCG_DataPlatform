@@ -103,3 +103,94 @@ class EmployeeSimulator(models.AbstractModel):
 
             simulated_picking = picking.with_user(random_user.id)
             simulated_picking.action_confirm()
+
+    @api.model
+    def cron_simulate_picking_unreserve(self):
+        """
+        [CRON] Giả lập nhân viên: Unreserve (Bỏ giữ hàng).
+        
+        Mục đích: 
+        - Giả lập hành động của nhân viên kho khi tìm kiếm các phiếu kho (stock.picking)
+        đang ở trạng thái giữ hàng (assigned) nhưng cần giải phóng hàng hóa.
+        - Gọi thao tác unreserve trên các phiếu kho đó để trả tồn kho về trạng thái khả dụng.
+        """
+        # TODO: Define test cases and implement logic
+        pass
+
+    @api.model
+    def cron_simulate_picking_lock_unlock(self):
+        """
+        [CRON] Giả lập nhân viên quản lý: Lock/Unlock (Khóa / Mở khóa).
+        
+        Mục đích: 
+        - Giả lập thao tác của quản lý kho đi kiểm tra lại các phiếu kho đã hoàn thành (done).
+        - Thực hiện Lock các phiếu để chốt sổ, hoặc Unlock các phiếu cần điều chỉnh 
+        sai lệch số lượng thực tế.
+        """
+        # TODO: Define test cases and implement logic
+        pass
+
+    @api.model
+    def cron_simulate_picking_scrap(self):
+        """
+        [CRON] Giả lập nhân viên: Scrap (Báo phế liệu).
+        
+        Mục đích: 
+        - Giả lập kịch bản nhân viên đang xử lý phiếu kho thì phát hiện hàng hỏng/rách bao bì.
+        - Tự động lấy ngẫu nhiên (hoặc theo quy tắc) một số lượng hàng hóa trên phiếu 
+        để tạo action Scrap, đẩy hàng lỗi sang địa điểm phế liệu (Scrap Location).
+        """
+        # TODO: Define test cases and implement logic
+        pass
+        
+    @api.model
+    def cron_simulate_picking_split(self):
+        """
+        [CRON] Giả lập nhân viên: Split (Tách phiếu / Tách dòng).
+        
+        Mục đích: 
+        - Giả lập hành động chia tách (Split) của nhân viên kho.
+        - Có thể là kịch bản nhận hàng thiếu phải tạo Backorder (tách phiếu), 
+        hoặc thao tác bóc 1 dòng hàng hóa lớn thành nhiều dòng nhỏ mang số Lot/Serial khác nhau.
+        """
+        # TODO: Define test cases and implement logic
+        pass
+
+    @api.model
+    def cron_simulate_picking_assign(self):
+        """
+        [CRON] Giả lập nhân viên: Check Availability (Kiểm tra khả dụng).
+        
+        Mục đích: 
+        - Giả lập việc nhân viên kho bấm nút 'Kiểm tra khả dụng' để giữ hàng (Reserve).
+        - Khi nhấn nút này, hệ thống sẽ gọi action_assign().
+        - Điều kiện bắt buộc (Test Case target): Các phiếu kho phải đang ở trạng thái 'Chờ xử lý' (confirmed).
+        """
+        # TODO: Define test cases (assert picking changes from 'confirmed' to 'assigned') and implement logic
+        pass
+
+    @api.model
+    def cron_simulate_picking_validate(self):
+        """
+        [CRON] Giả lập nhân viên: Validate (Xác nhận hoàn tất).
+        
+        Mục đích: 
+        - Giả lập việc nhân viên kho đã lấy/giao xong hàng và bấm 'Xác nhận' để chốt sổ giao dịch.
+        - Khi nhấn nút này, hệ thống gọi button_validate().
+        - Điều kiện bắt buộc (Test Case target): Các phiếu kho đã được giữ đủ hàng, ở trạng thái 'Sẵn sàng' (assigned).
+        """
+        # TODO: Define test cases (assert picking changes from 'assigned' to 'done') and implement logic
+        pass
+
+    @api.model
+    def cron_simulate_picking_cancel(self):
+        """
+        [CRON] Giả lập nhân viên/quản lý: Cancel (Hủy phiếu).
+        
+        Mục đích: 
+        - Giả lập tình huống khách hủy đơn hoặc tạo nhầm phiếu, người dùng bấm nút 'Hủy'.
+        - Khi nhấn nút này, hệ thống gọi action_cancel().
+        - Điều kiện bắt buộc (Test Case target): Chỉ tác động lên các phiếu chưa hoàn thành (thường là draft, confirmed, hoặc assigned).
+        """
+        # TODO: Define test cases (assert picking changes to 'cancel') and implement logic
+        pass
