@@ -97,7 +97,7 @@ class EmployeeSimulator(models.AbstractModel):
         users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
         random_user = random.choice(users) if users else self.env.user
 
-        pickings = self.env['stock.picking'].search([], limit=20)
+        pickings = self.env['stock.picking'].search([('state', '=', 'draft')], limit=20)
 
         for picking in pickings:
 
