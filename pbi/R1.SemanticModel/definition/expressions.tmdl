@@ -8,7 +8,7 @@ expression OdooServer = "192.168.139.1" meta [IsParameterQuery=true, Type="Text"
 	annotation PBI_NavigationStepName = Navigation
 
 /// Host port published by the local Odoo PostgreSQL container.
-expression OdooPort = "5433" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+expression OdooPort = "5432" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
 	lineageTag: efe4ec6f-a29b-4999-8538-29a06176c3d7
 
 	annotation PBI_ResultType = Text
@@ -16,7 +16,7 @@ expression OdooPort = "5433" meta [IsParameterQuery=true, Type="Text", IsParamet
 	annotation PBI_NavigationStepName = Navigation
 
 /// Odoo PostgreSQL database name.
-expression OdooDatabase = "fmcg_erp" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+expression OdooDatabase = "fmcg_core" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
 	lineageTag: eadff919-53d0-4510-9a30-de6a6bcb6619
 
 	annotation PBI_ResultType = Text
