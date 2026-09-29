@@ -166,8 +166,34 @@ class EmployeeSimulator(models.AbstractModel):
         - Khi nhấn nút này, hệ thống sẽ gọi action_assign().
         - Điều kiện bắt buộc (Test Case target): Các phiếu kho phải đang ở trạng thái 'Chờ xử lý' (confirmed).
         """
-        # TODO: Define test cases (assert picking changes from 'confirmed' to 'assigned') and implement logic
-        pass
+        now = fields.Datetime.now()
+        minute = now.minute
+        hour = now.hour
+        day = now.day
+
+        # Kéo toàn bộ dữ liệu ra trước (hoặc một tập lớn)
+        users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
+        pickings = self.env['stock.picking'].search([('state', 'in', ['confirmed', 'waiting'])])
+
+        # Tạo một salt ngẫu nhiên
+        import random
+        salt = random.randint(1, 10000)
+
+        # Thay vì dùng limit cứng, ta xác định số lượng record cần chạy ngẫu nhiên dựa vào thời gian (ví dụ từ 1 đến 3 phiếu)
+        record_count = (minute + hour + salt) % 3 + 1
+        
+        for i in range(record_count):
+            current_salt = salt + i
+            
+            # Chọn user dựa vào thuật toán thời gian
+            selected_user = users[(minute * 5 + hour * 11 + day * 13 + current_salt) % len(users)]
+            
+            # Chọn picking dựa vào thuật toán thời gian (thay thế cho limit + order random)
+            selected_picking = pickings[(minute * 7 + hour * 17 + day * 23 + current_salt) % len(pickings)]
+            
+            simulated_picking = selected_picking.with_user(selected_user.id)
+            simulated_picking.action_assign()
+
 
     @api.model
     def cron_simulate_picking_validate(self):

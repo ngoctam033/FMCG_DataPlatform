@@ -9,7 +9,7 @@
             <field name="state">code</field>
             <!-- Gọi thẳng vào AbstractModel qua env -->
             <field name="code">env['employee.simulator'].simulate_create_picking(record_count=100)</field>
-            <field name="interval_number">1</field>
+            <field name="interval_number">20</field>
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>
         </record>
@@ -19,6 +19,16 @@
             <field name="model_id" ref="model_employee_simulator"/>
             <field name="state">code</field>
             <field name="code">model.simulate_confirm_picking()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="ir_cron_simulate_picking_assign" model="ir.cron">
+            <field name="name">Simulator: Tự động Kiểm tra Khả dụng (Assign)</field>
+            <field name="model_id" ref="model_employee_simulator"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_simulate_picking_assign()</field>
+            <!-- Chạy mỗi 2 phút hoặc 1 phút tùy bạn muốn tần suất giả lập -->
             <field name="interval_number">1</field>
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>
