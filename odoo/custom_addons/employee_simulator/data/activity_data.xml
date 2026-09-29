@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Tạo một Loại Hoạt động (Activity Type) dành riêng cho lỗi thiếu Lot -->
+        <record id="mail_activity_missing_lot" model="mail.activity.type">
+            <field name="name">Bổ sung Lot/Serial (Simulator)</field>
+            <field name="summary">Phiếu kho cần khai báo Lot/Serial</field>
+            <field name="icon">fa-barcode</field>
+            <field name="res_model">stock.picking</field>
+            <field name="delay_count">0</field>
+            <field name="delay_unit">days</field>
+        </record>
+    </data>
+</odoo>

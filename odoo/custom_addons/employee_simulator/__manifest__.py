@@ -7,6 +7,7 @@
     'depends': ['base', 'stock', 'base_automation'], # Phụ thuộc module stock để gọi stock.picking
     'data': [
         'data/cron_data.xml',
+        'data/activity_data.xml',
     ],
     'installable': True,
     'application': False,
