@@ -176,7 +176,6 @@ class EmployeeSimulator(models.AbstractModel):
         pickings = self.env['stock.picking'].search([('state', 'in', ['confirmed', 'waiting'])])
 
         # Tạo một salt ngẫu nhiên
-        import random
         salt = random.randint(1, 10000)
 
         # Thay vì dùng limit cứng, ta xác định số lượng record cần chạy ngẫu nhiên dựa vào thời gian (ví dụ từ 1 đến 3 phiếu)
@@ -205,8 +204,37 @@ class EmployeeSimulator(models.AbstractModel):
         - Khi nhấn nút này, hệ thống gọi button_validate().
         - Điều kiện bắt buộc (Test Case target): Các phiếu kho đã được giữ đủ hàng, ở trạng thái 'Sẵn sàng' (assigned).
         """
-        # TODO: Define test cases (assert picking changes from 'assigned' to 'done') and implement logic
-        pass
+        now = fields.Datetime.now()
+        minute = now.minute
+        hour = now.hour
+        day = now.day
+        # Kéo toàn bộ dữ liệu ra trước
+        users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
+        pickings = self.env['stock.picking'].search([('state', '=', 'assigned')])
+
+        salt = random.randint(1, 10000)
+        record_count = (minute + hour + salt) % 3 + 1
+        
+        record_count = min(record_count, len(pickings))
+        
+        for i in range(record_count):
+            current_salt = salt + i
+            
+            selected_user = users[(minute * 7 + hour * 13 + day * 17 + current_salt) % len(users)]
+            
+            picking_index = (minute * 11 + hour * 19 + day * 23 + current_salt) % len(pickings)
+            selected_picking = pickings[picking_index]
+            
+            pickings -= selected_picking
+            
+            simulated_picking = selected_picking.with_user(selected_user.id)
+
+            action_result = simulated_picking.button_validate()
+
+            if isinstance(action_result, dict):
+                import json
+                formatted_json = json.dumps(action_result, indent=4, default=str)
+                _logger.info(f"{simulated_picking.name}:\n{formatted_json}")
 
     @api.model
     def cron_simulate_picking_cancel(self):
