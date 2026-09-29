@@ -3,6 +3,7 @@ import random
 import logging
 from datetime import timedelta
 from odoo import Command
+import string
 
 _logger = logging.getLogger(__name__)
 
@@ -248,3 +249,47 @@ class EmployeeSimulator(models.AbstractModel):
         """
         # TODO: Define test cases (assert picking changes to 'cancel') and implement logic
         pass
+    
+    def cron_process_missing_lot_activities(self):
+        """
+        Lọc các phiếu NHẬP KHO có activity yêu cầu khai báo Lot/Serial và tiến hành khai báo tự động.
+        Các phiếu Xuất/Chuyển nội bộ sẽ tự động bị bỏ qua (để lại Activity trên phiếu như một Backlog).
+        """
+        activity_type = self.env.ref('employee_simulator.mail_activity_missing_lot', raise_if_not_found=False)
+
+        domain = [
+            ('activity_ids.activity_type_id', '=', activity_type.id),
+            ('picking_type_id.code', 'in', ['incoming', 'mrp_operation'])
+        ]
+        
+        pickings = self.env['stock.picking'].search(domain, limit=30)
+
+        local_time = fields.Datetime.now() + timedelta(hours=7)
+        time_str = local_time.strftime('%m%d%H%M%S')
+
+        def make_code(prefix, salt):
+            rand_str = ''.join(random.choices(string.ascii_uppercase, k=3))
+            return f"SIM-{prefix}-{time_str}-{salt}-{rand_str}"
+            
+        for picking in pickings:
+            is_fully_processed = True 
+            
+            for line in picking.move_line_ids:
+                if line.product_id.tracking == 'none' or (line.lot_id or line.lot_name):
+                    continue
+                
+                if line.product_id.tracking == 'lot':
+                    line.write({'lot_name': make_code('LOT', f"L{line.id}")})
+                
+                elif line.product_id.tracking == 'serial':
+                    qty = line.product_uom_qty or line.qty_done or 1.0 
+                    if qty <= 1.0:
+                        line.write({'lot_name': make_code('SN', f"L{line.id}")})
+                    else:
+                        is_fully_processed = False 
+                        continue
+
+            if is_fully_processed:
+                target_activities = picking.activity_ids.filtered(lambda a: a.activity_type_id.id == activity_type.id)
+                for activity in target_activities:
+                    activity.action_done()
