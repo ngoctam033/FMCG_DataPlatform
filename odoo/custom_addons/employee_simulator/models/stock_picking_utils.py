@@ -15,6 +15,21 @@ class EmployeeSimulatorLotSerial(models.AbstractModel):
             ('state', '=', 'assigned'),
             # Lọc sơ bộ: Phiếu phải chứa ít nhất 1 line có sản phẩm yêu cầu Lot/Serial
             ('move_line_ids.product_id.tracking', '!=', 'none'),
+            ('picking_type_id.code', 'in', ['incoming', 'mrp_operation']),
+
+            # Chưa có Activity đang mở
+            (
+                'activity_ids',
+                'not any',
+                [('activity_type_id', '=', activity_type.id)]
+            ),
+
+            # Chưa từng hoàn tất Activity loại này
+            (
+                'message_ids',
+                'not any',
+                [('mail_activity_type_id', '=', activity_type.id)]
+            ),
         ]
         
         pickings = self.env['stock.picking'].search(domain, limit=80)
@@ -22,8 +37,8 @@ class EmployeeSimulatorLotSerial(models.AbstractModel):
         problematic_pickings = self.env['stock.picking']
         
         for picking in pickings:
-            if len(problematic_pickings) >= 30:
-                break
+            # if len(problematic_pickings) >= 30:
+            #     break
             has_open_activity = any(act.activity_type_id.id == activity_type.id for act in picking.activity_ids)
             has_done_activity = any(msg.mail_activity_type_id.id == activity_type.id for msg in picking.message_ids)
             
