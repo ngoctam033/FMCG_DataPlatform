@@ -229,9 +229,23 @@ class EmployeeSimulator(models.AbstractModel):
             pickings -= selected_picking
             
             simulated_picking = selected_picking.with_user(selected_user.id)
-
+            _logger.info(
+                '[VALIDATE] Đang thao tác stock.picking: id=%s, mã=%s, user_id=%s',
+                simulated_picking.id,
+                simulated_picking.name,
+                selected_user.id,
+            )
             action_result = simulated_picking.button_validate()
 
+            if isinstance(action_result, dict):
+                if action_result.get('res_model') == 'stock.backorder.confirmation':
+                    simulated_picking.activity_schedule(
+                        'employee_simulator.mail_activity_backorder',
+                        summary='Xác nhận tạo Backorder',
+                        note='Hệ thống tự động phát hiện thiếu hàng khi Validate. Cần xử lý tạo Backorder.',
+                        user_id=selected_user.id
+                    )
+                    _logger.info(f"[VALIDATE] Đã gắn Activity Backorder cho phiếu {simulated_picking.name}")
             if isinstance(action_result, dict):
                 import json
                 formatted_json = json.dumps(action_result, indent=4, default=str)

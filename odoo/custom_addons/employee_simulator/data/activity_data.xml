@@ -10,5 +10,23 @@
             <field name="delay_count">0</field>
             <field name="delay_unit">days</field>
         </record>
+        
+        <record id="mail_activity_simulate_cancel" model="mail.activity.type">
+            <field name="name">Hủy phiếu kho (Simulator)</field>
+            <field name="summary">Phiếu kho chờ simulator hủy</field>
+            <field name="icon">fa-times-circle</field>
+            <field name="res_model">stock.picking</field>
+            <field name="delay_count">0</field>
+            <field name="delay_unit">days</field>
+        </record>
+        
+        <record id="mail_activity_backorder" model="mail.activity.type">
+            <field name="name">Xác nhận Backorder (Simulator)</field>
+            <field name="summary">Phiếu kho cần xác nhận tạo hoặc hủy Backorder</field>
+            <field name="icon">fa-files-o</field>
+            <field name="res_model">stock.picking</field>
+            <field name="delay_count">0</field>
+            <field name="delay_unit">days</field>
+        </record>
     </data>
 </odoo>
