@@ -36,5 +36,13 @@
             <field name="delay_count">0</field>
             <field name="delay_unit">days</field>
         </record>
+        <record id="mail_activity_expired_lot" model="mail.activity.type">
+            <field name="name">Xác nhận hàng hết hạn (Simulator)</field>
+            <field name="summary">Phiếu kho có hàng hết hạn cần xác nhận xuất/nhập</field>
+            <field name="icon">fa-clock-o</field>
+            <field name="res_model">stock.picking</field>
+            <field name="delay_count">0</field>
+            <field name="delay_unit">days</field>
+        </record>
     </data>
 </odoo>
