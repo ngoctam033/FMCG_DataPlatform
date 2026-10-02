@@ -28,5 +28,13 @@
             <field name="delay_count">0</field>
             <field name="delay_unit">days</field>
         </record>
+        <record id="mail_activity_simulator_error" model="mail.activity.type">
+            <field name="name">[LỖI SIMULATOR] Phiếu kho không thể Validate</field>
+            <field name="summary">Phiếu kho không thể xác nhận (trống số lượng)p</field>
+            <field name="icon">fa-exclamation-triangle</field>
+            <field name="res_model">stock.picking</field>
+            <field name="delay_count">0</field>
+            <field name="delay_unit">days</field>
+        </record>
     </data>
 </odoo>

@@ -1,4 +1,5 @@
 from odoo import models, api, fields
+from odoo.exceptions import UserError
 import random
 import logging
 from datetime import timedelta
@@ -313,11 +314,13 @@ class EmployeeSimulator(models.AbstractModel):
         [CRON] Giả lập nhân viên: Xử lý Activity Backorder - Tự động chọn "Tạo Backorder"
         """
         activity_type = self.env.ref('employee_simulator.mail_activity_backorder', raise_if_not_found=False)
+        warning_act_type = self.env.ref('employee_simulator.mail_activity_simulator_error', raise_if_not_found=False)
         if not activity_type:
             return
 
         domain = [
             ('activity_ids.activity_type_id', '=', activity_type.id),
+            ('activity_ids', 'not any', [('activity_type_id', '=', warning_act_type.id)])
         ]
         
         pickings = self.env['stock.picking'].search(domain, limit=10)
@@ -338,14 +341,26 @@ class EmployeeSimulator(models.AbstractModel):
             wizard = self.env['stock.backorder.confirmation'].with_user(user_id).with_context(context).create({
                 'pick_ids': [(4, simulated_picking.id)]
             })
-            
-            action_result = wizard.process()
+            try:
+                action_result = wizard.process()
+            except UserError as e:
+                _logger.exception("[CRON SIMULATE BACKORDER] Phiếu %s bị lỗi khi xử lý: %s", picking.name, str(e))
+                if "empty transfer" in str(e):
+                    # Gắn Activity cảnh báo cho User
+                    simulated_picking.activity_schedule(
+                        'employee_simulator.mail_activity_simulator_error', 
+                        summary='Lỗi xác nhận phiếu trống',
+                        note=f'Hệ thống tự động xử lý Backorder thất bại: <b>{str(e)}</b><br/>Vui lòng kiểm tra lại.',
+                        user_id=user_id
+                    )
+                continue
             # 1. Nếu có popup, in ra để nghiên cứu
             if isinstance(action_result, dict):
+                import json
                 _logger.info(
-                    "[CRON SIMULATE] Phat hien Popup/Action moi tu picking %s:\n%s", 
+                    "[CRON SIMULATE] Phát hiện Popup/Action mới từ picking %s:\n%s", 
                     simulated_picking.name, 
-                    action_result
+                    json.dumps(action_result, indent=4, ensure_ascii=False, default=str)
                 )
             
             # 2. KIỂM TRA NGHIỆP VỤ: Chỉ đóng activity khi phiếu kho đã chốt thành công
