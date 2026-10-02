@@ -1,8 +1,10 @@
 from odoo import models, api, fields
+from odoo.exceptions import UserError
 import random
 import logging
 from datetime import timedelta
 from odoo import Command
+import string
 
 _logger = logging.getLogger(__name__)
 
@@ -166,8 +168,33 @@ class EmployeeSimulator(models.AbstractModel):
         - Khi nhấn nút này, hệ thống sẽ gọi action_assign().
         - Điều kiện bắt buộc (Test Case target): Các phiếu kho phải đang ở trạng thái 'Chờ xử lý' (confirmed).
         """
-        # TODO: Define test cases (assert picking changes from 'confirmed' to 'assigned') and implement logic
-        pass
+        now = fields.Datetime.now()
+        minute = now.minute
+        hour = now.hour
+        day = now.day
+
+        # Kéo toàn bộ dữ liệu ra trước (hoặc một tập lớn)
+        users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
+        pickings = self.env['stock.picking'].search([('state', 'in', ['confirmed', 'waiting'])])
+
+        # Tạo một salt ngẫu nhiên
+        salt = random.randint(1, 10000)
+
+        # Thay vì dùng limit cứng, ta xác định số lượng record cần chạy ngẫu nhiên dựa vào thời gian (ví dụ từ 1 đến 3 phiếu)
+        record_count = (minute + hour + salt) % 3 + 1
+        
+        for i in range(record_count):
+            current_salt = salt + i
+            
+            # Chọn user dựa vào thuật toán thời gian
+            selected_user = users[(minute * 5 + hour * 11 + day * 13 + current_salt) % len(users)]
+            
+            # Chọn picking dựa vào thuật toán thời gian (thay thế cho limit + order random)
+            selected_picking = pickings[(minute * 7 + hour * 17 + day * 23 + current_salt) % len(pickings)]
+            
+            simulated_picking = selected_picking.with_user(selected_user.id)
+            simulated_picking.action_assign()
+
 
     @api.model
     def cron_simulate_picking_validate(self):
@@ -179,8 +206,69 @@ class EmployeeSimulator(models.AbstractModel):
         - Khi nhấn nút này, hệ thống gọi button_validate().
         - Điều kiện bắt buộc (Test Case target): Các phiếu kho đã được giữ đủ hàng, ở trạng thái 'Sẵn sàng' (assigned).
         """
-        # TODO: Define test cases (assert picking changes from 'assigned' to 'done') and implement logic
-        pass
+        now = fields.Datetime.now()
+        minute = now.minute
+        hour = now.hour
+        day = now.day
+        # Kéo toàn bộ dữ liệu ra trước
+        users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
+        pickings = self.env['stock.picking'].search([('state', '=', 'assigned')])
+
+        salt = random.randint(1, 10000)
+        record_count = (minute + hour + salt) % 3 + 1
+        
+        record_count = min(record_count, len(pickings))
+        
+        for i in range(record_count):
+            current_salt = salt + i
+            
+            selected_user = users[(minute * 7 + hour * 13 + day * 17 + current_salt) % len(users)]
+            
+            picking_index = (minute * 11 + hour * 19 + day * 23 + current_salt) % len(pickings)
+            selected_picking = pickings[picking_index]
+            
+            pickings -= selected_picking
+            
+            simulated_picking = selected_picking.with_user(selected_user.id)
+            _logger.info(
+                '[VALIDATE] Đang thao tác stock.picking: id=%s, mã=%s, user_id=%s',
+                simulated_picking.id,
+                simulated_picking.name,
+                selected_user.id,
+            )
+            try:
+                action_result = simulated_picking.button_validate()
+            except UserError as e:
+                if "Lot/Serial" in str(e):
+                    missing_lot_act_type = self.env.ref('employee_simulator.mail_activity_missing_lot', raise_if_not_found=False)
+                    if missing_lot_act_type:
+                        # Tránh tạo trùng Activity nếu phiếu đã có activity này
+                        has_missing_lot_act = any(act.activity_type_id.id == missing_lot_act_type.id for act in simulated_picking.activity_ids)
+                        if not has_missing_lot_act:
+                            simulated_picking.activity_schedule(
+                                'employee_simulator.mail_activity_missing_lot', 
+                                summary='Thiếu Lot/Serial khi Xác nhận (Validate)',
+                                note=f'Validate thất bại do thiếu Lot/Serial: <b>{str(e)}</b>',
+                                user_id=selected_user.id
+                            )
+                else:
+                    _logger.exception("[CRON VALIDATE] Phiếu %s bị lỗi khi Validate: %s", simulated_picking.name, str(e))
+                
+                # Bỏ qua phiếu kho hiện tại và tiếp tục xử lý các phiếu kho khác
+                continue
+            if isinstance(action_result, dict):
+                if action_result.get('res_model') == 'stock.backorder.confirmation':
+                    simulated_picking.activity_schedule(
+                        'employee_simulator.mail_activity_backorder',
+                        summary='Xác nhận tạo Backorder',
+                        note='Hệ thống tự động phát hiện thiếu hàng khi Validate. Cần xử lý tạo Backorder.',
+                        user_id=selected_user.id
+                    )
+                    _logger.info(f"[VALIDATE] Đã gắn Activity Backorder cho phiếu {simulated_picking.name}")
+            if isinstance(action_result, dict):
+                import json
+                formatted_json = json.dumps(action_result, indent=4, default=str)
+                _logger.info(f"{simulated_picking.name}:\n{formatted_json}")
 
     @api.model
     def cron_simulate_picking_cancel(self):
@@ -194,3 +282,131 @@ class EmployeeSimulator(models.AbstractModel):
         """
         # TODO: Define test cases (assert picking changes to 'cancel') and implement logic
         pass
+    
+    def cron_process_missing_lot_activities(self):
+        """
+        Lọc các phiếu NHẬP KHO có activity yêu cầu khai báo Lot/Serial và tiến hành khai báo tự động.
+        Các phiếu Xuất/Chuyển nội bộ sẽ tự động bị bỏ qua (để lại Activity trên phiếu như một Backlog).
+        """
+        activity_type = self.env.ref('employee_simulator.mail_activity_missing_lot', raise_if_not_found=False)
+
+        domain = [
+            ('activity_ids.activity_type_id', '=', activity_type.id),
+            ('picking_type_id.code', 'in', ['incoming', 'mrp_operation'])
+        ]
+        
+        pickings = self.env['stock.picking'].search(domain, limit=30)
+
+        local_time = fields.Datetime.now() + timedelta(hours=7)
+        time_str = local_time.strftime('%m%d%H%M%S')
+
+        def make_code(prefix, salt):
+            rand_str = ''.join(random.choices(string.ascii_uppercase, k=3))
+            return f"SIM-{prefix}-{time_str}-{salt}-{rand_str}"
+            
+        for picking in pickings:
+            is_fully_processed = True 
+            
+            for line in picking.move_line_ids:
+                if line.product_id.tracking == 'none' or (line.lot_id or line.lot_name):
+                    continue
+                
+                if line.product_id.tracking == 'lot':
+                    line.write({'lot_name': make_code('LOT', f"L{line.id}")})
+                
+                elif line.product_id.tracking == 'serial':
+                    qty = line.product_uom_qty or line.qty_done or 1.0 
+                    if qty <= 1.0:
+                        line.write({'lot_name': make_code('SN', f"L{line.id}")})
+                    else:
+                        is_fully_processed = False 
+                        continue
+
+            if is_fully_processed:
+                target_activities = picking.activity_ids.filtered(lambda a: a.activity_type_id.id == activity_type.id)
+                for activity in target_activities:
+                    activity.action_done()
+    @api.model
+    def cron_simulate_backorder_create(self):
+        """
+        [CRON] Giả lập nhân viên: Xử lý Activity Backorder - Tự động chọn "Tạo Backorder"
+        """
+        activity_type = self.env.ref('employee_simulator.mail_activity_backorder', raise_if_not_found=False)
+        warning_act_type = self.env.ref('employee_simulator.mail_activity_simulator_error', raise_if_not_found=False)
+        missing_lot_act_type = self.env.ref('employee_simulator.mail_activity_missing_lot', raise_if_not_found=False)
+        expired_lot_act_type = self.env.ref('employee_simulator.mail_activity_expired_lot', raise_if_not_found=False)
+        if not activity_type:
+            return
+
+        domain = [
+            ('activity_ids.activity_type_id', '=', activity_type.id),
+            ('activity_ids', 'not any', [('activity_type_id', '=', warning_act_type.id)]),
+            ('activity_ids', 'not any', [('activity_type_id', '=', missing_lot_act_type.id)]),
+            ('activity_ids', 'not any', [('activity_type_id', '=', expired_lot_act_type.id)]),
+        ]
+        
+        pickings = self.env['stock.picking'].search(domain, limit=10)
+
+        for picking in pickings:
+            _logger.info("[CRON SIMULATE BACKORDER] Đang xử lý tạo backorder cho phiếu: %s", picking.name)
+            target_activities = picking.activity_ids.filtered(lambda a: a.activity_type_id.id == activity_type.id)
+            user_id = target_activities[0].user_id.id if target_activities else self.env.user.id
+
+            simulated_picking = picking.with_user(user_id)
+            
+            context = {
+                'button_validate_picking_ids': [simulated_picking.id],
+                'default_pick_ids': [(4, simulated_picking.id)],
+                'default_company_id': simulated_picking.company_id.id,
+            }
+            
+            wizard = self.env['stock.backorder.confirmation'].with_user(user_id).with_company(picking.company_id.id).with_context(context).create({
+                'pick_ids': [(4, simulated_picking.id)]
+            })
+            try:
+                action_result = wizard.process()
+            except UserError as e:
+                if "empty transfer" in str(e) or "zero quantity" in str(e) or "Transfer trouble alert" in str(e):
+                    # Gắn Activity cảnh báo cho User
+                    simulated_picking.activity_schedule(
+                        'employee_simulator.mail_activity_simulator_error', 
+                        summary='Lỗi xác nhận phiếu trống',
+                        note=f'Hệ thống tự động xử lý Backorder thất bại: <b>{str(e)}</b><br/>Vui lòng kiểm tra lại.',
+                        user_id=user_id
+                    )
+                elif "Lot/Serial" in str(e):
+                    # Kiểm tra để tránh tạo trùng lặp Activity
+                    has_missing_lot_act = any(act.activity_type_id.id == missing_lot_act_type.id for act in simulated_picking.activity_ids)
+                    if not has_missing_lot_act:
+                        simulated_picking.activity_schedule(
+                            'employee_simulator.mail_activity_missing_lot', 
+                            summary='Thiếu Lot/Serial khi tạo Backorder',
+                            note=f'Xử lý Backorder thất bại do thiếu Lot/Serial: <b>{str(e)}</b>',
+                            user_id=user_id
+                        )
+                else:
+                    _logger.exception("[CRON SIMULATE BACKORDER] Phiếu %s bị lỗi khi xử lý: %s", picking.name, str(e))
+                continue
+            # 1. Nếu có popup, in ra để nghiên cứu
+            if isinstance(action_result, dict):
+                if action_result.get('res_model') == 'expiry.picking.confirmation':
+                    # Sinh ra Activity để đánh dấu phiếu kho đang bị kẹt do hàng hết hạn
+                    simulated_picking.activity_schedule(
+                        'employee_simulator.mail_activity_expired_lot',
+                        summary='Xác nhận hàng hết hạn',
+                        note='Hệ thống phát hiện lô hàng đã hết hạn khi Validate. Cần xử lý xác nhận xuất/nhập.',
+                        user_id=user_id
+                    )
+                else:
+                    # NẾU KHÁC POPUP HẾT HẠN THÌ MỚI IN LOG RA ĐỂ XEM ĐÓ LÀ GÌ
+                    import json
+                    _logger.info(
+                        "[CRON SIMULATE] Phát hiện Popup/Action mới từ picking %s:\n%s", 
+                        simulated_picking.name, 
+                        json.dumps(action_result, indent=4, ensure_ascii=False, default=str)
+                    )
+            
+            # 2. KIỂM TRA NGHIỆP VỤ: Chỉ đóng activity khi phiếu kho đã chốt thành công
+            if simulated_picking.state == 'done':
+                for activity in target_activities:
+                    activity.action_done()

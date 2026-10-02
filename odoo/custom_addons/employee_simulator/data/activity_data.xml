@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Tạo một Loại Hoạt động (Activity Type) dành riêng cho lỗi thiếu Lot -->
+        <record id="mail_activity_missing_lot" model="mail.activity.type">
+            <field name="name">Bổ sung Lot/Serial (Simulator)</field>
+            <field name="summary">Phiếu kho cần khai báo Lot/Serial</field>
+            <field name="icon">fa-barcode</field>
+            <field name="res_model">stock.picking</field>
+            <field name="delay_count">0</field>
+            <field name="delay_unit">days</field>
+        </record>
+        
+        <record id="mail_activity_simulate_cancel" model="mail.activity.type">
+            <field name="name">Hủy phiếu kho (Simulator)</field>
+            <field name="summary">Phiếu kho chờ simulator hủy</field>
+            <field name="icon">fa-times-circle</field>
+            <field name="res_model">stock.picking</field>
+            <field name="delay_count">0</field>
+            <field name="delay_unit">days</field>
+        </record>
+        
+        <record id="mail_activity_backorder" model="mail.activity.type">
+            <field name="name">Xác nhận Backorder (Simulator)</field>
+            <field name="summary">Phiếu kho cần xác nhận tạo hoặc hủy Backorder</field>
+            <field name="icon">fa-files-o</field>
+            <field name="res_model">stock.picking</field>
+            <field name="delay_count">0</field>
+            <field name="delay_unit">days</field>
+        </record>
+        <record id="mail_activity_simulator_error" model="mail.activity.type">
+            <field name="name">[LỖI SIMULATOR] Phiếu kho không thể Validate</field>
+            <field name="summary">Phiếu kho không thể xác nhận (trống số lượng)p</field>
+            <field name="icon">fa-exclamation-triangle</field>
+            <field name="res_model">stock.picking</field>
+            <field name="delay_count">0</field>
+            <field name="delay_unit">days</field>
+        </record>
+        <record id="mail_activity_expired_lot" model="mail.activity.type">
+            <field name="name">Xác nhận hàng hết hạn (Simulator)</field>
+            <field name="summary">Phiếu kho có hàng hết hạn cần xác nhận xuất/nhập</field>
+            <field name="icon">fa-clock-o</field>
+            <field name="res_model">stock.picking</field>
+            <field name="delay_count">0</field>
+            <field name="delay_unit">days</field>
+        </record>
+    </data>
+</odoo>
