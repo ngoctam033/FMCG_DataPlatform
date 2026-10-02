@@ -360,7 +360,7 @@ class EmployeeSimulator(models.AbstractModel):
                 'default_company_id': simulated_picking.company_id.id,
             }
             
-            wizard = self.env['stock.backorder.confirmation'].with_user(user_id).with_context(context).create({
+            wizard = self.env['stock.backorder.confirmation'].with_user(user_id).with_company(picking.company_id.id).with_context(context).create({
                 'pick_ids': [(4, simulated_picking.id)]
             })
             try:
