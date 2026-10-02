@@ -307,3 +307,48 @@ class EmployeeSimulator(models.AbstractModel):
                 target_activities = picking.activity_ids.filtered(lambda a: a.activity_type_id.id == activity_type.id)
                 for activity in target_activities:
                     activity.action_done()
+    @api.model
+    def cron_simulate_backorder_create(self):
+        """
+        [CRON] Giả lập nhân viên: Xử lý Activity Backorder - Tự động chọn "Tạo Backorder"
+        """
+        activity_type = self.env.ref('employee_simulator.mail_activity_backorder', raise_if_not_found=False)
+        if not activity_type:
+            return
+
+        domain = [
+            ('activity_ids.activity_type_id', '=', activity_type.id),
+        ]
+        
+        pickings = self.env['stock.picking'].search(domain, limit=10)
+
+        for picking in pickings:
+            _logger.info("[CRON SIMULATE BACKORDER] Đang xử lý tạo backorder cho phiếu: %s", picking.name)
+            target_activities = picking.activity_ids.filtered(lambda a: a.activity_type_id.id == activity_type.id)
+            user_id = target_activities[0].user_id.id if target_activities else self.env.user.id
+
+            simulated_picking = picking.with_user(user_id)
+            
+            context = {
+                'button_validate_picking_ids': [simulated_picking.id],
+                'default_pick_ids': [(4, simulated_picking.id)],
+                'default_company_id': simulated_picking.company_id.id,
+            }
+            
+            wizard = self.env['stock.backorder.confirmation'].with_user(user_id).with_context(context).create({
+                'pick_ids': [(4, simulated_picking.id)]
+            })
+            
+            action_result = wizard.process()
+            # 1. Nếu có popup, in ra để nghiên cứu
+            if isinstance(action_result, dict):
+                _logger.info(
+                    "[CRON SIMULATE] Phat hien Popup/Action moi tu picking %s:\n%s", 
+                    simulated_picking.name, 
+                    action_result
+                )
+            
+            # 2. KIỂM TRA NGHIỆP VỤ: Chỉ đóng activity khi phiếu kho đã chốt thành công
+            if simulated_picking.state == 'done':
+                for activity in target_activities:
+                    activity.action_done()
