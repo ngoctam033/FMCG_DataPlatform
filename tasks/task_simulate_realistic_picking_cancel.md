@@ -1,4 +1,4 @@
-# Backlog: Nghiên cứu và giả lập hủy phiếu kho sát thực tế
+# Task: Nghiên cứu và giả lập hủy phiếu kho sát thực tế
 
 ## 1. Bối cảnh
 
@@ -230,12 +230,12 @@ Ngoài ra:
 - Không hủy dữ liệu production nếu chưa có cờ cấu hình hoặc giới hạn chỉ chọn
   record simulator.
 
-## 10. Thứ tự triển khai đề xuất
+## 10. Tiến độ triển khai
 
-1. Bổ sung Activity Type và cron tạo Activity cancel.
-2. Bổ sung cron xử lý Activity với bước kiểm tra lại trạng thái.
-3. Ưu tiên picking có `origin` simulator để kiểm thử an toàn.
-4. Thêm các rule `customer_cancelled`, `wrong_picking_created` và
+- [x] 1. Bổ sung Activity Type và cron tạo Activity cancel (Đã implement qua cron `ir_cron_find_picking_cancel_candidates` và model `EmployeeSimulatorCancel`).
+- [ ] 2. Bổ sung cron xử lý Activity với bước kiểm tra lại trạng thái (chuẩn bị gọi `action_cancel()`).
+- [ ] 3. Ưu tiên picking có `origin` simulator để kiểm thử an toàn.
+- [ ] 4. Thêm các rule `customer_cancelled`, `wrong_picking_created` và
    `insufficient_stock`.
-5. Thêm test cho reservation, duplicate Activity và race trạng thái.
-6. Sau khi ổn định mới mở rộng sang deadline, batch và sale order.
+- [ ] 5. Thêm test cho reservation, duplicate Activity và race trạng thái.
+- [ ] 6. Sau khi ổn định mới mở rộng sang deadline, batch và sale order.
