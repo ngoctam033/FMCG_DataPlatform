@@ -236,8 +236,26 @@ class EmployeeSimulator(models.AbstractModel):
                 simulated_picking.name,
                 selected_user.id,
             )
-            action_result = simulated_picking.button_validate()
-
+            try:
+                action_result = simulated_picking.button_validate()
+            except UserError as e:
+                if "Lot/Serial" in str(e):
+                    missing_lot_act_type = self.env.ref('employee_simulator.mail_activity_missing_lot', raise_if_not_found=False)
+                    if missing_lot_act_type:
+                        # Tránh tạo trùng Activity nếu phiếu đã có activity này
+                        has_missing_lot_act = any(act.activity_type_id.id == missing_lot_act_type.id for act in simulated_picking.activity_ids)
+                        if not has_missing_lot_act:
+                            simulated_picking.activity_schedule(
+                                'employee_simulator.mail_activity_missing_lot', 
+                                summary='Thiếu Lot/Serial khi Xác nhận (Validate)',
+                                note=f'Validate thất bại do thiếu Lot/Serial: <b>{str(e)}</b>',
+                                user_id=selected_user.id
+                            )
+                else:
+                    _logger.exception("[CRON VALIDATE] Phiếu %s bị lỗi khi Validate: %s", simulated_picking.name, str(e))
+                
+                # Bỏ qua phiếu kho hiện tại và tiếp tục xử lý các phiếu kho khác
+                continue
             if isinstance(action_result, dict):
                 if action_result.get('res_model') == 'stock.backorder.confirmation':
                     simulated_picking.activity_schedule(
