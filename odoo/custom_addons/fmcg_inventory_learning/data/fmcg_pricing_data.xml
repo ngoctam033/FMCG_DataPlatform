@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Cập nhật thông tin Công ty mặc định -->
+        <record id="base.main_company" model="res.company">
+            <field name="name">Công ty FMCG Việt Nam</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="currency_id" ref="base.VND"/>
+            <field name="street">01 Đường Nguyễn Huệ</field>
+            <field name="city">Thành phố Hồ Chí Minh</field>
+            <field name="zip">700000</field>
+            <field name="phone">+84 28 0000 0000</field>
+            <field name="email">contact@fmcg-simulator.example.test</field>
+            <field name="vat">0312345678</field>
+        </record>
+        <!-- Bảng giá & Chiết khấu (Pricelists) -->
+        <record id="pricelist_general_trade" model="product.pricelist">
+            <field name="name">General Trade</field>
+            <field name="currency_id" ref="base.VND"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="pricelist_item_general_trade" model="product.pricelist.item">
+            <field name="pricelist_id" ref="pricelist_general_trade"/>
+            <field name="applied_on">3_global</field>
+            <field name="compute_price">percentage</field>
+            <field name="percent_price">3.0</field>
+            <field name="min_quantity">0</field>
+        </record>
+        <record id="pricelist_modern_trade" model="product.pricelist">
+            <field name="name">Modern Trade</field>
+            <field name="currency_id" ref="base.VND"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="pricelist_item_modern_trade" model="product.pricelist.item">
+            <field name="pricelist_id" ref="pricelist_modern_trade"/>
+            <field name="applied_on">3_global</field>
+            <field name="compute_price">percentage</field>
+            <field name="percent_price">7.0</field>
+            <field name="min_quantity">0</field>
+        </record>
+        <record id="pricelist_distributor" model="product.pricelist">
+            <field name="name">Distributor</field>
+            <field name="currency_id" ref="base.VND"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="pricelist_item_distributor" model="product.pricelist.item">
+            <field name="pricelist_id" ref="pricelist_distributor"/>
+            <field name="applied_on">3_global</field>
+            <field name="compute_price">percentage</field>
+            <field name="percent_price">12.0</field>
+            <field name="min_quantity">0</field>
+        </record>
+        <record id="pricelist_horeca" model="product.pricelist">
+            <field name="name">HORECA</field>
+            <field name="currency_id" ref="base.VND"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="pricelist_item_horeca" model="product.pricelist.item">
+            <field name="pricelist_id" ref="pricelist_horeca"/>
+            <field name="applied_on">3_global</field>
+            <field name="compute_price">percentage</field>
+            <field name="percent_price">5.0</field>
+            <field name="min_quantity">0</field>
+        </record>
+        <record id="pricelist_e_commerce" model="product.pricelist">
+            <field name="name">E-commerce</field>
+            <field name="currency_id" ref="base.VND"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="pricelist_item_e_commerce" model="product.pricelist.item">
+            <field name="pricelist_id" ref="pricelist_e_commerce"/>
+            <field name="applied_on">3_global</field>
+            <field name="compute_price">percentage</field>
+            <field name="percent_price">0.0</field>
+            <field name="min_quantity">0</field>
+        </record>
+        <!-- Danh sách khách hàng mẫu theo kênh (Channels) -->
+        <record id="partner_gt_cust_001" model="res.partner">
+            <field name="name">General Trade Customer 01</field>
+            <field name="ref">GT-CUST-001</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">1 Đường Mô Phỏng</field>
+            <field name="city">Hồ Chí Minh</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 001 001</field>
+            <field name="email">gt-cust-001@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_general_trade"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_gt_cust_002" model="res.partner">
+            <field name="name">General Trade Customer 02</field>
+            <field name="ref">GT-CUST-002</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">2 Đường Mô Phỏng</field>
+            <field name="city">Hà Nội</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 001 002</field>
+            <field name="email">gt-cust-002@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_general_trade"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_gt_cust_003" model="res.partner">
+            <field name="name">General Trade Customer 03</field>
+            <field name="ref">GT-CUST-003</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">3 Đường Mô Phỏng</field>
+            <field name="city">Đà Nẵng</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 001 003</field>
+            <field name="email">gt-cust-003@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_general_trade"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_gt_cust_004" model="res.partner">
+            <field name="name">General Trade Customer 04</field>
+            <field name="ref">GT-CUST-004</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">4 Đường Mô Phỏng</field>
+            <field name="city">Cần Thơ</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 001 004</field>
+            <field name="email">gt-cust-004@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_general_trade"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_mt_cust_001" model="res.partner">
+            <field name="name">Modern Trade Customer 01</field>
+            <field name="ref">MT-CUST-001</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">1 Đường Mô Phỏng</field>
+            <field name="city">Hồ Chí Minh</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 002 001</field>
+            <field name="email">mt-cust-001@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '45 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_modern_trade"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_mt_cust_002" model="res.partner">
+            <field name="name">Modern Trade Customer 02</field>
+            <field name="ref">MT-CUST-002</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">2 Đường Mô Phỏng</field>
+            <field name="city">Hà Nội</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 002 002</field>
+            <field name="email">mt-cust-002@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '45 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_modern_trade"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_mt_cust_003" model="res.partner">
+            <field name="name">Modern Trade Customer 03</field>
+            <field name="ref">MT-CUST-003</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">3 Đường Mô Phỏng</field>
+            <field name="city">Đà Nẵng</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 002 003</field>
+            <field name="email">mt-cust-003@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '45 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_modern_trade"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_mt_cust_004" model="res.partner">
+            <field name="name">Modern Trade Customer 04</field>
+            <field name="ref">MT-CUST-004</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">4 Đường Mô Phỏng</field>
+            <field name="city">Cần Thơ</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 002 004</field>
+            <field name="email">mt-cust-004@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '45 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_modern_trade"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_dist_cust_001" model="res.partner">
+            <field name="name">Distributor Customer 01</field>
+            <field name="ref">DIST-CUST-001</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">1 Đường Mô Phỏng</field>
+            <field name="city">Hồ Chí Minh</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 003 001</field>
+            <field name="email">dist-cust-001@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_distributor"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_dist_cust_002" model="res.partner">
+            <field name="name">Distributor Customer 02</field>
+            <field name="ref">DIST-CUST-002</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">2 Đường Mô Phỏng</field>
+            <field name="city">Hà Nội</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 003 002</field>
+            <field name="email">dist-cust-002@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_distributor"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_dist_cust_003" model="res.partner">
+            <field name="name">Distributor Customer 03</field>
+            <field name="ref">DIST-CUST-003</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">3 Đường Mô Phỏng</field>
+            <field name="city">Đà Nẵng</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 003 003</field>
+            <field name="email">dist-cust-003@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_distributor"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_dist_cust_004" model="res.partner">
+            <field name="name">Distributor Customer 04</field>
+            <field name="ref">DIST-CUST-004</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">4 Đường Mô Phỏng</field>
+            <field name="city">Cần Thơ</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 003 004</field>
+            <field name="email">dist-cust-004@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_distributor"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_horeca_cust_001" model="res.partner">
+            <field name="name">HORECA Customer 01</field>
+            <field name="ref">HORECA-CUST-001</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">1 Đường Mô Phỏng</field>
+            <field name="city">Hồ Chí Minh</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 004 001</field>
+            <field name="email">horeca-cust-001@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '21 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_horeca"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_horeca_cust_002" model="res.partner">
+            <field name="name">HORECA Customer 02</field>
+            <field name="ref">HORECA-CUST-002</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">2 Đường Mô Phỏng</field>
+            <field name="city">Hà Nội</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 004 002</field>
+            <field name="email">horeca-cust-002@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '21 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_horeca"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_horeca_cust_003" model="res.partner">
+            <field name="name">HORECA Customer 03</field>
+            <field name="ref">HORECA-CUST-003</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">3 Đường Mô Phỏng</field>
+            <field name="city">Đà Nẵng</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 004 003</field>
+            <field name="email">horeca-cust-003@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '21 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_horeca"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_horeca_cust_004" model="res.partner">
+            <field name="name">HORECA Customer 04</field>
+            <field name="ref">HORECA-CUST-004</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">4 Đường Mô Phỏng</field>
+            <field name="city">Cần Thơ</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 004 004</field>
+            <field name="email">horeca-cust-004@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '21 Days')]"/>
+            <field name="property_product_pricelist" ref="pricelist_horeca"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_ecom_cust_001" model="res.partner">
+            <field name="name">E-commerce Customer 01</field>
+            <field name="ref">ECOM-CUST-001</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">1 Đường Mô Phỏng</field>
+            <field name="city">Hồ Chí Minh</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 005 001</field>
+            <field name="email">ecom-cust-001@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', 'Immediate Payment')]"/>
+            <field name="property_product_pricelist" ref="pricelist_e_commerce"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_ecom_cust_002" model="res.partner">
+            <field name="name">E-commerce Customer 02</field>
+            <field name="ref">ECOM-CUST-002</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">2 Đường Mô Phỏng</field>
+            <field name="city">Hà Nội</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 005 002</field>
+            <field name="email">ecom-cust-002@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', 'Immediate Payment')]"/>
+            <field name="property_product_pricelist" ref="pricelist_e_commerce"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_ecom_cust_003" model="res.partner">
+            <field name="name">E-commerce Customer 03</field>
+            <field name="ref">ECOM-CUST-003</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">3 Đường Mô Phỏng</field>
+            <field name="city">Đà Nẵng</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 005 003</field>
+            <field name="email">ecom-cust-003@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', 'Immediate Payment')]"/>
+            <field name="property_product_pricelist" ref="pricelist_e_commerce"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="partner_ecom_cust_004" model="res.partner">
+            <field name="name">E-commerce Customer 04</field>
+            <field name="ref">ECOM-CUST-004</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">4 Đường Mô Phỏng</field>
+            <field name="city">Cần Thơ</field>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">+84 900 005 004</field>
+            <field name="email">ecom-cust-004@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', 'Immediate Payment')]"/>
+            <field name="property_product_pricelist" ref="pricelist_e_commerce"/>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

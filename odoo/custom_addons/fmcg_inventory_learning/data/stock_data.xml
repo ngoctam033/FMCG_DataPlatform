@@ -24,7 +24,7 @@
             <field name="name">Khu Vực Phế Liệu (Scrap)</field>
             <field name="location_id" ref="stock.stock_location_stock"/>
             <field name="usage">inventory</field> <!-- Vị trí ảo để xả kho -->
-            <field name="scrap_location">True</field> <!-- Đánh dấu là vị trí Phế liệu -->
+
             <field name="company_id" ref="base.main_company"/>
         </record>
 

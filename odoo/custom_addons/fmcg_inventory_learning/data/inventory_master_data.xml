@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Static FMCG warehouse configuration. User changes are preserved on upgrade. -->
+    <data noupdate="1">
+        <!-- Stable XML IDs for the categories used by catalog and putaway data. -->
+        <record id="product_category_fmcg_food" model="product.category">
+            <field name="name">Food</field>
+        </record>
+        <record id="product_category_fmcg_milk" model="product.category">
+            <field name="name">Nước giải khát</field>
+            <field name="parent_id" ref="product_category_fmcg_food"/>
+        </record>
+        <record id="product_category_fmcg_instant_food" model="product.category">
+            <field name="name">Thực phẩm ăn liền</field>
+            <field name="parent_id" ref="product_category_fmcg_food"/>
+        </record>
+        <record id="product_category_fmcg_snack" model="product.category">
+            <field name="name">Bánh kẹo &amp; Snack</field>
+            <field name="parent_id" ref="product_category_fmcg_food"/>
+        </record>
+        <record id="product_category_fmcg_condiment" model="product.category">
+            <field name="name">Gia vị</field>
+            <field name="parent_id" ref="product_category_fmcg_food"/>
+        </record>
+        <record id="product_category_fmcg_frozen" model="product.category">
+            <field name="name">Hàng đông lạnh</field>
+            <field name="parent_id" ref="product_category_fmcg_food"/>
+        </record>
+        <record id="product_category_fmcg_raw_material" model="product.category">
+            <field name="name">Nguyên liệu đa ngành</field>
+            <field name="parent_id" ref="product_category_fmcg_food"/>
+        </record>
+        <record id="product_category_fmcg_cosmetics" model="product.category">
+            <field name="name">Chăm sóc cá nhân</field>
+            <field name="parent_id" ref="product.product_category_goods"/>
+        </record>
+        <record id="product_category_fmcg_consumables" model="product.category">
+            <field name="name">Chăm sóc gia đình</field>
+            <field name="parent_id" ref="product.product_category_goods"/>
+        </record>
+        <record id="product_category_fmcg_packaging" model="product.category">
+            <field name="name">Bao bì đa ngành</field>
+            <field name="parent_id" ref="product.product_category_goods"/>
+        </record>
+        <record id="product_category_fmcg_trading" model="product.category">
+            <field name="name">Hàng thương mại</field>
+            <field name="parent_id" ref="product.product_category_goods"/>
+        </record>
+
+        <!-- Logistics package types -->
+        <record id="package_type_fmcg_carton" model="stock.package.type">
+            <field name="name">Thùng carton FMCG</field>
+            <field name="package_use">disposable</field>
+            <field name="sequence">10</field>
+            <field name="height">30</field>
+            <field name="width">40</field>
+            <field name="packaging_length">50</field>
+            <field name="base_weight">0.5</field>
+            <field name="max_weight">15</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="package_type_fmcg_shrink_wrap" model="stock.package.type">
+            <field name="name">Màng co lốc chai</field>
+            <field name="package_use">disposable</field>
+            <field name="sequence">20</field>
+            <field name="height">12</field>
+            <field name="width">14</field>
+            <field name="packaging_length">24</field>
+            <field name="base_weight">0.05</field>
+            <field name="max_weight">3</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="package_type_fmcg_euro_pallet" model="stock.package.type">
+            <field name="name">Euro Pallet</field>
+            <field name="package_use">reusable</field>
+            <field name="sequence">30</field>
+            <field name="height">15</field>
+            <field name="width">80</field>
+            <field name="packaging_length">120</field>
+            <field name="base_weight">25</field>
+            <field name="max_weight">1000</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="package_type_fmcg_picking_tote" model="stock.package.type">
+            <field name="name">Picking Tote</field>
+            <field name="package_use">reusable</field>
+            <field name="sequence">40</field>
+            <field name="height">32</field>
+            <field name="width">40</field>
+            <field name="packaging_length">60</field>
+            <field name="base_weight">2</field>
+            <field name="max_weight">25</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="package_type_fmcg_thermal_box" model="stock.package.type">
+            <field name="name">Thùng giữ nhiệt</field>
+            <field name="package_use">reusable</field>
+            <field name="sequence">50</field>
+            <field name="height">45</field>
+            <field name="width">50</field>
+            <field name="packaging_length">60</field>
+            <field name="base_weight">5</field>
+            <field name="max_weight">40</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Storage categories -->
+        <record id="storage_category_food_grade" model="stock.storage.category">
+            <field name="name">Food Grade Storage</field>
+            <field name="max_weight">20000</field>
+            <field name="allow_new_product">mixed</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="storage_category_finished_goods" model="stock.storage.category">
+            <field name="name">Finished Goods</field>
+            <field name="max_weight">25000</field>
+            <field name="allow_new_product">mixed</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="storage_category_packaging" model="stock.storage.category">
+            <field name="name">Packaging Storage</field>
+            <field name="max_weight">15000</field>
+            <field name="allow_new_product">mixed</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="storage_category_chemical" model="stock.storage.category">
+            <field name="name">Chemical Storage</field>
+            <field name="max_weight">12000</field>
+            <field name="allow_new_product">same</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="storage_category_cold" model="stock.storage.category">
+            <field name="name">Cold Storage</field>
+            <field name="max_weight">10000</field>
+            <field name="allow_new_product">same</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="storage_category_frozen" model="stock.storage.category">
+            <field name="name">Frozen Storage</field>
+            <field name="max_weight">8000</field>
+            <field name="allow_new_product">same</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Package capacities: pallet=20, tote/thermal box=100. -->
+        <record id="capacity_food_grade_pallet" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_food_grade"/>
+            <field name="package_type_id" ref="package_type_fmcg_euro_pallet"/>
+            <field name="quantity">20</field>
+        </record>
+        <record id="capacity_food_grade_tote" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_food_grade"/>
+            <field name="package_type_id" ref="package_type_fmcg_picking_tote"/>
+            <field name="quantity">100</field>
+        </record>
+        <record id="capacity_food_grade_thermal" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_food_grade"/>
+            <field name="package_type_id" ref="package_type_fmcg_thermal_box"/>
+            <field name="quantity">100</field>
+        </record>
+
+        <record id="capacity_finished_goods_pallet" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+            <field name="package_type_id" ref="package_type_fmcg_euro_pallet"/>
+            <field name="quantity">20</field>
+        </record>
+        <record id="capacity_finished_goods_tote" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+            <field name="package_type_id" ref="package_type_fmcg_picking_tote"/>
+            <field name="quantity">100</field>
+        </record>
+        <record id="capacity_finished_goods_thermal" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+            <field name="package_type_id" ref="package_type_fmcg_thermal_box"/>
+            <field name="quantity">100</field>
+        </record>
+
+        <record id="capacity_packaging_pallet" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_packaging"/>
+            <field name="package_type_id" ref="package_type_fmcg_euro_pallet"/>
+            <field name="quantity">20</field>
+        </record>
+        <record id="capacity_packaging_tote" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_packaging"/>
+            <field name="package_type_id" ref="package_type_fmcg_picking_tote"/>
+            <field name="quantity">100</field>
+        </record>
+        <record id="capacity_packaging_thermal" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_packaging"/>
+            <field name="package_type_id" ref="package_type_fmcg_thermal_box"/>
+            <field name="quantity">100</field>
+        </record>
+
+        <record id="capacity_chemical_pallet" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_chemical"/>
+            <field name="package_type_id" ref="package_type_fmcg_euro_pallet"/>
+            <field name="quantity">20</field>
+        </record>
+        <record id="capacity_chemical_tote" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_chemical"/>
+            <field name="package_type_id" ref="package_type_fmcg_picking_tote"/>
+            <field name="quantity">100</field>
+        </record>
+        <record id="capacity_chemical_thermal" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_chemical"/>
+            <field name="package_type_id" ref="package_type_fmcg_thermal_box"/>
+            <field name="quantity">100</field>
+        </record>
+
+        <record id="capacity_cold_pallet" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_cold"/>
+            <field name="package_type_id" ref="package_type_fmcg_euro_pallet"/>
+            <field name="quantity">20</field>
+        </record>
+        <record id="capacity_cold_tote" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_cold"/>
+            <field name="package_type_id" ref="package_type_fmcg_picking_tote"/>
+            <field name="quantity">100</field>
+        </record>
+        <record id="capacity_cold_thermal" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_cold"/>
+            <field name="package_type_id" ref="package_type_fmcg_thermal_box"/>
+            <field name="quantity">100</field>
+        </record>
+
+        <record id="capacity_frozen_pallet" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_frozen"/>
+            <field name="package_type_id" ref="package_type_fmcg_euro_pallet"/>
+            <field name="quantity">20</field>
+        </record>
+        <record id="capacity_frozen_tote" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_frozen"/>
+            <field name="package_type_id" ref="package_type_fmcg_picking_tote"/>
+            <field name="quantity">100</field>
+        </record>
+        <record id="capacity_frozen_thermal" model="stock.storage.category.capacity">
+            <field name="storage_category_id" ref="storage_category_frozen"/>
+            <field name="package_type_id" ref="package_type_fmcg_thermal_box"/>
+            <field name="quantity">100</field>
+        </record>
+
+        <!-- Storage zones below the main warehouse stock location. -->
+        <record id="location_fmcg_food_raw_materials" model="stock.location">
+            <field name="name">Food Raw Materials</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="storage_category_id" ref="storage_category_food_grade"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="location_fmcg_finished_food" model="stock.location">
+            <field name="name">Finished Food</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="location_fmcg_packaging" model="stock.location">
+            <field name="name">Packaging</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="storage_category_id" ref="storage_category_packaging"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="location_fmcg_chemicals" model="stock.location">
+            <field name="name">Chemicals</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="storage_category_id" ref="storage_category_chemical"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="location_fmcg_cold_chain" model="stock.location">
+            <field name="name">Cold Chain</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="storage_category_id" ref="storage_category_cold"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="location_fmcg_frozen" model="stock.location">
+            <field name="name">Frozen</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="storage_category_id" ref="storage_category_frozen"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Category-based putaway rules. -->
+        <record id="putaway_fmcg_raw_material" model="stock.putaway.rule">
+            <field name="location_in_id" ref="stock.stock_location_stock"/>
+            <field name="location_out_id" ref="location_fmcg_food_raw_materials"/>
+            <field name="category_id" ref="product_category_fmcg_raw_material"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="putaway_fmcg_beverage" model="stock.putaway.rule">
+            <field name="location_in_id" ref="stock.stock_location_stock"/>
+            <field name="location_out_id" ref="location_fmcg_finished_food"/>
+            <field name="category_id" ref="product_category_fmcg_milk"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="putaway_fmcg_instant_food" model="stock.putaway.rule">
+            <field name="location_in_id" ref="stock.stock_location_stock"/>
+            <field name="location_out_id" ref="location_fmcg_finished_food"/>
+            <field name="category_id" ref="product_category_fmcg_instant_food"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="putaway_fmcg_snack" model="stock.putaway.rule">
+            <field name="location_in_id" ref="stock.stock_location_stock"/>
+            <field name="location_out_id" ref="location_fmcg_finished_food"/>
+            <field name="category_id" ref="product_category_fmcg_snack"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="putaway_fmcg_condiment" model="stock.putaway.rule">
+            <field name="location_in_id" ref="stock.stock_location_stock"/>
+            <field name="location_out_id" ref="location_fmcg_finished_food"/>
+            <field name="category_id" ref="product_category_fmcg_condiment"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="putaway_fmcg_packaging" model="stock.putaway.rule">
+            <field name="location_in_id" ref="stock.stock_location_stock"/>
+            <field name="location_out_id" ref="location_fmcg_packaging"/>
+            <field name="category_id" ref="product_category_fmcg_packaging"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="putaway_fmcg_home_care" model="stock.putaway.rule">
+            <field name="location_in_id" ref="stock.stock_location_stock"/>
+            <field name="location_out_id" ref="location_fmcg_chemicals"/>
+            <field name="category_id" ref="product_category_fmcg_consumables"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="putaway_fmcg_frozen" model="stock.putaway.rule">
+            <field name="location_in_id" ref="stock.stock_location_stock"/>
+            <field name="location_out_id" ref="location_fmcg_frozen"/>
+            <field name="category_id" ref="product_category_fmcg_frozen"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Warehouse Orderpoints -->
+        <record id="orderpoint_rm_purified_water" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_rm_wheat_flour" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-WHEAT-FLOUR')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_rm_seasoning" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-SEASONING')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_rm_potato" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-POTATO')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_rm_veg_oil" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-VEG-OIL')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_rm_cleaning_base" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-CLEANING-BASE')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_rm_chili_paste" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-CHILI-PASTE')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_pm_bottle_generic" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'PM-BOTTLE-GENERIC')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_pm_can_330" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'PM-CAN-330')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_pm_pouch_generic" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'PM-POUCH-GENERIC')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_trade_tissue_10" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'TRADE-TISSUE-10')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_trade_toothpaste_180" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'TRADE-TOOTHPASTE-180')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_trade_shampoo_650" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'TRADE-SHAMPOO-650')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_trade_shower_gel_500" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'TRADE-SHOWER-GEL-500')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_trade_handwash_500" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'TRADE-HANDWASH-500')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_trade_floor_cleaner_1l" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'TRADE-FLOOR-CLEANER-1L')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_trade_fabric_softener_2l" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'TRADE-FABRIC-SOFTENER-2L')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_trade_coffee_3in1_20" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'TRADE-COFFEE-3IN1-20')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_trade_biscuit_300" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'TRADE-BISCUIT-300')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_trade_fish_sauce_750" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'TRADE-FISH-SAUCE-750')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_frozen_dumpling_500" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'FROZEN-DUMPLING-500')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_frozen_icecream_450" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'FROZEN-ICECREAM-450')]"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+    </data>
+</odoo>

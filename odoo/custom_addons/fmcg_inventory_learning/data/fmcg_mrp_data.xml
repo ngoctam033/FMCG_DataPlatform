@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Workcenters -->
+        <record id="workcenter_mix" model="mrp.workcenter">
+            <field name="name">Mixing</field>
+            <field name="code">MIX</field>
+            <field name="time_efficiency">95</field>
+            <field name="costs_hour">450000</field>
+            <field name="resource_calendar_id" search="[('name', '=', 'Standard 40 hours/week')]"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="workcenter_proc" model="mrp.workcenter">
+            <field name="name">Processing / Sterilization</field>
+            <field name="code">PROC</field>
+            <field name="time_efficiency">90</field>
+            <field name="costs_hour">650000</field>
+            <field name="resource_calendar_id" search="[('name', '=', 'Standard 40 hours/week')]"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="workcenter_fill" model="mrp.workcenter">
+            <field name="name">Filling</field>
+            <field name="code">FILL</field>
+            <field name="time_efficiency">92</field>
+            <field name="costs_hour">550000</field>
+            <field name="resource_calendar_id" search="[('name', '=', 'Standard 40 hours/week')]"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="workcenter_pack" model="mrp.workcenter">
+            <field name="name">Packing</field>
+            <field name="code">PACK</field>
+            <field name="time_efficiency">95</field>
+            <field name="costs_hour">350000</field>
+            <field name="resource_calendar_id" search="[('name', '=', 'Standard 40 hours/week')]"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="workcenter_clean" model="mrp.workcenter">
+            <field name="name">Cleaning</field>
+            <field name="code">CLEAN</field>
+            <field name="time_efficiency">90</field>
+            <field name="costs_hour">250000</field>
+            <field name="resource_calendar_id" search="[('name', '=', 'Standard 40 hours/week')]"/>
+            <field name="active" eval="True"/>
+        </record>
+        <!-- Routing Operations for BoMs -->
+        <record id="operation_bev_water_500_mix" model="mrp.routing.workcenter">
+            <field name="name">Mixing / Preparation</field>
+            <field name="bom_id" ref="bom_product_bev_water_500"/>
+            <field name="workcenter_id" ref="workcenter_mix"/>
+            <field name="sequence">10</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_bev_water_500_proc" model="mrp.routing.workcenter">
+            <field name="name">Processing</field>
+            <field name="bom_id" ref="bom_product_bev_water_500"/>
+            <field name="workcenter_id" ref="workcenter_proc"/>
+            <field name="sequence">20</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">45</field>
+        </record>
+        <record id="operation_bev_water_500_pack" model="mrp.routing.workcenter">
+            <field name="name">Filling and Packing</field>
+            <field name="bom_id" ref="bom_product_bev_water_500"/>
+            <field name="workcenter_id" ref="workcenter_pack"/>
+            <field name="sequence">30</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_bev_tea_peach_450_mix" model="mrp.routing.workcenter">
+            <field name="name">Mixing / Preparation</field>
+            <field name="bom_id" ref="bom_product_bev_tea_peach_450"/>
+            <field name="workcenter_id" ref="workcenter_mix"/>
+            <field name="sequence">10</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_bev_tea_peach_450_proc" model="mrp.routing.workcenter">
+            <field name="name">Processing</field>
+            <field name="bom_id" ref="bom_product_bev_tea_peach_450"/>
+            <field name="workcenter_id" ref="workcenter_proc"/>
+            <field name="sequence">20</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">45</field>
+        </record>
+        <record id="operation_bev_tea_peach_450_pack" model="mrp.routing.workcenter">
+            <field name="name">Filling and Packing</field>
+            <field name="bom_id" ref="bom_product_bev_tea_peach_450"/>
+            <field name="workcenter_id" ref="workcenter_pack"/>
+            <field name="sequence">30</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_bev_cola_330_mix" model="mrp.routing.workcenter">
+            <field name="name">Mixing / Preparation</field>
+            <field name="bom_id" ref="bom_product_bev_cola_330"/>
+            <field name="workcenter_id" ref="workcenter_mix"/>
+            <field name="sequence">10</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_bev_cola_330_proc" model="mrp.routing.workcenter">
+            <field name="name">Processing</field>
+            <field name="bom_id" ref="bom_product_bev_cola_330"/>
+            <field name="workcenter_id" ref="workcenter_proc"/>
+            <field name="sequence">20</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">45</field>
+        </record>
+        <record id="operation_bev_cola_330_pack" model="mrp.routing.workcenter">
+            <field name="name">Filling and Packing</field>
+            <field name="bom_id" ref="bom_product_bev_cola_330"/>
+            <field name="workcenter_id" ref="workcenter_pack"/>
+            <field name="sequence">30</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_food_noodle_beef_75_mix" model="mrp.routing.workcenter">
+            <field name="name">Mixing / Preparation</field>
+            <field name="bom_id" ref="bom_product_food_noodle_beef_75"/>
+            <field name="workcenter_id" ref="workcenter_mix"/>
+            <field name="sequence">10</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_food_noodle_beef_75_proc" model="mrp.routing.workcenter">
+            <field name="name">Processing</field>
+            <field name="bom_id" ref="bom_product_food_noodle_beef_75"/>
+            <field name="workcenter_id" ref="workcenter_proc"/>
+            <field name="sequence">20</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">45</field>
+        </record>
+        <record id="operation_food_noodle_beef_75_pack" model="mrp.routing.workcenter">
+            <field name="name">Filling and Packing</field>
+            <field name="bom_id" ref="bom_product_food_noodle_beef_75"/>
+            <field name="workcenter_id" ref="workcenter_pack"/>
+            <field name="sequence">30</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_food_snack_potato_50_mix" model="mrp.routing.workcenter">
+            <field name="name">Mixing / Preparation</field>
+            <field name="bom_id" ref="bom_product_food_snack_potato_50"/>
+            <field name="workcenter_id" ref="workcenter_mix"/>
+            <field name="sequence">10</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_food_snack_potato_50_proc" model="mrp.routing.workcenter">
+            <field name="name">Processing</field>
+            <field name="bom_id" ref="bom_product_food_snack_potato_50"/>
+            <field name="workcenter_id" ref="workcenter_proc"/>
+            <field name="sequence">20</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">45</field>
+        </record>
+        <record id="operation_food_snack_potato_50_pack" model="mrp.routing.workcenter">
+            <field name="name">Filling and Packing</field>
+            <field name="bom_id" ref="bom_product_food_snack_potato_50"/>
+            <field name="workcenter_id" ref="workcenter_pack"/>
+            <field name="sequence">30</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_cond_chili_250_mix" model="mrp.routing.workcenter">
+            <field name="name">Mixing / Preparation</field>
+            <field name="bom_id" ref="bom_product_cond_chili_250"/>
+            <field name="workcenter_id" ref="workcenter_mix"/>
+            <field name="sequence">10</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_cond_chili_250_proc" model="mrp.routing.workcenter">
+            <field name="name">Processing</field>
+            <field name="bom_id" ref="bom_product_cond_chili_250"/>
+            <field name="workcenter_id" ref="workcenter_proc"/>
+            <field name="sequence">20</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">45</field>
+        </record>
+        <record id="operation_cond_chili_250_pack" model="mrp.routing.workcenter">
+            <field name="name">Filling and Packing</field>
+            <field name="bom_id" ref="bom_product_cond_chili_250"/>
+            <field name="workcenter_id" ref="workcenter_pack"/>
+            <field name="sequence">30</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_home_dish_750_mix" model="mrp.routing.workcenter">
+            <field name="name">Mixing / Preparation</field>
+            <field name="bom_id" ref="bom_product_home_dish_750"/>
+            <field name="workcenter_id" ref="workcenter_mix"/>
+            <field name="sequence">10</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_home_dish_750_proc" model="mrp.routing.workcenter">
+            <field name="name">Processing</field>
+            <field name="bom_id" ref="bom_product_home_dish_750"/>
+            <field name="workcenter_id" ref="workcenter_proc"/>
+            <field name="sequence">20</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">45</field>
+        </record>
+        <record id="operation_home_dish_750_pack" model="mrp.routing.workcenter">
+            <field name="name">Filling and Packing</field>
+            <field name="bom_id" ref="bom_product_home_dish_750"/>
+            <field name="workcenter_id" ref="workcenter_pack"/>
+            <field name="sequence">30</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_home_laundry_3l_mix" model="mrp.routing.workcenter">
+            <field name="name">Mixing / Preparation</field>
+            <field name="bom_id" ref="bom_product_home_laundry_3l"/>
+            <field name="workcenter_id" ref="workcenter_mix"/>
+            <field name="sequence">10</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+        <record id="operation_home_laundry_3l_proc" model="mrp.routing.workcenter">
+            <field name="name">Processing</field>
+            <field name="bom_id" ref="bom_product_home_laundry_3l"/>
+            <field name="workcenter_id" ref="workcenter_proc"/>
+            <field name="sequence">20</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">45</field>
+        </record>
+        <record id="operation_home_laundry_3l_pack" model="mrp.routing.workcenter">
+            <field name="name">Filling and Packing</field>
+            <field name="bom_id" ref="bom_product_home_laundry_3l"/>
+            <field name="workcenter_id" ref="workcenter_pack"/>
+            <field name="sequence">30</field>
+            <field name="time_mode">manual</field>
+            <field name="time_cycle">30</field>
+        </record>
+    </data>
+</odoo>

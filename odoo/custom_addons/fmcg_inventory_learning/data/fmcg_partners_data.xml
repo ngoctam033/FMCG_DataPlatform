@@ -1,0 +1,842 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Partner Tags -->
+        <record id="res_partner_category_fmcg_supplier" model="res.partner.category">
+            <field name="name">FMCG / Supplier</field>
+        </record>
+        <record id="res_partner_category_fmcg_general_trade" model="res.partner.category">
+            <field name="name">FMCG / General Trade</field>
+        </record>
+        <record id="res_partner_category_fmcg_modern_trade" model="res.partner.category">
+            <field name="name">FMCG / Modern Trade</field>
+        </record>
+        <record id="res_partner_category_fmcg_horeca" model="res.partner.category">
+            <field name="name">FMCG / HORECA</field>
+        </record>
+        <record id="res_partner_category_fmcg_e_commerce" model="res.partner.category">
+            <field name="name">FMCG / E-commerce</field>
+        </record>
+        <record id="res_partner_category_fmcg_distributor" model="res.partner.category">
+            <field name="name">FMCG / Distributor</field>
+        </record>
+        <!-- Suppliers -->
+
+        <record id="partner_sup_dairy" model="res.partner">
+            <field name="name">Nhà cung cấp Sữa nguyên liệu Miền Nam</field>
+            <field name="ref">SUP-DAIRY</field>
+            <field name="company_type">company</field>
+            <field name="supplier_rank">1</field>
+            <field name="customer_rank">0</field>
+            <field name="street">Khu công nghiệp Tân Tạo</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">02873001001</field>
+            <field name="email">dairy.supplier@example.test</field>
+            <field name="property_supplier_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_supplier')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_sup_ingredients" model="res.partner">
+            <field name="name">Nhà cung cấp Đường &amp; Gia vị Việt</field>
+            <field name="ref">SUP-INGREDIENTS</field>
+            <field name="company_type">company</field>
+            <field name="supplier_rank">1</field>
+            <field name="customer_rank">0</field>
+            <field name="street">Khu công nghiệp Sóng Thần</field>
+            <field name="city">Bình Dương</field>
+            <field name="state_id" search="[('code', '=', 'VN-57'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">02747300102</field>
+            <field name="email">ingredients.supplier@example.test</field>
+            <field name="property_supplier_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_supplier')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_sup_packaging" model="res.partner">
+            <field name="name">Bao bì FMCG Đông Nam</field>
+            <field name="ref">SUP-PACKAGING</field>
+            <field name="company_type">company</field>
+            <field name="supplier_rank">1</field>
+            <field name="customer_rank">0</field>
+            <field name="street">Khu công nghiệp Amata</field>
+            <field name="city">Đồng Nai</field>
+            <field name="state_id" search="[('code', '=', 'VN-39'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">02517300103</field>
+            <field name="email">packaging.supplier@example.test</field>
+            <field name="property_supplier_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_supplier')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_sup_chemical" model="res.partner">
+            <field name="name">Nguyên liệu Hóa phẩm An Phát</field>
+            <field name="ref">SUP-CHEMICAL</field>
+            <field name="company_type">company</field>
+            <field name="supplier_rank">1</field>
+            <field name="customer_rank">0</field>
+            <field name="street">Khu công nghiệp Hiệp Phước</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">02873001004</field>
+            <field name="email">chemical.supplier@example.test</field>
+            <field name="property_supplier_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_supplier')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_sup_trading" model="res.partner">
+            <field name="name">Nhà phân phối Hàng tiêu dùng Toàn Việt</field>
+            <field name="ref">SUP-TRADING</field>
+            <field name="company_type">company</field>
+            <field name="supplier_rank">1</field>
+            <field name="customer_rank">0</field>
+            <field name="street">Khu công nghiệp Bắc Thăng Long</field>
+            <field name="city">Hà Nội</field>
+            <field name="state_id" search="[('code', '=', 'VN-01'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">02473001005</field>
+            <field name="email">trading.supplier@example.test</field>
+            <field name="property_supplier_payment_term_id" search="[('name', '=', '45 Days')]"/>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_supplier')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_sup_frozen" model="res.partner">
+            <field name="name">Thực phẩm Đông lạnh Biển Xanh</field>
+            <field name="ref">SUP-FROZEN</field>
+            <field name="company_type">company</field>
+            <field name="supplier_rank">1</field>
+            <field name="customer_rank">0</field>
+            <field name="street">Khu công nghiệp Vĩnh Lộc</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-48'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">02873001006</field>
+            <field name="email">frozen.supplier@example.test</field>
+            <field name="property_supplier_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_supplier')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_sup_logistics" model="res.partner">
+            <field name="name">Vận tải &amp; Kho lạnh Nam Việt</field>
+            <field name="ref">SUP-LOGISTICS</field>
+            <field name="company_type">company</field>
+            <field name="supplier_rank">1</field>
+            <field name="customer_rank">0</field>
+            <field name="street">Đường Nguyễn Văn Linh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">02873001007</field>
+            <field name="email">logistics.supplier@example.test</field>
+            <field name="property_supplier_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_supplier')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_sup_general" model="res.partner">
+            <field name="name">Nhà cung cấp FMCG tổng hợp (Simulator)</field>
+            <field name="ref">SUP-GENERAL</field>
+            <field name="company_type">company</field>
+            <field name="supplier_rank">1</field>
+            <field name="customer_rank">0</field>
+            <field name="street">Đường Võ Văn Kiệt</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">02873001008</field>
+            <field name="email">general.supplier@example.test</field>
+            <field name="property_supplier_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_supplier')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+        <!-- Customers and Delivery Addresses -->
+
+        <record id="partner_cus_gt_001" model="res.partner">
+            <field name="name">Tạp hóa Minh Anh</field>
+            <field name="ref">CUS-GT-001</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 1, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000001</field>
+            <field name="email">customer01@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="credit_limit">30000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_general_trade')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_gt_001_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Tạp hóa Minh Anh</field>
+            <field name="ref">CUS-GT-001-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_gt_001"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 1, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000001</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_gt_002" model="res.partner">
+            <field name="name">Cửa hàng Bách hóa Thành Công</field>
+            <field name="ref">CUS-GT-002</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 2, Biên Hòa</field>
+            <field name="city">Biên Hòa</field>
+            <field name="state_id" search="[('code', '=', 'VN-39'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000002</field>
+            <field name="email">customer02@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="credit_limit">40000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_general_trade')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_gt_002_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Cửa hàng Bách hóa Thành Công</field>
+            <field name="ref">CUS-GT-002-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_gt_002"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 2, Biên Hòa</field>
+            <field name="city">Biên Hòa</field>
+            <field name="state_id" search="[('code', '=', 'VN-39'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000002</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_gt_003" model="res.partner">
+            <field name="name">Đại lý Tiêu dùng Hồng Phúc</field>
+            <field name="ref">CUS-GT-003</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 3, Thủ Dầu Một</field>
+            <field name="city">Thủ Dầu Một</field>
+            <field name="state_id" search="[('code', '=', 'VN-57'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000003</field>
+            <field name="email">customer03@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="credit_limit">80000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_general_trade')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_gt_003_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Đại lý Tiêu dùng Hồng Phúc</field>
+            <field name="ref">CUS-GT-003-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_gt_003"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 3, Thủ Dầu Một</field>
+            <field name="city">Thủ Dầu Một</field>
+            <field name="state_id" search="[('code', '=', 'VN-57'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000003</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_gt_004" model="res.partner">
+            <field name="name">Tạp hóa Gia Đình</field>
+            <field name="ref">CUS-GT-004</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 4, Long Xuyên</field>
+            <field name="city">Long Xuyên</field>
+            <field name="state_id" search="[('code', '=', 'VN-41'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000004</field>
+            <field name="email">customer04@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="credit_limit">25000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_general_trade')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_gt_004_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Tạp hóa Gia Đình</field>
+            <field name="ref">CUS-GT-004-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_gt_004"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 4, Long Xuyên</field>
+            <field name="city">Long Xuyên</field>
+            <field name="state_id" search="[('code', '=', 'VN-41'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000004</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_gt_005" model="res.partner">
+            <field name="name">Đại lý Phương Nam</field>
+            <field name="ref">CUS-GT-005</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 5, Cần Thơ</field>
+            <field name="city">Cần Thơ</field>
+            <field name="state_id" search="[('code', '=', 'VN-92'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000005</field>
+            <field name="email">customer05@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="credit_limit">70000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_general_trade')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_gt_005_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Đại lý Phương Nam</field>
+            <field name="ref">CUS-GT-005-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_gt_005"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 5, Cần Thơ</field>
+            <field name="city">Cần Thơ</field>
+            <field name="state_id" search="[('code', '=', 'VN-92'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000005</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_gt_006" model="res.partner">
+            <field name="name">Cửa hàng Tiện lợi Bình Minh</field>
+            <field name="ref">CUS-GT-006</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 6, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-48'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000006</field>
+            <field name="email">customer06@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="credit_limit">35000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_general_trade')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_gt_006_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Cửa hàng Tiện lợi Bình Minh</field>
+            <field name="ref">CUS-GT-006-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_gt_006"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 6, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-48'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000006</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_mt_001" model="res.partner">
+            <field name="name">Siêu thị Thành Thị Miền Nam</field>
+            <field name="ref">CUS-MT-001</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 7, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000007</field>
+            <field name="email">customer07@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '45 Days')]"/>
+            <field name="credit_limit">1500000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_modern_trade')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_mt_001_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Siêu thị Thành Thị Miền Nam</field>
+            <field name="ref">CUS-MT-001-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_mt_001"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 7, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000007</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_mt_002" model="res.partner">
+            <field name="name">Chuỗi Minimart Sao Việt</field>
+            <field name="ref">CUS-MT-002</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 8, Bình Dương</field>
+            <field name="city">Bình Dương</field>
+            <field name="state_id" search="[('code', '=', 'VN-57'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000008</field>
+            <field name="email">customer08@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '45 Days')]"/>
+            <field name="credit_limit">900000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_modern_trade')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_mt_002_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Chuỗi Minimart Sao Việt</field>
+            <field name="ref">CUS-MT-002-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_mt_002"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 8, Bình Dương</field>
+            <field name="city">Bình Dương</field>
+            <field name="state_id" search="[('code', '=', 'VN-57'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000008</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_mt_003" model="res.partner">
+            <field name="name">Trung tâm Bán lẻ Đồng Nai</field>
+            <field name="ref">CUS-MT-003</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 9, Đồng Nai</field>
+            <field name="city">Đồng Nai</field>
+            <field name="state_id" search="[('code', '=', 'VN-39'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000009</field>
+            <field name="email">customer09@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '45 Days')]"/>
+            <field name="credit_limit">700000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_modern_trade')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_mt_003_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Trung tâm Bán lẻ Đồng Nai</field>
+            <field name="ref">CUS-MT-003-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_mt_003"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 9, Đồng Nai</field>
+            <field name="city">Đồng Nai</field>
+            <field name="state_id" search="[('code', '=', 'VN-39'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000009</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_mt_004" model="res.partner">
+            <field name="name">Siêu thị Miền Tây</field>
+            <field name="ref">CUS-MT-004</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 10, Cần Thơ</field>
+            <field name="city">Cần Thơ</field>
+            <field name="state_id" search="[('code', '=', 'VN-92'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000010</field>
+            <field name="email">customer10@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '45 Days')]"/>
+            <field name="credit_limit">800000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_modern_trade')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_mt_004_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Siêu thị Miền Tây</field>
+            <field name="ref">CUS-MT-004-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_mt_004"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 10, Cần Thơ</field>
+            <field name="city">Cần Thơ</field>
+            <field name="state_id" search="[('code', '=', 'VN-92'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000010</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_hr_001" model="res.partner">
+            <field name="name">Khách sạn Sông Sài Gòn</field>
+            <field name="ref">CUS-HR-001</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 11, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000011</field>
+            <field name="email">customer11@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="credit_limit">250000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_horeca')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_hr_001_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Khách sạn Sông Sài Gòn</field>
+            <field name="ref">CUS-HR-001-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_hr_001"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 11, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000011</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_hr_002" model="res.partner">
+            <field name="name">Chuỗi Café Ban Mai</field>
+            <field name="ref">CUS-HR-002</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 12, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000012</field>
+            <field name="email">customer12@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="credit_limit">180000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_horeca')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_hr_002_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Chuỗi Café Ban Mai</field>
+            <field name="ref">CUS-HR-002-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_hr_002"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 12, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000012</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_hr_003" model="res.partner">
+            <field name="name">Nhà hàng Hương Việt</field>
+            <field name="ref">CUS-HR-003</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 13, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-48'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000013</field>
+            <field name="email">customer13@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '15 Days')]"/>
+            <field name="credit_limit">100000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_horeca')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_hr_003_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Nhà hàng Hương Việt</field>
+            <field name="ref">CUS-HR-003-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_hr_003"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 13, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-48'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000013</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_hr_004" model="res.partner">
+            <field name="name">Công ty Suất ăn Công nghiệp An Khang</field>
+            <field name="ref">CUS-HR-004</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 14, Bình Dương</field>
+            <field name="city">Bình Dương</field>
+            <field name="state_id" search="[('code', '=', 'VN-57'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000014</field>
+            <field name="email">customer14@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="credit_limit">350000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_horeca')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_hr_004_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Công ty Suất ăn Công nghiệp An Khang</field>
+            <field name="ref">CUS-HR-004-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_hr_004"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 14, Bình Dương</field>
+            <field name="city">Bình Dương</field>
+            <field name="state_id" search="[('code', '=', 'VN-57'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000014</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_ec_001" model="res.partner">
+            <field name="name">Khách hàng Online Hồ Chí Minh</field>
+            <field name="ref">CUS-EC-001</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 15, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000015</field>
+            <field name="email">customer15@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', 'Immediate Payment')]"/>
+            <field name="credit_limit">0</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_e_commerce')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_ec_001_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Khách hàng Online Hồ Chí Minh</field>
+            <field name="ref">CUS-EC-001-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_ec_001"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 15, TP. Hồ Chí Minh</field>
+            <field name="city">TP. Hồ Chí Minh</field>
+            <field name="state_id" search="[('code', '=', 'VN-79'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000015</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_ec_002" model="res.partner">
+            <field name="name">Khách hàng Online Đồng Nai</field>
+            <field name="ref">CUS-EC-002</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 16, Đồng Nai</field>
+            <field name="city">Đồng Nai</field>
+            <field name="state_id" search="[('code', '=', 'VN-39'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000016</field>
+            <field name="email">customer16@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', 'Immediate Payment')]"/>
+            <field name="credit_limit">0</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_e_commerce')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_ec_002_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Khách hàng Online Đồng Nai</field>
+            <field name="ref">CUS-EC-002-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_ec_002"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 16, Đồng Nai</field>
+            <field name="city">Đồng Nai</field>
+            <field name="state_id" search="[('code', '=', 'VN-39'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000016</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_ec_003" model="res.partner">
+            <field name="name">Khách hàng Online Cần Thơ</field>
+            <field name="ref">CUS-EC-003</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 17, Cần Thơ</field>
+            <field name="city">Cần Thơ</field>
+            <field name="state_id" search="[('code', '=', 'VN-92'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000017</field>
+            <field name="email">customer17@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', 'Immediate Payment')]"/>
+            <field name="credit_limit">0</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_e_commerce')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_ec_003_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Khách hàng Online Cần Thơ</field>
+            <field name="ref">CUS-EC-003-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_ec_003"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 17, Cần Thơ</field>
+            <field name="city">Cần Thơ</field>
+            <field name="state_id" search="[('code', '=', 'VN-92'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000017</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_dis_001" model="res.partner">
+            <field name="name">Nhà phân phối Miền Đông</field>
+            <field name="ref">CUS-DIS-001</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 18, Đồng Nai</field>
+            <field name="city">Đồng Nai</field>
+            <field name="state_id" search="[('code', '=', 'VN-39'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000018</field>
+            <field name="email">customer18@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="credit_limit">2000000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_distributor')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_dis_001_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Nhà phân phối Miền Đông</field>
+            <field name="ref">CUS-DIS-001-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_dis_001"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 18, Đồng Nai</field>
+            <field name="city">Đồng Nai</field>
+            <field name="state_id" search="[('code', '=', 'VN-39'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000018</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_dis_002" model="res.partner">
+            <field name="name">Nhà phân phối Tây Nam Bộ</field>
+            <field name="ref">CUS-DIS-002</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 19, Cần Thơ</field>
+            <field name="city">Cần Thơ</field>
+            <field name="state_id" search="[('code', '=', 'VN-92'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000019</field>
+            <field name="email">customer19@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="credit_limit">2500000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_distributor')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_dis_002_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Nhà phân phối Tây Nam Bộ</field>
+            <field name="ref">CUS-DIS-002-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_dis_002"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 19, Cần Thơ</field>
+            <field name="city">Cần Thơ</field>
+            <field name="state_id" search="[('code', '=', 'VN-92'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000019</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_dis_003" model="res.partner">
+            <field name="name">Nhà phân phối Cao Nguyên</field>
+            <field name="ref">CUS-DIS-003</field>
+            <field name="company_type">company</field>
+            <field name="customer_rank">1</field>
+            <field name="supplier_rank">0</field>
+            <field name="street">Địa chỉ mô phỏng 20, Lâm Đồng</field>
+            <field name="city">Lâm Đồng</field>
+            <field name="state_id" search="[('code', '=', 'VN-35'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0901000020</field>
+            <field name="email">customer20@example.test</field>
+            <field name="property_payment_term_id" search="[('name', '=', '30 Days')]"/>
+            <field name="credit_limit">1800000000</field>
+            <field name="category_id" eval="[(6, 0, [ref('res_partner_category_fmcg_distributor')])]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="partner_cus_dis_003_ship" model="res.partner">
+            <field name="name">Kho nhận hàng – Nhà phân phối Cao Nguyên</field>
+            <field name="ref">CUS-DIS-003-SHIP</field>
+            <field name="company_type">person</field>
+            <field name="parent_id" ref="partner_cus_dis_003"/>
+            <field name="type">delivery</field>
+            <field name="street">Kho giao nhận mô phỏng 20, Lâm Đồng</field>
+            <field name="city">Lâm Đồng</field>
+            <field name="state_id" search="[('code', '=', 'VN-35'), ('country_id.code', '=', 'VN')]"/>
+            <field name="country_id" ref="base.vn"/>
+            <field name="phone">0902000020</field>
+            <field name="customer_rank">0</field>
+            <field name="supplier_rank">0</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

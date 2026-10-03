@@ -1,0 +1,1163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Units of Measure -->
+        <record id="uom_bottle" model="uom.uom">
+            <field name="name">Chai</field>
+            <field name="relative_factor" eval="1.0"/>
+            <field name="relative_uom_id" ref="uom.product_uom_unit"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="uom_can" model="uom.uom">
+            <field name="name">Lon</field>
+            <field name="relative_factor" eval="1.0"/>
+            <field name="relative_uom_id" ref="uom.product_uom_unit"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="uom_packet" model="uom.uom">
+            <field name="name">Gói</field>
+            <field name="relative_factor" eval="1.0"/>
+            <field name="relative_uom_id" ref="uom.product_uom_unit"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="uom_bag" model="uom.uom">
+            <field name="name">Túi</field>
+            <field name="relative_factor" eval="1.0"/>
+            <field name="relative_uom_id" ref="uom.product_uom_unit"/>
+            <field name="active" eval="True"/>
+        </record>
+        <record id="uom_box_24" model="uom.uom">
+            <field name="name">Hộp</field>
+            <field name="relative_factor" eval="1.0"/>
+            <field name="relative_uom_id" ref="uom.product_uom_unit"/>
+            <field name="active" eval="True"/>
+        </record>
+        <!-- Categories FEFO Update -->
+        <record id="product_category_fmcg_milk" model="product.category">
+            <field name="removal_strategy_id" search="[('method', '=', 'fefo')]"/>
+        </record>
+        <record id="product_category_fmcg_instant_food" model="product.category">
+            <field name="removal_strategy_id" search="[('method', '=', 'fefo')]"/>
+        </record>
+        <record id="product_category_fmcg_snack" model="product.category">
+            <field name="removal_strategy_id" search="[('method', '=', 'fefo')]"/>
+        </record>
+        <record id="product_category_fmcg_condiment" model="product.category">
+            <field name="removal_strategy_id" search="[('method', '=', 'fefo')]"/>
+        </record>
+        <record id="product_category_fmcg_frozen" model="product.category">
+            <field name="removal_strategy_id" search="[('method', '=', 'fefo')]"/>
+        </record>
+        <record id="product_category_fmcg_raw_material" model="product.category">
+            <field name="removal_strategy_id" search="[('method', '=', 'fefo')]"/>
+        </record>
+        <!-- General Supplier -->
+        <record id="partner_sup_general" model="res.partner">
+            <field name="name">Nhà cung cấp FMCG tổng hợp (Simulator)</field>
+            <field name="ref">SUP-GENERAL</field>
+            <field name="company_type">company</field>
+            <field name="email">general.supplier@example.test</field>
+        </record>
+        <!-- Products -->
+
+        <record id="product_rm_purified_water" model="product.template">
+            <field name="name">Nước tinh khiết sản xuất</field>
+            <field name="default_code">RM-PURIFIED-WATER</field>
+            <field name="barcode">2000010003013</field>
+            <field name="categ_id" ref="product_category_fmcg_raw_material"/>
+            <field name="uom_id" ref="uom.product_uom_litre"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">1200</field>
+            <field name="list_price">0.0</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Nước tinh khiết sản xuất – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">30</field>
+            <field name="use_time">7</field>
+            <field name="removal_time">14</field>
+            <field name="alert_time">21</field>
+        </record>
+        <record id="supplierinfo_product_rm_purified_water" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_rm_purified_water"/>
+            <field name="price">1200</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_rm_wheat_flour" model="product.template">
+            <field name="name">Bột mì thực phẩm</field>
+            <field name="default_code">RM-WHEAT-FLOUR</field>
+            <field name="barcode">2000010003020</field>
+            <field name="categ_id" ref="product_category_fmcg_raw_material"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">18000</field>
+            <field name="list_price">0.0</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Bột mì thực phẩm – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">365</field>
+            <field name="use_time">30</field>
+            <field name="removal_time">45</field>
+            <field name="alert_time">60</field>
+        </record>
+        <record id="supplierinfo_product_rm_wheat_flour" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_rm_wheat_flour"/>
+            <field name="price">18000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_rm_seasoning" model="product.template">
+            <field name="name">Gia vị tổng hợp</field>
+            <field name="default_code">RM-SEASONING</field>
+            <field name="barcode">2000010003037</field>
+            <field name="categ_id" ref="product_category_fmcg_raw_material"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">95000</field>
+            <field name="list_price">0.0</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Gia vị tổng hợp – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">365</field>
+            <field name="use_time">30</field>
+            <field name="removal_time">45</field>
+            <field name="alert_time">60</field>
+        </record>
+        <record id="supplierinfo_product_rm_seasoning" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_rm_seasoning"/>
+            <field name="price">95000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_rm_potato" model="product.template">
+            <field name="name">Khoai tây nguyên liệu</field>
+            <field name="default_code">RM-POTATO</field>
+            <field name="barcode">2000010003044</field>
+            <field name="categ_id" ref="product_category_fmcg_raw_material"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">16000</field>
+            <field name="list_price">0.0</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Khoai tây nguyên liệu – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">30</field>
+            <field name="use_time">7</field>
+            <field name="removal_time">14</field>
+            <field name="alert_time">21</field>
+        </record>
+        <record id="supplierinfo_product_rm_potato" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_rm_potato"/>
+            <field name="price">16000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_rm_veg_oil" model="product.template">
+            <field name="name">Dầu thực vật</field>
+            <field name="default_code">RM-VEG-OIL</field>
+            <field name="barcode">2000010003051</field>
+            <field name="categ_id" ref="product_category_fmcg_raw_material"/>
+            <field name="uom_id" ref="uom.product_uom_litre"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">42000</field>
+            <field name="list_price">0.0</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Dầu thực vật – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">365</field>
+            <field name="use_time">30</field>
+            <field name="removal_time">45</field>
+            <field name="alert_time">60</field>
+        </record>
+        <record id="supplierinfo_product_rm_veg_oil" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_rm_veg_oil"/>
+            <field name="price">42000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_rm_cleaning_base" model="product.template">
+            <field name="name">Hỗn hợp nền tẩy rửa</field>
+            <field name="default_code">RM-CLEANING-BASE</field>
+            <field name="barcode">2000010003068</field>
+            <field name="categ_id" ref="product_category_fmcg_raw_material"/>
+            <field name="uom_id" ref="uom.product_uom_litre"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">28000</field>
+            <field name="list_price">0.0</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Hỗn hợp nền tẩy rửa – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">730</field>
+            <field name="use_time">60</field>
+            <field name="removal_time">91</field>
+            <field name="alert_time">121</field>
+        </record>
+        <record id="supplierinfo_product_rm_cleaning_base" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_rm_cleaning_base"/>
+            <field name="price">28000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_rm_chili_paste" model="product.template">
+            <field name="name">Ớt nghiền nguyên liệu</field>
+            <field name="default_code">RM-CHILI-PASTE</field>
+            <field name="barcode">2000010003075</field>
+            <field name="categ_id" ref="product_category_fmcg_raw_material"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">38000</field>
+            <field name="list_price">0.0</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Ớt nghiền nguyên liệu – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">180</field>
+            <field name="use_time">15</field>
+            <field name="removal_time">22</field>
+            <field name="alert_time">30</field>
+        </record>
+        <record id="supplierinfo_product_rm_chili_paste" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_rm_chili_paste"/>
+            <field name="price">38000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_pm_bottle_generic" model="product.template">
+            <field name="name">Chai nhựa thực phẩm</field>
+            <field name="default_code">PM-BOTTLE-GENERIC</field>
+            <field name="barcode">2000010003082</field>
+            <field name="categ_id" ref="product_category_fmcg_packaging"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">none</field>
+            <field name="standard_price">1200</field>
+            <field name="list_price">0.0</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Chai nhựa thực phẩm – dữ liệu mô phỏng FMCG.</field>
+        </record>
+        <record id="supplierinfo_product_pm_bottle_generic" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_pm_bottle_generic"/>
+            <field name="price">1200</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_pm_can_330" model="product.template">
+            <field name="name">Lon nhôm 330ml</field>
+            <field name="default_code">PM-CAN-330</field>
+            <field name="barcode">2000010003099</field>
+            <field name="categ_id" ref="product_category_fmcg_packaging"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">none</field>
+            <field name="standard_price">1800</field>
+            <field name="list_price">0.0</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Lon nhôm 330ml – dữ liệu mô phỏng FMCG.</field>
+        </record>
+        <record id="supplierinfo_product_pm_can_330" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_pm_can_330"/>
+            <field name="price">1800</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_pm_pouch_generic" model="product.template">
+            <field name="name">Túi và gói bao bì</field>
+            <field name="default_code">PM-POUCH-GENERIC</field>
+            <field name="barcode">2000010003105</field>
+            <field name="categ_id" ref="product_category_fmcg_packaging"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">none</field>
+            <field name="standard_price">700</field>
+            <field name="list_price">0.0</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Túi và gói bao bì – dữ liệu mô phỏng FMCG.</field>
+        </record>
+        <record id="supplierinfo_product_pm_pouch_generic" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_pm_pouch_generic"/>
+            <field name="price">700</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_bev_water_500" model="product.template">
+            <field name="name">Nước tinh khiết 500ml</field>
+            <field name="default_code">BEV-WATER-500</field>
+            <field name="barcode">2000010004010</field>
+            <field name="categ_id" ref="product_category_fmcg_milk"/>
+            <field name="uom_id" ref="uom_bottle"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">2500</field>
+            <field name="list_price">6000</field>
+            <field name="weight">0.52</field>
+            <field name="volume">0.00065</field>
+            <field name="description_sale">Nước tinh khiết 500ml – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">365</field>
+            <field name="use_time">30</field>
+            <field name="removal_time">45</field>
+            <field name="alert_time">60</field>
+            <field name="route_ids" eval="[(6, 0, [ref('stock.route_warehouse0_mto')])]"/>
+        </record>
+
+        <!-- <record id="bom_product_bev_water_500" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_bev_water_500"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_bottle"/>
+            <field name="type">normal</field>
+        </record> -->
+
+        <!-- <record id="bom_line_product_bev_water_500_0" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_water_500"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="product_qty">0.5</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_bev_water_500_1" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_water_500"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-BOTTLE-GENERIC')]"/>
+            <field name="product_qty">1</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record> -->
+
+        <record id="product_bev_tea_peach_450" model="product.template">
+            <field name="name">Trà đào đóng chai 450ml</field>
+            <field name="default_code">BEV-TEA-PEACH-450</field>
+            <field name="barcode">2000010004027</field>
+            <field name="categ_id" ref="product_category_fmcg_milk"/>
+            <field name="uom_id" ref="uom_bottle"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">6000</field>
+            <field name="list_price">12000</field>
+            <field name="weight">0.47</field>
+            <field name="volume">0.0006</field>
+            <field name="description_sale">Trà đào đóng chai 450ml – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">270</field>
+            <field name="use_time">22</field>
+            <field name="removal_time">33</field>
+            <field name="alert_time">45</field>
+            <field name="route_ids" eval="[(6, 0, [ref('stock.route_warehouse0_mto')])]"/>
+        </record>
+
+        <!-- <record id="bom_product_bev_tea_peach_450" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_bev_tea_peach_450"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_bottle"/>
+            <field name="type">normal</field>
+        </record> -->
+
+        <!-- <record id="bom_line_product_bev_tea_peach_450_0" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_tea_peach_450"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="product_qty">0.43</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_bev_tea_peach_450_1" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_tea_peach_450"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-SEASONING')]"/>
+            <field name="product_qty">0.01</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_bev_tea_peach_450_2" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_tea_peach_450"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-BOTTLE-GENERIC')]"/>
+            <field name="product_qty">1</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record> -->
+
+        <record id="product_bev_cola_330" model="product.template">
+            <field name="name">Nước ngọt có gas 330ml</field>
+            <field name="default_code">BEV-COLA-330</field>
+            <field name="barcode">2000010004034</field>
+            <field name="categ_id" ref="product_category_fmcg_milk"/>
+            <field name="uom_id" ref="uom_can"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">5000</field>
+            <field name="list_price">10000</field>
+            <field name="weight">0.35</field>
+            <field name="volume">0.00045</field>
+            <field name="description_sale">Nước ngọt có gas 330ml – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">270</field>
+            <field name="use_time">22</field>
+            <field name="removal_time">33</field>
+            <field name="alert_time">45</field>
+            <field name="route_ids" eval="[(6, 0, [ref('stock.route_warehouse0_mto')])]"/>
+        </record>
+
+        <!-- <record id="bom_product_bev_cola_330" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_bev_cola_330"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_can"/>
+            <field name="type">normal</field>
+        </record> -->
+
+        <!-- <record id="bom_line_product_bev_cola_330_0" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_cola_330"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="product_qty">0.31</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_bev_cola_330_1" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_cola_330"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-SEASONING')]"/>
+            <field name="product_qty">0.015</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_bev_cola_330_2" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_cola_330"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-CAN-330')]"/>
+            <field name="product_qty">1</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record> -->
+
+        <record id="product_food_noodle_beef_75" model="product.template">
+            <field name="name">Mì ăn liền vị bò 75g</field>
+            <field name="default_code">FOOD-NOODLE-BEEF-75</field>
+            <field name="barcode">2000010004041</field>
+            <field name="categ_id" ref="product_category_fmcg_instant_food"/>
+            <field name="uom_id" ref="uom_packet"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">2600</field>
+            <field name="list_price">5000</field>
+            <field name="weight">0.08</field>
+            <field name="volume">0.0004</field>
+            <field name="description_sale">Mì ăn liền vị bò 75g – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">180</field>
+            <field name="use_time">15</field>
+            <field name="removal_time">22</field>
+            <field name="alert_time">30</field>
+            <field name="route_ids" eval="[(6, 0, [ref('stock.route_warehouse0_mto')])]"/>
+        </record>
+
+        <!-- <record id="bom_product_food_noodle_beef_75" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_food_noodle_beef_75"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_packet"/>
+            <field name="type">normal</field>
+        </record> -->
+
+        <!-- <record id="bom_line_product_food_noodle_beef_75_0" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_noodle_beef_75"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-WHEAT-FLOUR')]"/>
+            <field name="product_qty">0.06</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_food_noodle_beef_75_1" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_noodle_beef_75"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-SEASONING')]"/>
+            <field name="product_qty">0.01</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_food_noodle_beef_75_2" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_noodle_beef_75"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-VEG-OIL')]"/>
+            <field name="product_qty">0.005</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_food_noodle_beef_75_3" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_noodle_beef_75"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-POUCH-GENERIC')]"/>
+            <field name="product_qty">1</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record> -->
+
+        <record id="product_food_snack_potato_50" model="product.template">
+            <field name="name">Snack khoai tây 50g</field>
+            <field name="default_code">FOOD-SNACK-POTATO-50</field>
+            <field name="barcode">2000010004058</field>
+            <field name="categ_id" ref="product_category_fmcg_snack"/>
+            <field name="uom_id" ref="uom_packet"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">4800</field>
+            <field name="list_price">10000</field>
+            <field name="weight">0.055</field>
+            <field name="volume">0.0008</field>
+            <field name="description_sale">Snack khoai tây 50g – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">180</field>
+            <field name="use_time">15</field>
+            <field name="removal_time">22</field>
+            <field name="alert_time">30</field>
+            <field name="route_ids" eval="[(6, 0, [ref('stock.route_warehouse0_mto')])]"/>
+        </record>
+
+        <!-- <record id="bom_product_food_snack_potato_50" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_food_snack_potato_50"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_packet"/>
+            <field name="type">normal</field>
+        </record> -->
+
+        <!-- <record id="bom_line_product_food_snack_potato_50_0" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_snack_potato_50"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-POTATO')]"/>
+            <field name="product_qty">0.08</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_food_snack_potato_50_1" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_snack_potato_50"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-VEG-OIL')]"/>
+            <field name="product_qty">0.012</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_food_snack_potato_50_2" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_snack_potato_50"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-SEASONING')]"/>
+            <field name="product_qty">0.003</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_food_snack_potato_50_3" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_snack_potato_50"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-POUCH-GENERIC')]"/>
+            <field name="product_qty">1</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record> -->
+
+        <record id="product_cond_chili_250" model="product.template">
+            <field name="name">Tương ớt chai 250g</field>
+            <field name="default_code">COND-CHILI-250</field>
+            <field name="barcode">2000010004065</field>
+            <field name="categ_id" ref="product_category_fmcg_condiment"/>
+            <field name="uom_id" ref="uom_bottle"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">9000</field>
+            <field name="list_price">18000</field>
+            <field name="weight">0.28</field>
+            <field name="volume">0.0004</field>
+            <field name="description_sale">Tương ớt chai 250g – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">365</field>
+            <field name="use_time">30</field>
+            <field name="removal_time">45</field>
+            <field name="alert_time">60</field>
+            <field name="route_ids" eval="[(6, 0, [ref('stock.route_warehouse0_mto')])]"/>
+        </record>
+
+        <!-- <record id="bom_product_cond_chili_250" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_cond_chili_250"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_bottle"/>
+            <field name="type">normal</field>
+        </record> -->
+
+        <!-- <record id="bom_line_product_cond_chili_250_0" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_cond_chili_250"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-CHILI-PASTE')]"/>
+            <field name="product_qty">0.2</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_cond_chili_250_1" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_cond_chili_250"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="product_qty">0.04</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_cond_chili_250_2" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_cond_chili_250"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-SEASONING')]"/>
+            <field name="product_qty">0.01</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_cond_chili_250_3" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_cond_chili_250"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-BOTTLE-GENERIC')]"/>
+            <field name="product_qty">1</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record> -->
+
+        <record id="product_home_dish_750" model="product.template">
+            <field name="name">Nước rửa chén 750ml</field>
+            <field name="default_code">HOME-DISH-750</field>
+            <field name="barcode">2000010004072</field>
+            <field name="categ_id" ref="product_category_fmcg_consumables"/>
+            <field name="uom_id" ref="uom_bottle"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">17000</field>
+            <field name="list_price">35000</field>
+            <field name="weight">0.8</field>
+            <field name="volume">0.001</field>
+            <field name="description_sale">Nước rửa chén 750ml – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">730</field>
+            <field name="use_time">60</field>
+            <field name="removal_time">91</field>
+            <field name="alert_time">121</field>
+            <field name="route_ids" eval="[(6, 0, [ref('stock.route_warehouse0_mto')])]"/>
+        </record>
+
+        <!-- <record id="bom_product_home_dish_750" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_home_dish_750"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_bottle"/>
+            <field name="type">normal</field>
+        </record> -->
+
+        <!-- <record id="bom_line_product_home_dish_750_0" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_dish_750"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-CLEANING-BASE')]"/>
+            <field name="product_qty">0.72</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_home_dish_750_1" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_dish_750"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="product_qty">0.03</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_home_dish_750_2" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_dish_750"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-BOTTLE-GENERIC')]"/>
+            <field name="product_qty">1</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record> -->
+
+        <record id="product_home_laundry_3l" model="product.template">
+            <field name="name">Nước giặt 3L</field>
+            <field name="default_code">HOME-LAUNDRY-3L</field>
+            <field name="barcode">2000010004089</field>
+            <field name="categ_id" ref="product_category_fmcg_consumables"/>
+            <field name="uom_id" ref="uom_bottle"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">72000</field>
+            <field name="list_price">145000</field>
+            <field name="weight">3.1</field>
+            <field name="volume">0.0035</field>
+            <field name="description_sale">Nước giặt 3L – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">730</field>
+            <field name="use_time">60</field>
+            <field name="removal_time">91</field>
+            <field name="alert_time">121</field>
+            <field name="route_ids" eval="[(6, 0, [ref('stock.route_warehouse0_mto')])]"/>
+        </record>
+
+        <!-- <record id="bom_product_home_laundry_3l" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_home_laundry_3l"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_bottle"/>
+            <field name="type">normal</field>
+        </record> -->
+
+        <!-- <record id="bom_line_product_home_laundry_3l_0" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_laundry_3l"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-CLEANING-BASE')]"/>
+            <field name="product_qty">2.85</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_home_laundry_3l_1" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_laundry_3l"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="product_qty">0.15</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record> -->
+
+        <!-- <record id="bom_line_product_home_laundry_3l_2" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_laundry_3l"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-BOTTLE-GENERIC')]"/>
+            <field name="product_qty">1</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record> -->
+
+        <record id="product_trade_tissue_10" model="product.template">
+            <field name="name">Khăn giấy lốc 10 gói</field>
+            <field name="default_code">TRADE-TISSUE-10</field>
+            <field name="barcode">2000010005017</field>
+            <field name="categ_id" ref="product_category_fmcg_trading"/>
+            <field name="uom_id" ref="uom_packet"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">none</field>
+            <field name="standard_price">42000</field>
+            <field name="list_price">65000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Khăn giấy lốc 10 gói – dữ liệu mô phỏng FMCG.</field>
+        </record>
+        <record id="supplierinfo_product_trade_tissue_10" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_trade_tissue_10"/>
+            <field name="price">42000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_trade_toothpaste_180" model="product.template">
+            <field name="name">Kem đánh răng 180g</field>
+            <field name="default_code">TRADE-TOOTHPASTE-180</field>
+            <field name="barcode">2000010005024</field>
+            <field name="categ_id" ref="product_category_fmcg_cosmetics"/>
+            <field name="uom_id" ref="uom_box_24"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">33000</field>
+            <field name="list_price">52000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Kem đánh răng 180g – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">1095</field>
+            <field name="use_time">91</field>
+            <field name="removal_time">136</field>
+            <field name="alert_time">182</field>
+        </record>
+        <record id="supplierinfo_product_trade_toothpaste_180" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_trade_toothpaste_180"/>
+            <field name="price">33000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_trade_shampoo_650" model="product.template">
+            <field name="name">Dầu gội 650ml</field>
+            <field name="default_code">TRADE-SHAMPOO-650</field>
+            <field name="barcode">2000010005031</field>
+            <field name="categ_id" ref="product_category_fmcg_cosmetics"/>
+            <field name="uom_id" ref="uom_bottle"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">85000</field>
+            <field name="list_price">135000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Dầu gội 650ml – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">1095</field>
+            <field name="use_time">91</field>
+            <field name="removal_time">136</field>
+            <field name="alert_time">182</field>
+        </record>
+        <record id="supplierinfo_product_trade_shampoo_650" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_trade_shampoo_650"/>
+            <field name="price">85000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_trade_shower_gel_500" model="product.template">
+            <field name="name">Sữa tắm 500ml</field>
+            <field name="default_code">TRADE-SHOWER-GEL-500</field>
+            <field name="barcode">2000010005048</field>
+            <field name="categ_id" ref="product_category_fmcg_cosmetics"/>
+            <field name="uom_id" ref="uom_bottle"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">68000</field>
+            <field name="list_price">110000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Sữa tắm 500ml – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">1095</field>
+            <field name="use_time">91</field>
+            <field name="removal_time">136</field>
+            <field name="alert_time">182</field>
+        </record>
+        <record id="supplierinfo_product_trade_shower_gel_500" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_trade_shower_gel_500"/>
+            <field name="price">68000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_trade_handwash_500" model="product.template">
+            <field name="name">Nước rửa tay 500ml</field>
+            <field name="default_code">TRADE-HANDWASH-500</field>
+            <field name="barcode">2000010005055</field>
+            <field name="categ_id" ref="product_category_fmcg_cosmetics"/>
+            <field name="uom_id" ref="uom_bottle"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">45000</field>
+            <field name="list_price">75000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Nước rửa tay 500ml – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">730</field>
+            <field name="use_time">60</field>
+            <field name="removal_time">91</field>
+            <field name="alert_time">121</field>
+        </record>
+        <record id="supplierinfo_product_trade_handwash_500" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_trade_handwash_500"/>
+            <field name="price">45000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_trade_floor_cleaner_1l" model="product.template">
+            <field name="name">Nước lau sàn 1L</field>
+            <field name="default_code">TRADE-FLOOR-CLEANER-1L</field>
+            <field name="barcode">2000010005062</field>
+            <field name="categ_id" ref="product_category_fmcg_consumables"/>
+            <field name="uom_id" ref="uom_bottle"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">35000</field>
+            <field name="list_price">58000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Nước lau sàn 1L – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">730</field>
+            <field name="use_time">60</field>
+            <field name="removal_time">91</field>
+            <field name="alert_time">121</field>
+        </record>
+        <record id="supplierinfo_product_trade_floor_cleaner_1l" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_trade_floor_cleaner_1l"/>
+            <field name="price">35000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_trade_fabric_softener_2l" model="product.template">
+            <field name="name">Nước xả vải 2L</field>
+            <field name="default_code">TRADE-FABRIC-SOFTENER-2L</field>
+            <field name="barcode">2000010005079</field>
+            <field name="categ_id" ref="product_category_fmcg_consumables"/>
+            <field name="uom_id" ref="uom_bag"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">58000</field>
+            <field name="list_price">95000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Nước xả vải 2L – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">730</field>
+            <field name="use_time">60</field>
+            <field name="removal_time">91</field>
+            <field name="alert_time">121</field>
+        </record>
+        <record id="supplierinfo_product_trade_fabric_softener_2l" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_trade_fabric_softener_2l"/>
+            <field name="price">58000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_trade_coffee_3in1_20" model="product.template">
+            <field name="name">Cà phê hòa tan hộp 20 gói</field>
+            <field name="default_code">TRADE-COFFEE-3IN1-20</field>
+            <field name="barcode">2000010005086</field>
+            <field name="categ_id" ref="product_category_fmcg_instant_food"/>
+            <field name="uom_id" ref="uom_box_24"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">48000</field>
+            <field name="list_price">78000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Cà phê hòa tan hộp 20 gói – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">365</field>
+            <field name="use_time">30</field>
+            <field name="removal_time">45</field>
+            <field name="alert_time">60</field>
+        </record>
+        <record id="supplierinfo_product_trade_coffee_3in1_20" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_trade_coffee_3in1_20"/>
+            <field name="price">48000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_trade_biscuit_300" model="product.template">
+            <field name="name">Bánh quy bơ hộp 300g</field>
+            <field name="default_code">TRADE-BISCUIT-300</field>
+            <field name="barcode">2000010005093</field>
+            <field name="categ_id" ref="product_category_fmcg_snack"/>
+            <field name="uom_id" ref="uom_box_24"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">39000</field>
+            <field name="list_price">65000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Bánh quy bơ hộp 300g – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">270</field>
+            <field name="use_time">22</field>
+            <field name="removal_time">33</field>
+            <field name="alert_time">45</field>
+        </record>
+        <record id="supplierinfo_product_trade_biscuit_300" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_trade_biscuit_300"/>
+            <field name="price">39000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_trade_fish_sauce_750" model="product.template">
+            <field name="name">Nước mắm 750ml</field>
+            <field name="default_code">TRADE-FISH-SAUCE-750</field>
+            <field name="barcode">2000010005109</field>
+            <field name="categ_id" ref="product_category_fmcg_condiment"/>
+            <field name="uom_id" ref="uom_bottle"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">41000</field>
+            <field name="list_price">68000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Nước mắm 750ml – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">730</field>
+            <field name="use_time">60</field>
+            <field name="removal_time">91</field>
+            <field name="alert_time">121</field>
+        </record>
+        <record id="supplierinfo_product_trade_fish_sauce_750" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_trade_fish_sauce_750"/>
+            <field name="price">41000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_frozen_dumpling_500" model="product.template">
+            <field name="name">Há cảo đông lạnh 500g</field>
+            <field name="default_code">FROZEN-DUMPLING-500</field>
+            <field name="barcode">2000010005116</field>
+            <field name="categ_id" ref="product_category_fmcg_frozen"/>
+            <field name="uom_id" ref="uom_bag"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">55000</field>
+            <field name="list_price">89000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Há cảo đông lạnh 500g – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">365</field>
+            <field name="use_time">30</field>
+            <field name="removal_time">45</field>
+            <field name="alert_time">60</field>
+        </record>
+        <record id="supplierinfo_product_frozen_dumpling_500" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_frozen_dumpling_500"/>
+            <field name="price">55000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="product_frozen_icecream_450" model="product.template">
+            <field name="name">Kem hộp 450ml</field>
+            <field name="default_code">FROZEN-ICECREAM-450</field>
+            <field name="barcode">2000010005123</field>
+            <field name="categ_id" ref="product_category_fmcg_frozen"/>
+            <field name="uom_id" ref="uom_box_24"/>
+
+            <field name="is_storable" eval="True"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="invoice_policy">delivery</field>
+            <field name="tracking">lot</field>
+            <field name="standard_price">60000</field>
+            <field name="list_price">95000</field>
+            <field name="weight">1.0</field>
+            <field name="volume">0.0</field>
+            <field name="description_sale">Kem hộp 450ml – dữ liệu mô phỏng FMCG.</field>
+            <field name="use_expiration_date" eval="True"/>
+            <field name="expiration_time">365</field>
+            <field name="use_time">30</field>
+            <field name="removal_time">45</field>
+            <field name="alert_time">60</field>
+        </record>
+        <record id="supplierinfo_product_frozen_icecream_450" model="product.supplierinfo">
+            <field name="partner_id" ref="partner_sup_general"/>
+            <field name="product_tmpl_id" ref="product_frozen_icecream_450"/>
+            <field name="price">60000</field>
+            <field name="min_qty">10</field>
+            <field name="delay">7</field>
+        </record>
+    </data>
+</odoo>

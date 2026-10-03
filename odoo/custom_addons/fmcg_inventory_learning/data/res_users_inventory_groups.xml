@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <record id="base.user_admin" model="res.users">
+        <field name="group_ids" eval="[
+            Command.link(ref('stock.group_stock_manager')),
+            Command.link(ref('stock.group_stock_user')),
+            Command.link(ref('stock.group_adv_location')),
+        ]"/>
+    </record>
+</odoo>
