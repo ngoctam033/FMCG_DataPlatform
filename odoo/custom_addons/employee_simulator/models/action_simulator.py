@@ -264,11 +264,10 @@ class EmployeeSimulator(models.AbstractModel):
                         note='Hệ thống tự động phát hiện thiếu hàng khi Validate. Cần xử lý tạo Backorder.',
                         user_id=selected_user.id
                     )
-                    _logger.info(f"[VALIDATE] Đã gắn Activity Backorder cho phiếu {simulated_picking.name}")
-            if isinstance(action_result, dict):
-                import json
-                formatted_json = json.dumps(action_result, indent=4, default=str)
-                _logger.info(f"{simulated_picking.name}:\n{formatted_json}")
+                else:
+                    import json
+                    formatted_json = json.dumps(action_result, indent=4, default=str)
+                    _logger.info(f"{simulated_picking.name}:\n{formatted_json}")
 
     @api.model
     def cron_simulate_picking_cancel(self):
