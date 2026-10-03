@@ -237,7 +237,7 @@ class EmployeeSimulator(models.AbstractModel):
                 selected_user.id,
             )
             try:
-                action_result = simulated_picking.button_validate()
+                action_result = simulated_picking.with_context(skip_sms=True).button_validate()
             except UserError as e:
                 if "Lot/Serial" in str(e):
                     missing_lot_act_type = self.env.ref('employee_simulator.mail_activity_missing_lot', raise_if_not_found=False)
