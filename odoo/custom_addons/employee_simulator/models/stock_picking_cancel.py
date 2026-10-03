@@ -1,5 +1,7 @@
 from odoo import api, models
-
+from odoo.exceptions import UserError
+import logging
+_logger = logging.getLogger(__name__)
 
 class EmployeeSimulatorCancel(models.AbstractModel):
     _inherit = "employee.simulator"
@@ -62,11 +64,14 @@ class EmployeeSimulatorCancel(models.AbstractModel):
             if activity_user.has_group('stock.group_stock_user'):
                 user_id = activity_user.id
             else:
-                stock_users = self.env.ref('stock.group_stock_user').sudo().users
-                if stock_users:
-                    user_id = stock_users[0].id
-                else:
-                    user_id = self.env.user.id
+                stock_group = self.env.ref('stock.group_stock_user')
+                stock_user = self.env['res.users'].sudo().search([
+                    ('active', '=', True),
+                    ('all_group_ids', 'in', [stock_group.id]),
+                    ('company_ids', 'in', [picking.company_id.id]),
+                ], order='id', limit=1)
+                stock_user.ensure_one()
+                user_id = stock_user.id
 
             simulated_picking = picking.with_user(user_id)
             
