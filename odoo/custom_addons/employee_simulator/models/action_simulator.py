@@ -290,7 +290,10 @@ class EmployeeSimulator(models.AbstractModel):
         activity_type = self.env.ref('employee_simulator.mail_activity_missing_lot', raise_if_not_found=False)
 
         domain = [
-            ('activity_ids.activity_type_id', '=', activity_type.id),
+            ('activity_ids', 'any', [
+                ('activity_type_id', '=', activity_type.id),
+                ('date_deadline', '<', fields.Date.today()),
+            ]),
             ('picking_type_id.code', 'in', ['incoming', 'mrp_operation'])
         ]
         
