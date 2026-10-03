@@ -9,6 +9,7 @@
             <field name="state">code</field>
             <!-- Gọi thẳng vào AbstractModel qua env -->
             <field name="code">env['employee.simulator'].simulate_create_picking(record_count=100)</field>
+            <field name="priority">0</field>
             <field name="interval_number">20</field>
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>
@@ -19,6 +20,7 @@
             <field name="model_id" ref="model_employee_simulator"/>
             <field name="state">code</field>
             <field name="code">model.simulate_confirm_picking()</field>
+            <field name="priority">1</field>
             <field name="interval_number">1</field>
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>
@@ -28,6 +30,7 @@
             <field name="model_id" ref="model_employee_simulator"/>
             <field name="state">code</field>
             <field name="code">model.cron_simulate_picking_assign()</field>
+            <field name="priority">2</field>
             <!-- Chạy mỗi 2 phút hoặc 1 phút tùy bạn muốn tần suất giả lập -->
             <field name="interval_number">1</field>
             <field name="interval_type">minutes</field>
@@ -39,6 +42,7 @@
             <field name="model_id" ref="model_employee_simulator"/>
             <field name="state">code</field>
             <field name="code">model.cron_simulate_picking_validate()</field>
+            <field name="priority">3</field>
             <field name="interval_number">1</field>
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>
@@ -49,6 +53,7 @@
             <field name="model_id" ref="model_employee_simulator"/>
             <field name="state">code</field>
             <field name="code">model.cron_find_missing_lot_pickings()</field>
+            <field name="priority">4</field>
             <field name="interval_number">1</field>
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>
@@ -59,6 +64,7 @@
             <field name="model_id" ref="employee_simulator.model_employee_simulator"/>
             <field name="state">code</field>
             <field name="code">model.cron_process_missing_lot_activities()</field>
+            <field name="priority">5</field>
             <field name="interval_number">1</field>
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>
@@ -69,6 +75,7 @@
             <field name="model_id" ref="model_employee_simulator"/>
             <field name="state">code</field>
             <field name="code">model.cron_find_picking_cancel_candidates()</field>
+            <field name="priority">8</field>
             <field name="interval_number">1</field>
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>
@@ -88,6 +95,7 @@
             <field name="model_id" ref="model_employee_simulator"/>
             <field name="state">code</field>
             <field name="code">model.cron_simulate_backorder_create()</field>
+            <field name="priority">6</field>
             <field name="interval_number">1</field>
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>
@@ -97,6 +105,7 @@
             <field name="model_id" ref="model_employee_simulator"/>
             <field name="state">code</field>
             <field name="code">model.cron_simulate_backorder_cancel()</field>
+            <field name="priority">7</field>
             <field name="interval_number">3</field>
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>
