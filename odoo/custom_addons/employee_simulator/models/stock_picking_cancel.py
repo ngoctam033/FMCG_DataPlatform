@@ -17,19 +17,16 @@ class EmployeeSimulatorCancel(models.AbstractModel):
                     "in",
                     ["draft", "confirmed", "waiting", "assigned"],
                 ),
+                (
+                    "activity_ids",
+                    "not any",
+                    [("activity_type_id", "=", activity_type.id)],
+                ),
             ],
             limit=5,
         )
 
         for picking in pickings:
-            has_cancel_activity = any(
-                activity.activity_type_id == activity_type
-                for activity in picking.activity_ids
-            )
-
-            if has_cancel_activity:
-                continue
-
             picking.activity_schedule(
                 activity_type_id=activity_type.id,
                 summary="Simulator: Chờ hủy phiếu kho",

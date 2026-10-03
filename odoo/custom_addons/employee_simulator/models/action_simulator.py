@@ -279,8 +279,76 @@ class EmployeeSimulator(models.AbstractModel):
         - Khi nhấn nút này, hệ thống gọi action_cancel().
         - Điều kiện bắt buộc (Test Case target): Chỉ tác động lên các phiếu chưa hoàn thành (thường là draft, confirmed, hoặc assigned).
         """
-        # TODO: Define test cases (assert picking changes to 'cancel') and implement logic
-        pass
+        activity_type = self.env.ref(
+            'employee_simulator.mail_activity_simulate_cancel',
+            raise_if_not_found=False,
+        )
+        if not activity_type:
+            _logger.warning(
+                "[CRON PICKING CANCEL] Không tìm thấy activity type "
+                "employee_simulator.mail_activity_simulate_cancel"
+            )
+            return
+
+        today = fields.Date.context_today(self)
+        pickings = self.env['stock.picking'].search([
+            ('activity_ids', 'any', [
+                ('activity_type_id', '=', activity_type.id),
+                ('date_deadline', '<', today),
+            ]),
+            ('state', 'in', ['draft', 'confirmed', 'waiting', 'assigned']),
+        ], limit=5)
+
+        for picking in pickings:
+            target_activities = picking.activity_ids.filtered(
+                lambda activity: (
+                    activity.activity_type_id.id == activity_type.id
+                    and activity.date_deadline < today
+                )
+            )
+            activity_user = target_activities[:1].user_id or self.env.user
+
+            if (
+                activity_user.has_group('stock.group_stock_user')
+                and picking.company_id in activity_user.company_ids
+            ):
+                simulated_user = activity_user
+            else:
+                stock_group = self.env.ref('stock.group_stock_user')
+                simulated_user = self.env['res.users'].sudo().search([
+                    ('active', '=', True),
+                    ('all_group_ids', 'in', [stock_group.id]),
+                    ('company_ids', 'in', [picking.company_id.id]),
+                ], order='id', limit=1)
+
+            if not simulated_user:
+                _logger.warning(
+                    "[CRON PICKING CANCEL] Không tìm thấy người dùng Kho để hủy phiếu %s",
+                    picking.name,
+                )
+                continue
+
+            simulated_picking = picking.with_user(simulated_user).with_company(
+                picking.company_id
+            )
+
+            try:
+                simulated_picking.action_cancel()
+            except Exception:
+                _logger.exception(
+                    "[CRON PICKING CANCEL] Không thể hủy phiếu %s với user_id=%s",
+                    picking.name,
+                    simulated_user.id,
+                )
+                continue
+
+            if simulated_picking.state == 'cancel':
+                target_activities.action_done()
+                _logger.info(
+                    "[CRON PICKING CANCEL] Đã hủy phiếu %s với user_id=%s",
+                    picking.name,
+                    simulated_user.id,
+                )
     
     def cron_process_missing_lot_activities(self):
         """
