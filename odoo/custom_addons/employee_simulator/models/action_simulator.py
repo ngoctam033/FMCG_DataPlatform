@@ -29,7 +29,11 @@ class EmployeeSimulator(models.AbstractModel):
         
         # 1. TỐI ƯU HÓA: Kéo dữ liệu từ Database ra ngoài vòng lặp 
         # (Chỉ query 1 lần, giúp hàm chạy cực nhanh kể cả khi tạo 100 record)
-        users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
+        stock_user_group = self.env.ref('stock.group_stock_user')
+        users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False),
+            ('active', '=', True),
+            ('all_group_ids', 'in', stock_user_group.id),
+        ])
         products = self.env['product.product'].search([])
         partners = self.env['res.partner'].search([])
         
