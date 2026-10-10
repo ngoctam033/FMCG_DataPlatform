@@ -3,6 +3,7 @@ from odoo.exceptions import UserError
 import random
 import logging
 from datetime import timedelta
+from itertools import product
 from odoo import Command
 import string
 
@@ -14,78 +15,130 @@ class EmployeeSimulator(models.AbstractModel):
     _description = 'Employee Action Simulator'
 
     @api.model
+    def _get_valid_combinations(self, users, picking_types, partners, products):
+        
+        user_allowed_companies = {u.id: set(u.company_ids.ids) for u in users}
+        pt_company = {pt.id: pt.company_id.id for pt in picking_types}
+        
+        valid_combinations = []
+        
+        for user, p_type, partner, product_rec in product(users, picking_types, partners, products):
+            u_id, pt_id = user.id, p_type.id
+            target_company_id = pt_company.get(pt_id)
+            
+            # Tránh vi phạm record rule: Stock Operation Type multi-company
+            if target_company_id and target_company_id not in user_allowed_companies[u_id]:
+                continue
+                
+            valid_combinations.append((user, p_type, partner, product_rec))
+            
+        return valid_combinations
+
+    @api.model
     def simulate_create_picking(self, record_count=100):
         """
-        Nâng cấp: Giả lập tạo hàng loạt phiếu kho trong 1 lần chạy hàm.
-        - Tối ưu hóa: Truy vấn DB trước vòng lặp.
-        - Xáo trộn: Sử dụng biến `salt` để xáo trộn dữ liệu giữa các record.
+        Nâng cấp: Sử dụng tích Đề-các (Cartesian Product) kết hợp ánh xạ thời gian (Time-based Indexing).
+        Không lưu trữ trạng thái. Tự động xác định vùng tổ hợp cần chạy dựa vào thời gian thực thi của Cron.
         """
         now = fields.Datetime.now()
-        minute = now.minute
-        hour = now.hour
-        day = now.day
-        month = now.month
-        # Tùy thuộc vào cron chạy, second có thể luôn bằng 0, nên hạn chế dùng second làm biến số chính
         
-        # 1. TỐI ƯU HÓA: Kéo dữ liệu từ Database ra ngoài vòng lặp 
-        # (Chỉ query 1 lần, giúp hàm chạy cực nhanh kể cả khi tạo 100 record)
+        # 1. Kéo dữ liệu từ Database ra ngoài vòng lặp
         stock_user_group = self.env.ref('stock.group_stock_user')
-        users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False),
+        users = self.env['res.users'].search([
+            ('id', '>', 1),
+            ('share', '=', False),
             ('active', '=', True),
             ('all_group_ids', 'in', stock_user_group.id),
         ])
-        products = self.env['product.product'].search([])
+        picking_types = self.env['stock.picking.type'].search([])
         partners = self.env['res.partner'].search([])
+        products = self.env['product.product'].search([])
+
+        # Materialize tích Đề-các để có thể lưu và lọc từng bộ dữ liệu.
+        all_combinations = self._get_valid_combinations(
+            users,
+            picking_types,
+            partners,
+            products,
+        )
+        total_combinations = len(all_combinations)
+
+        _logger.info(
+            '[SIMULATE CREATE PICKING] Cartesian product size=%s '
+            '(users=%s, picking_types=%s, partners=%s, products=%s)',
+            total_combinations,
+            len(users),
+            len(picking_types),
+            len(partners),
+            len(products),
+        )
+
+        # 2. XÁC ĐỊNH VỊ TRÍ TỔ HỢP DỰA VÀO THỜI GIAN
+        # Lấy ngày thứ mấy trong năm (ví dụ ngày 1 tháng 2 là ngày thứ 32)
+        day_of_year = now.timetuple().tm_yday
+        # Tính tổng số phút tính từ ngày 1 tháng 1
+        total_minutes = (day_of_year * 24 * 60) + (now.hour * 60) + now.minute
+
+        # Nhân tổng số phút với record_count để đảm bảo các lần chạy liên tiếp không bị đè lên nhau
+        start_index = (total_minutes * record_count) % total_combinations
+
+        # _logger.info(
+        #     '[SIMULATE CREATE PICKING] Batch start_index=%s, record_count=%s',
+        #     start_index,
+        #     record_count,
+        # )
         
         created_picking_ids = []
         
+        # 3. Tiến hành chạy theo Batch (record_count)
         for i in range(record_count):
-            salt = random.randint(1, 10000) + i
+            # Tịnh tiến index và tự động reset về 0 (xoay vòng) nếu vượt quá tổng số tổ hợp
+            current_index = (start_index + i) % total_combinations
+
+            (
+                selected_user,
+                selected_picking_type,
+                selected_partner,
+                selected_product,
+            ) = all_combinations[current_index]
+
+            _logger.info(
+                '[SIMULATE CREATE PICKING] Combination index=%s: '
+                'user_id=%s, picking_type_id=%s, partner_id=%s, product_id=%s',
+                current_index,
+                selected_user.id,
+                selected_picking_type.id,
+                selected_partner.id,
+                selected_product.id,
+            )
+
+            demand_qty = random.randint(5, 50)
             
-            # Chọn user
-            selected_user = users[(minute * 3 + hour * 7 + day * 11 + salt) % len(users)]
+            # Random một phần số lượng hoàn thành
+            is_partial = random.choice([True, False])
+            done_qty = max(0, demand_qty - random.randint(1, 5)) if is_partial else demand_qty
             
-            # (Riêng Picking type phụ thuộc vào company của User, nên phải tìm trong vòng lặp)
-            company_domain = ['|', ('company_id', '=', selected_user.company_id.id), ('company_id', '=', False)]
-            picking_types = self.env['stock.picking.type'].search(company_domain)
-            selected_picking_type = picking_types[(minute * 5 + day * 13 + salt) % len(picking_types)]
+            move_commands = [Command.create({
+                'description_picking': f"Chi tiết giả lập: {selected_product.name}",
+                'product_id': selected_product.id,
+                'product_uom_qty': demand_qty,
+                'quantity': done_qty,
+                'product_uom': selected_product.uom_id.id,
+            })]
             
-            # Chọn đối tác
-            selected_partner_id = False
-            if partners:
-                selected_partner_id = partners[(minute * 17 + hour * 23 + month * 31 + salt) % len(partners)].id
+            days_offset = random.randint(1, 5)
+            salt = random.randint(1, 10000)
             
-            move_commands = []
+            # Mã phiếu có đính kèm current_index để bạn có thể kiểm tra xem nó đang ở tổ hợp thứ mấy
+            origin_str = f'SIM-MANUAL-{now.strftime("%Y%m%d%H%M%S")}-{salt}-IDX{current_index}'
             
-            for j in range((minute + hour + salt) % 3 + 1):
-                selected_product = products[(minute * 19 + hour * 29 + day * 37 + j * 41 + salt) % len(products)]
-                demand_qty = 5 + ((minute * 7 + j * 13 + day * 17 + salt) % 41)
-                
-                if (minute + j) % 3 == 0:
-                    done_qty = max(0, demand_qty - ((hour + j) % 5 + 1))
-                else:
-                    done_qty = demand_qty
-                
-                move_commands.append(Command.create({
-                    'description_picking': f"Chi tiết giả lập: {selected_product.name}",
-                    'product_id': selected_product.id,
-                    'product_uom_qty': demand_qty,
-                    'quantity': done_qty,
-                    'product_uom': selected_product.uom_id.id,
-                }))
-            
-            days_offset = (minute * 11 + hour * 3 + salt) % 5 + 1
-            
-            # 3. ĐẢM BẢO ORIGIN DUY NHẤT (Mã phiếu chứa mã ngẫu nhiên)
-            origin_str = f'SIM-MANUAL-{now.strftime("%Y%m%d%H%M%S")}-{salt}'
-            
-            # Tạo phiếu
-            picking = self.env['stock.picking'].with_user(selected_user.id).create({
+            # 4. Thực hiện Tạo Phiếu Kho
+            picking = self.env['stock.picking'].with_user(selected_user).with_company(selected_picking_type.company_id).create({
                 'picking_type_id': selected_picking_type.id,
                 'origin': origin_str,
-                'partner_id': selected_partner_id,
+                'partner_id': selected_partner.id,
                 'scheduled_date': now + timedelta(days=days_offset),
-                'date_deadline': now + timedelta(days=days_offset + (hour % 3) + 1),
+                'date_deadline': now + timedelta(days=days_offset + random.randint(1, 3)),
                 'move_ids': move_commands,
             })
             
@@ -93,6 +146,8 @@ class EmployeeSimulator(models.AbstractModel):
             
         if record_count == 1 and created_picking_ids:
             return created_picking_ids[0]
+
+        return created_picking_ids
 
     @api.model
     def cron_simulate_internal_transfer_create(self):
@@ -163,15 +218,20 @@ class EmployeeSimulator(models.AbstractModel):
         return picking.id
 
     @api.model
-    def simulate_confirm_picking(self):
+    def simulate_confirm_picking(self, picking_type_code=False):
         """
         Cron 2: Giả lập nhân viên thao tác Xác nhận (Confirm) các phiếu kho đang Nháp.
+        Hàm dùng chung, có thể nhận các tham số filter để lọc domain.
         """
         # Lấy một user ngẫu nhiên để ghi nhận lịch sử thao tác
         users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
         random_user = random.choice(users) if users else self.env.user
 
-        pickings = self.env['stock.picking'].search([('state', '=', 'draft')], limit=20)
+        domain = [('state', '=', 'draft')]
+        
+        if picking_type_code:
+            domain.append(('picking_type_id.code', '=', picking_type_code))
+        pickings = self.env['stock.picking'].search(domain, limit=20)
 
         for picking in pickings:
 
