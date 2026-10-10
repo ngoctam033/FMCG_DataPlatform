@@ -22,24 +22,15 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
             ('all_group_ids', 'in', stock_user_group.id),
         ])
 
-        if not users:
-            return False
-
-        # Chọn ngẫu nhiên một user
+        # Chọn ngẫu nhiên một user và công ty của họ
         user = random.choice(users)
-        
-        # Chọn ngẫu nhiên một công ty của user
         company = random.choice(user.company_ids)
 
-        # Lấy picking type xuất kho (outgoing) của công ty này
+        # Lấy picking type xuất kho (outgoing)
         picking_types = self.env['stock.picking.type'].search([
             ('code', '=', 'outgoing'),
             ('company_id', 'in', [False, company.id]),
         ])
-
-        if not picking_types:
-            return False
-
         picking_type = random.choice(picking_types)
 
         # Kho mặc định của picking type
@@ -53,9 +44,6 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
             ('company_id', 'in', [False, company.id]),
         ], limit=50)
 
-        if not products:
-            return False
-            
         # Lấy một khách hàng ngẫu nhiên
         partners = self.env['res.partner'].search([
             ('customer_rank', '>', 0),
@@ -68,8 +56,7 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
                 ('company_id', 'in', [False, company.id])
             ], limit=50)
 
-        partner = random.choice(partners) if partners else False
-
+        partner = random.choice(partners)
         product = random.choice(products)
         demand_qty = random.randint(5, 50)
         salt = random.randint(1, 10000)
@@ -79,6 +66,7 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
             'picking_type_id': picking_type.id,
             'company_id': company.id,
             'origin': origin,
+            'partner_id': partner.id,
             'location_id': source_location.id if source_location else False,
             'location_dest_id': destination_location.id if destination_location else False,
             'scheduled_date': now + timedelta(days=random.randint(1, 3)),
@@ -92,12 +80,7 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
             })],
         }
         
-        if partner:
-            picking_vals['partner_id'] = partner.id
-
         picking = self.env['stock.picking'].with_user(user).with_company(company).create(picking_vals)
-        
-        _logger.info(f"[CRON SIMULATOR] Đã tạo phiếu xuất kho: {picking.name}")
         return picking.id
 
     @api.model
