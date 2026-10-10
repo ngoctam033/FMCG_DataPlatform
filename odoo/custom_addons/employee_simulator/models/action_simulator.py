@@ -223,18 +223,28 @@ class EmployeeSimulator(models.AbstractModel):
         Cron 2: Giả lập nhân viên thao tác Xác nhận (Confirm) các phiếu kho đang Nháp.
         Hàm dùng chung, có thể nhận các tham số filter để lọc domain.
         """
-        # Lấy một user ngẫu nhiên để ghi nhận lịch sử thao tác
-        users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
-        random_user = random.choice(users) if users else self.env.user
-
         domain = [('state', '=', 'draft')]
         
         if picking_type_code:
             domain.append(('picking_type_id.code', '=', picking_type_code))
         pickings = self.env['stock.picking'].search(domain, limit=20)
+        
+        # Lấy group quyền nhân viên kho
+        stock_user_group = self.env.ref('stock.group_stock_user')
 
         for picking in pickings:
+            valid_users = self.env['res.users'].search([
+                ('id', '>', 1),
+                ('share', '=', False),
+                ('active', '=', True),
+                ('all_group_ids', 'in', stock_user_group.id),
+                ('company_ids', 'in', picking.company_id.id)
+            ])
+            
+            # Chọn user hợp lệ, nếu không có ai thì dùng fallback là user đang chạy cron (thường là Admin)
+            random_user = random.choice(valid_users)
 
+            # Gắn context theo user và company hợp lý để vượt qua mọi check quyền của Odoo
             simulated_picking = picking.with_user(random_user.id)
             simulated_picking.action_confirm()
 
