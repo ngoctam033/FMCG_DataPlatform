@@ -95,6 +95,74 @@ class EmployeeSimulator(models.AbstractModel):
             return created_picking_ids[0]
 
     @api.model
+    def cron_simulate_internal_transfer_create(self):
+        """Create one draft internal transfer without reserving stock."""
+        now = fields.Datetime.now()
+        stock_user_group = self.env.ref('stock.group_stock_user')
+
+        users = self.env['res.users'].search([
+            ('id', '>', 1),
+            ('share', '=', False),
+            ('active', '=', True),
+            ('all_group_ids', 'in', stock_user_group.id),
+        ])
+
+        eligible_contexts = []
+        for user in users:
+            for company in user.company_ids:
+                picking_types = self.env['stock.picking.type'].search([
+                    ('code', '=', 'internal'),
+                    ('company_id', 'in', [False, company.id]),
+                ])
+                locations = self.env['stock.location'].search([
+                    ('usage', '=', 'internal'),
+                    ('active', '=', True),
+                    ('company_id', 'in', [False, company.id]),
+                ])
+                products = self.env['product.product'].search([
+                    ('active', '=', True),
+                    ('is_storable', '=', True),
+                    ('company_id', 'in', [False, company.id]),
+                ])
+                if picking_types and len(locations) >= 2 and products:
+                    eligible_contexts.append(
+                        (user, company, picking_types, locations, products)
+                    )
+
+        user, company, picking_types, locations, products = random.choice(
+            eligible_contexts
+        )
+        picking_type = random.choice(picking_types)
+        source_location = random.choice(locations)
+        destination_location = random.choice(
+            locations.filtered(lambda location: location != source_location)
+        )
+        product = random.choice(products)
+        demand_qty = random.randint(5, 45)
+        salt = random.randint(1, 10000)
+        origin = f'SIM-INT-{now.strftime("%Y%m%d%H%M%S")}-{salt}'
+
+        picking = self.env['stock.picking'].with_user(user).with_company(
+            company
+        ).create({
+            'picking_type_id': picking_type.id,
+            'company_id': company.id,
+            'origin': origin,
+            'location_id': source_location.id,
+            'location_dest_id': destination_location.id,
+            'scheduled_date': now + timedelta(days=random.randint(1, 5)),
+            'move_ids': [Command.create({
+                'description_picking': f'Chi tiết giả lập: {product.name}',
+                'product_id': product.id,
+                'product_uom_qty': demand_qty,
+                'product_uom': product.uom_id.id,
+                'location_id': source_location.id,
+                'location_dest_id': destination_location.id,
+            })],
+        })
+        return picking.id
+
+    @api.model
     def simulate_confirm_picking(self):
         """
         Cron 2: Giả lập nhân viên thao tác Xác nhận (Confirm) các phiếu kho đang Nháp.
@@ -287,12 +355,6 @@ class EmployeeSimulator(models.AbstractModel):
             'employee_simulator.mail_activity_simulate_cancel',
             raise_if_not_found=False,
         )
-        if not activity_type:
-            _logger.warning(
-                "[CRON PICKING CANCEL] Không tìm thấy activity type "
-                "employee_simulator.mail_activity_simulate_cancel"
-            )
-            return
 
         today = fields.Date.context_today(self)
         pickings = self.env['stock.picking'].search([
@@ -325,13 +387,6 @@ class EmployeeSimulator(models.AbstractModel):
                     ('company_ids', 'in', [picking.company_id.id]),
                 ], order='id', limit=1)
 
-            if not simulated_user:
-                _logger.warning(
-                    "[CRON PICKING CANCEL] Không tìm thấy người dùng Kho để hủy phiếu %s",
-                    picking.name,
-                )
-                continue
-
             simulated_picking = picking.with_user(simulated_user).with_company(
                 picking.company_id
             )
@@ -345,14 +400,6 @@ class EmployeeSimulator(models.AbstractModel):
                     simulated_user.id,
                 )
                 continue
-
-            if simulated_picking.state == 'cancel':
-                target_activities.action_done()
-                _logger.info(
-                    "[CRON PICKING CANCEL] Đã hủy phiếu %s với user_id=%s",
-                    picking.name,
-                    simulated_user.id,
-                )
     
     def cron_process_missing_lot_activities(self):
         """

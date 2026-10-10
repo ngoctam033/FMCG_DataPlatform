@@ -15,6 +15,17 @@
             <field name="active" eval="True"/>
         </record>
 
+        <record id="ir_cron_simulate_internal_transfer_create" model="ir.cron">
+            <field name="name">Simulator: Create Draft Internal Transfer</field>
+            <field name="model_id" ref="model_employee_simulator"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_simulate_internal_transfer_create()</field>
+            <field name="priority">0</field>
+            <field name="interval_number">10</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="False"/>
+        </record>
+
         <record id="ir_cron_simulate_confirm_picking" model="ir.cron">
             <field name="name">Simulator: Tự động Xác nhận Phiếu kho</field>
             <field name="model_id" ref="model_employee_simulator"/>
