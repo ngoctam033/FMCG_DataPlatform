@@ -328,13 +328,19 @@ class EmployeeSimulator(models.AbstractModel):
         for i in range(record_count):
             current_salt = salt + i
             
-            # Chọn user dựa vào thuật toán thời gian
-            selected_user = users[(minute * 5 + hour * 11 + day * 13 + current_salt) % len(users)]
-            
-            # Chọn picking dựa vào thuật toán thời gian (thay thế cho limit + order random)
+            # 1. Chọn picking ngẫu nhiên dựa vào thuật toán trước
             selected_picking = pickings[(minute * 7 + hour * 17 + day * 23 + current_salt) % len(pickings)]
             
-            simulated_picking = selected_picking.with_user(selected_user.id)
+            # 2. Lọc ra các user CÓ QUYỀN TRUY CẬP vào công ty của picking vừa chọn
+            valid_users = users.filtered(lambda u: selected_picking.company_id in u.company_ids)
+                
+            # 3. Chọn ngẫu nhiên user trong tập các user hợp lệ đó
+            selected_user = valid_users[(minute * 5 + hour * 11 + day * 13 + current_salt) % len(valid_users)]
+            
+            # 4. Đảm bảo set đúng ngữ cảnh Công ty bằng with_company() kết hợp with_user()
+            simulated_picking = selected_picking.with_company(selected_picking.company_id).with_user(selected_user)
+            
+            # 5. Thực thi action
             simulated_picking.action_assign()
 
 
