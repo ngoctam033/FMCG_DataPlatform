@@ -364,18 +364,22 @@ class EmployeeSimulator(models.AbstractModel):
         for i in range(record_count):
             current_salt = salt + i
             
-            selected_user = users[(minute * 7 + hour * 13 + day * 17 + current_salt) % len(users)]
-            
+            # 1. Chọn phiếu kho trước
             picking_index = (minute * 11 + hour * 19 + day * 23 + current_salt) % len(pickings)
             selected_picking = pickings[picking_index]
             
+            valid_users = users.filtered(lambda u: selected_picking.company_id.id in u.company_ids.ids)
+
+            selected_user = valid_users[(minute * 7 + hour * 13 + day * 17 + current_salt) % len(valid_users)]
+            
             pickings -= selected_picking
             
-            simulated_picking = selected_picking.with_user(selected_user.id)
+            simulated_picking = selected_picking.with_user(selected_user.id).with_company(selected_picking.company_id)
+
             _logger.info(
                 '[VALIDATE] Đang thao tác stock.picking: id=%s, mã=%s, user_id=%s',
-                simulated_picking.id,
-                simulated_picking.name,
+                selected_picking.id,
+                selected_picking.name,
                 selected_user.id,
             )
             try:
