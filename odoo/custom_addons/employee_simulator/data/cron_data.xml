@@ -132,5 +132,15 @@
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>
         </record>
+        <record id="ir_cron_mark_done_simulate_cancel_activities" model="ir.cron">
+            <field name="name">Simulator: Mark Done Activity Cancel Khi Picking Done</field>
+            <field name="model_id" ref="model_employee_simulator"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_mark_done_simulate_cancel_activities()</field>
+            <field name="priority">10</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
     </data>
 </odoo>
