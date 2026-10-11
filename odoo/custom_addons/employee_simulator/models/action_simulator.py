@@ -396,7 +396,19 @@ class EmployeeSimulator(models.AbstractModel):
             try:
                 action_result = simulated_picking.with_context(skip_sms=True).button_validate()
             except UserError as e:
-                if "Lot/Serial" in str(e):
+                error_msg = str(e)
+                if "empty transfer" in error_msg or "zero quantity" in error_msg or "Transfer trouble alert" in error_msg:
+                    missing_qty_act_type = self.env.ref('employee_simulator.mail_activity_missing_quantity', raise_if_not_found=False)
+                    if missing_qty_act_type:
+                        has_missing_qty_act = any(act.activity_type_id.id == missing_qty_act_type.id for act in simulated_picking.activity_ids)
+                        if not has_missing_qty_act:
+                            simulated_picking.activity_schedule(
+                                'employee_simulator.mail_activity_missing_quantity', 
+                                summary='Cần điền số lượng hoàn thành (Done Quantity)',
+                                note=f'Validate thất bại do chưa điền số lượng: <b>{error_msg}</b>',
+                                user_id=selected_user.id
+                            )
+                elif "Lot/Serial" in str(e):
                     missing_lot_act_type = self.env.ref('employee_simulator.mail_activity_missing_lot', raise_if_not_found=False)
                     if missing_lot_act_type:
                         # Tránh tạo trùng Activity nếu phiếu đã có activity này

@@ -58,3 +58,35 @@ class EmployeeSimulatorLotSerial(models.AbstractModel):
                         user_id=assignee_id
                     )
                     break
+
+    @api.model
+    def cron_process_missing_quantity_activities(self):
+        """
+        Lọc các phiếu có activity yêu cầu điền số lượng và tự động điền quantity = product_uom_qty.
+        """
+        activity_type = self.env.ref('employee_simulator.mail_activity_missing_quantity', raise_if_not_found=False)
+
+        domain = [
+            ('activity_ids.activity_type_id', '=', activity_type.id),
+            ('state', 'in', ['assigned', 'confirmed', 'draft'])
+        ]
+        
+        pickings = self.env['stock.picking'].search(domain, limit=30)
+        
+        for picking in pickings:
+            # Gán user_id cho quá trình thao tác dựa trên activity
+            activity = picking.activity_ids.filtered(lambda a: a.activity_type_id == activity_type)[:1]
+            user_id = activity.user_id.id if activity and activity.user_id else self.env.uid
+            simulated_picking = picking.with_user(user_id)
+            
+            # Điền số lượng hoàn thành ngẫu nhiên từ 1 đến product_uom_qty
+            for move in simulated_picking.move_ids.filtered(lambda m: m.state not in ('done', 'cancel')):
+                if move.product_uom_qty > 0 and move.quantity == 0:
+                    max_qty = int(move.product_uom_qty)
+                    if max_qty >= 1:
+                        move.quantity = random.randint(1, max_qty)
+                    else:
+                        move.quantity = move.product_uom_qty
+            
+            # Hoàn tất activity
+            activity.action_done()
