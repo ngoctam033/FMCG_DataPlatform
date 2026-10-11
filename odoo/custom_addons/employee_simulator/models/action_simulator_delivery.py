@@ -92,3 +92,11 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
         self.simulate_confirm_picking(
             picking_type_code='internal'
         )
+
+    @api.model
+    def cron_simulate_internal_transfer_assign(self):
+        """
+        [CRON] Giả lập nhân viên: Check Availability (Kiểm tra khả dụng) cho điều chuyển nội bộ.
+        """
+        picking_type = self.env['stock.picking.type'].search([('code', '=', 'internal')], limit=1)
+        self.cron_simulate_picking_assign(picking_type_id=picking_type.id)

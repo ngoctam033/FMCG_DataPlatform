@@ -301,7 +301,7 @@ class EmployeeSimulator(models.AbstractModel):
         pass
 
     @api.model
-    def cron_simulate_picking_assign(self):
+    def cron_simulate_picking_assign(self, picking_type_id=False):
         """
         [CRON] Giả lập nhân viên: Check Availability (Kiểm tra khả dụng).
         
@@ -317,7 +317,12 @@ class EmployeeSimulator(models.AbstractModel):
 
         # Kéo toàn bộ dữ liệu ra trước (hoặc một tập lớn)
         users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
-        pickings = self.env['stock.picking'].search([('state', 'in', ['confirmed', 'waiting'])])
+        
+        domain = [('state', 'in', ['confirmed', 'waiting'])]
+        if picking_type_id:
+            domain.append(('picking_type_id', '=', picking_type_id))
+            
+        pickings = self.env['stock.picking'].search(domain)
 
         # Tạo một salt ngẫu nhiên
         salt = random.randint(1, 10000)
