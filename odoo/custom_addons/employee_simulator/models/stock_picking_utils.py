@@ -1,5 +1,6 @@
 from odoo import models, api
 import logging
+import random
 _logger = logging.getLogger(__name__)
 class EmployeeSimulatorLotSerial(models.AbstractModel):
     # Kế thừa lại abstract model employee.simulator
@@ -95,7 +96,7 @@ class EmployeeSimulatorLotSerial(models.AbstractModel):
     def cron_mark_done_simulate_cancel_activities(self):
         activity_type = self.env.ref('employee_simulator.mail_activity_simulate_cancel')
         pickings = self.env['stock.picking'].search([
-            ('state', '=', 'done'),
+            ('state', 'in', ['done', 'cancel']),
             ('activity_ids.activity_type_id', '=', activity_type.id),
         ], limit=100)
         activities = pickings.activity_ids.filtered(lambda a: a.activity_type_id == activity_type)
