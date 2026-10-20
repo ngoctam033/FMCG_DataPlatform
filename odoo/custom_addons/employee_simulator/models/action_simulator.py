@@ -498,10 +498,13 @@ class EmployeeSimulator(models.AbstractModel):
                 )
                 continue
     
-    def cron_process_missing_lot_activities(self):
+    @api.model
+    def cron_process_missing_lot_activities(self, picking_type_domain=None):
         """
-        Lọc các phiếu NHẬP KHO có activity yêu cầu khai báo Lot/Serial và tiến hành khai báo tự động.
-        Các phiếu Xuất/Chuyển nội bộ sẽ tự động bị bỏ qua (để lại Activity trên phiếu như một Backlog).
+        Tự động khai báo Lot/Serial cho các phiếu có activity quá hạn.
+
+        Mặc định chỉ xử lý phiếu nhập kho và sản xuất. Cron chuyển
+        nội bộ có thể tái sử dụng logic bằng cách truyền domain riêng.
         """
         activity_type = self.env.ref('employee_simulator.mail_activity_missing_lot', raise_if_not_found=False)
 
@@ -510,10 +513,14 @@ class EmployeeSimulator(models.AbstractModel):
                 ('activity_type_id', '=', activity_type.id),
                 ('date_deadline', '<', fields.Date.today()),
             ]),
-            ('picking_type_id.code', 'in', ['incoming', 'mrp_operation'])
         ]
+        if picking_type_domain is None:
+            picking_type_domain = [
+                ('picking_type_id.code', 'in', ['incoming', 'mrp_operation']),
+            ]
+        domain += picking_type_domain
         
-        pickings = self.env['stock.picking'].search(domain, limit=30)
+        pickings = self.env['stock.picking'].search(domain, limit=500)
 
         local_time = fields.Datetime.now() + timedelta(hours=7)
         time_str = local_time.strftime('%m%d%H%M%S')
