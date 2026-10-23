@@ -15,7 +15,7 @@ class EmployeeSimulatorCancel(models.AbstractModel):
                 (
                     "state",
                     "in",
-                    ["draft", "confirmed", "waiting", "assigned"],
+                    ["draft", "confirmed", "waiting", "assigned", 'cancel'],
                 ),
                 (
                     "activity_ids",
