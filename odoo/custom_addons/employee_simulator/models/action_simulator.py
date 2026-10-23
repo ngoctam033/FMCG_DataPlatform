@@ -391,7 +391,16 @@ class EmployeeSimulator(models.AbstractModel):
             picking_index = (minute * 11 + hour * 19 + day * 23 + current_salt) % len(pickings)
             selected_picking = pickings[picking_index]
             
-            valid_users = users.filtered(lambda u: selected_picking.company_id.id in u.company_ids.ids)
+            # Khi validate, Odoo có thể cần đọc company_id của sản phẩm để tạo
+            # Lot/Serial. Vì vậy user mô phỏng phải có quyền với cả công ty của
+            # phiếu lẫn các công ty được gán trên sản phẩm của phiếu.
+            required_companies = (
+                selected_picking.company_id
+                | selected_picking.move_ids.product_id.company_id
+            )
+            valid_users = users.filtered(
+                lambda user: not (required_companies - user.company_ids)
+            )
 
             selected_user = valid_users[(minute * 7 + hour * 13 + day * 17 + current_salt) % len(valid_users)]
             
