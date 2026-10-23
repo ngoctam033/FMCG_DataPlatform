@@ -100,3 +100,26 @@ class EmployeeSimulatorCancel(models.AbstractModel):
             if simulated_picking.state == 'done':
                 for activity in target_activities:
                     activity.action_done()
+
+    @api.model
+    def cron_close_stale_backorder_activities(self):
+        """Close backorder activities left on completed or cancelled pickings."""
+        activity_type = self.env.ref(
+            'employee_simulator.mail_activity_backorder',
+            raise_if_not_found=False,
+        )
+
+        pickings = self.env['stock.picking'].search([
+            ('state', 'in', ['done', 'cancel']),
+            ('activity_ids.activity_type_id', '=', activity_type.id),
+        ], limit=100)
+
+        state_labels = dict(self.env['stock.picking']._fields['state'].selection)
+        for picking in pickings:
+            activities = picking.activity_ids.filtered(
+                lambda activity: activity.activity_type_id == activity_type
+            )
+            activities.action_feedback(feedback=(
+                'Phiếu kho đã ở trạng thái "%s". Yêu cầu xác nhận Backorder '
+                'không còn hiệu lực và được hệ thống tự động đóng.'
+            ) % state_labels[picking.state])
