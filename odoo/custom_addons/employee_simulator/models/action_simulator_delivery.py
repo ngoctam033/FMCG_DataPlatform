@@ -9,6 +9,70 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
     _inherit = 'employee.simulator'
 
     @api.model
+    def cron_process_outgoing_missing_lot_activities(self):
+        """Assign available existing lots/serials to overdue deliveries."""
+        activity_type = self.env.ref(
+            'employee_simulator.mail_activity_missing_lot',
+            raise_if_not_found=False,
+        )
+        pickings = self.env['stock.picking'].search([
+            ('activity_ids', 'any', [
+                ('activity_type_id', '=', activity_type.id),
+                ('date_deadline', '<', fields.Date.today()),
+            ]),
+            ('picking_type_id.code', '=', 'outgoing'),
+        ], limit=500)
+
+        Quant = self.env['stock.quant']
+        for picking in pickings:
+            is_fully_processed = True
+
+            for line in picking.move_line_ids:
+                product = line.product_id
+                if product.tracking == 'none' or line.lot_id or line.lot_name:
+                    continue
+
+                candidate_quants = Quant.search([
+                    ('product_id', '=', product.id),
+                    ('location_id', 'child_of', line.location_id.id),
+                    ('lot_id', '!=', False),
+                    ('quantity', '>', 0),
+                    ('company_id', '=', picking.company_id.id),
+                ], order='in_date, id')
+
+                selected_lot = self.env['stock.lot']
+                required_qty = line.quantity_product_uom
+                for lot in candidate_quants.lot_id:
+                    available_qty = Quant._get_available_quantity(
+                        product,
+                        line.location_id,
+                        lot_id=lot,
+                        strict=False,
+                    )
+                    has_enough_stock = product.uom_id.compare(
+                        available_qty,
+                        required_qty,
+                    ) >= 0
+                    is_valid_serial = (
+                        product.tracking != 'serial'
+                        or product.uom_id.compare(required_qty, 1.0) <= 0
+                    )
+                    if has_enough_stock and is_valid_serial:
+                        selected_lot = lot
+                        break
+
+                if selected_lot:
+                    line.write({'lot_id': selected_lot.id})
+                else:
+                    is_fully_processed = False
+
+            if is_fully_processed:
+                activities = picking.activity_ids.filtered(
+                    lambda activity: activity.activity_type_id == activity_type
+                )
+                activities.action_done()
+
+    @api.model
     def cron_simulate_delivery_picking_create(self):
         """Create one draft delivery order (outgoing)."""
         now = fields.Datetime.now()
