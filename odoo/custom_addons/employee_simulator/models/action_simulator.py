@@ -363,9 +363,21 @@ class EmployeeSimulator(models.AbstractModel):
         minute = now.minute
         hour = now.hour
         day = now.day
-        # Kéo toàn bộ dữ liệu ra trước
-        users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
-        pickings = self.env['stock.picking'].search([('state', '=', 'assigned')])
+        # Chỉ giả lập bằng user đang hoạt động và có quyền thao tác kho.
+        stock_user_group = self.env.ref('stock.group_stock_user')
+        users = self.env['res.users'].search([
+            ('id', '>', 1),
+            ('active', '=', True),
+            ('share', '=', False),
+            ('all_group_ids', 'in', [stock_user_group.id]),
+        ])
+        expired_lot_act_type = self.env.ref('employee_simulator.mail_activity_expired_lot')
+        pickings = self.env['stock.picking'].search([
+            ('state', '=', 'assigned'),
+            ('activity_ids', 'not any', [
+                ('activity_type_id', '=', expired_lot_act_type.id),
+            ]),
+        ])
 
         salt = random.randint(1, 10000)
         record_count = (minute + hour + salt) % 3 + 1
