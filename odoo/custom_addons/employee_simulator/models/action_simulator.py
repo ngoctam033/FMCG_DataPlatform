@@ -315,11 +315,19 @@ class EmployeeSimulator(models.AbstractModel):
         hour = now.hour
         day = now.day
 
-        # Kéo toàn bộ dữ liệu ra trước (hoặc một tập lớn)
-        users = self.env['res.users'].search([('id', '>', 1), ('share', '=', False)])
+        # Chỉ giả lập bằng user kho đang hoạt động.
+        stock_user_group = self.env.ref('stock.group_stock_user')
+        users = self.env['res.users'].search([
+            ('id', '>', 1),
+            ('active', '=', True),
+            ('share', '=', False),
+            ('all_group_ids', 'in', stock_user_group.id),
+        ])
         
         domain = [('state', 'in', ['confirmed', 'waiting'])]
-        if picking_type_id:
+        if isinstance(picking_type_id, (list, tuple)):
+            domain.append(('picking_type_id', 'in', picking_type_id))
+        elif picking_type_id:
             domain.append(('picking_type_id', '=', picking_type_id))
             
         pickings = self.env['stock.picking'].search(domain)
@@ -329,12 +337,14 @@ class EmployeeSimulator(models.AbstractModel):
 
         # Thay vì dùng limit cứng, ta xác định số lượng record cần chạy ngẫu nhiên dựa vào thời gian (ví dụ từ 1 đến 3 phiếu)
         record_count = (minute + hour + salt) % 3 + 1
+        record_count = min(record_count, len(pickings))
         
         for i in range(record_count):
             current_salt = salt + i
             
             # 1. Chọn picking ngẫu nhiên dựa vào thuật toán trước
             selected_picking = pickings[(minute * 7 + hour * 17 + day * 23 + current_salt) % len(pickings)]
+            pickings -= selected_picking
             
             # 2. Lọc ra các user CÓ QUYỀN TRUY CẬP vào công ty của picking vừa chọn
             valid_users = users.filtered(lambda u: selected_picking.company_id in u.company_ids)
