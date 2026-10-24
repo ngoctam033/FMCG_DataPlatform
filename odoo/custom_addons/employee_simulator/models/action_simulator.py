@@ -35,10 +35,13 @@ class EmployeeSimulator(models.AbstractModel):
         return valid_combinations
 
     @api.model
-    def simulate_create_picking(self, record_count=100):
+    def simulate_create_picking(self, record_count=100, picking_type_id=False):
         """
         Nâng cấp: Sử dụng tích Đề-các (Cartesian Product) kết hợp ánh xạ thời gian (Time-based Indexing).
         Không lưu trữ trạng thái. Tự động xác định vùng tổ hợp cần chạy dựa vào thời gian thực thi của Cron.
+
+        Có thể giới hạn dữ liệu giả lập theo một Stock Operation Type cụ thể
+        bằng tham số picking_type_id.
         """
         now = fields.Datetime.now()
         
@@ -50,7 +53,12 @@ class EmployeeSimulator(models.AbstractModel):
             ('active', '=', True),
             ('all_group_ids', 'in', stock_user_group.id),
         ])
-        picking_types = self.env['stock.picking.type'].search([])
+        picking_type_domain = []
+        if picking_type_id:
+            picking_type_domain.append(('id', '=', picking_type_id))
+        picking_types = self.env['stock.picking.type'].search(
+            picking_type_domain
+        )
         partners = self.env['res.partner'].search([])
         products = self.env['product.product'].search([])
 
