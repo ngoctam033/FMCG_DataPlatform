@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="employee_simulator.EmployeeActivitySlaListRenderer"
+       t-inherit="web.ListRenderer"
+       t-inherit-mode="primary">
+        <xpath expr="//div[hasclass('o_list_renderer')]" position="before">
+            <EmployeeActivitySlaDashboard list="props.list"/>
+        </xpath>
+    </t>
+
+    <t t-name="employee_simulator.EmployeeActivitySlaDashboard">
+        <div class="o_employee_activity_sla_dashboard container-fluid py-3 border-bottom bg-view">
+            <div class="d-flex flex-wrap align-items-stretch gap-2">
+                <button type="button" class="o_sla_kpi_card btn bg-100 text-body"
+                        data-filters="sla_all" t-on-click="setSearchContext">
+                    <span class="o_sla_kpi_value" t-out="dashboardData.total"/>
+                    <span class="o_sla_kpi_label">Tổng hoạt động</span>
+                </button>
+                <button type="button" class="o_sla_kpi_card btn bg-info-subtle text-info-emphasis"
+                        data-filters="sla_open" t-on-click="setSearchContext">
+                    <span class="o_sla_kpi_value" t-out="dashboardData.open"/>
+                    <span class="o_sla_kpi_label">Đang xử lý</span>
+                </button>
+                <button type="button" class="o_sla_kpi_card btn bg-danger-subtle text-danger-emphasis"
+                        data-filters="sla_overdue" t-on-click="setSearchContext">
+                    <span class="o_sla_kpi_value" t-out="dashboardData.overdue"/>
+                    <span class="o_sla_kpi_label">Quá hạn</span>
+                </button>
+                <button type="button" class="o_sla_kpi_card btn bg-warning-subtle text-warning-emphasis"
+                        data-filters="sla_due_today" t-on-click="setSearchContext">
+                    <span class="o_sla_kpi_value" t-out="dashboardData.dueToday"/>
+                    <span class="o_sla_kpi_label">Đến hạn hôm nay</span>
+                </button>
+                <button type="button" class="o_sla_kpi_card btn bg-primary-subtle text-primary-emphasis"
+                        data-filters="sla_planned" t-on-click="setSearchContext">
+                    <span class="o_sla_kpi_value" t-out="dashboardData.planned"/>
+                    <span class="o_sla_kpi_label">Còn trong hạn</span>
+                </button>
+                <button type="button" class="o_sla_kpi_card btn bg-success-subtle text-success-emphasis"
+                        data-filters="sla_done" t-on-click="setSearchContext">
+                    <span class="o_sla_kpi_value" t-out="dashboardData.done"/>
+                    <span class="o_sla_kpi_label">Đã hoàn thành</span>
+                </button>
+                <button type="button" class="o_sla_kpi_card btn bg-success-subtle text-success-emphasis"
+                        data-filters="sla_done_today" t-on-click="setSearchContext">
+                    <span class="o_sla_kpi_value" t-out="dashboardData.doneToday"/>
+                    <span class="o_sla_kpi_label">Hoàn thành hôm nay</span>
+                </button>
+            </div>
+            <div class="mt-2 text-muted small">
+                Nhấn vào KPI để lọc danh sách. Màu đỏ: quá hạn; vàng: đến hạn hôm nay; xanh: còn trong hạn hoặc đã hoàn thành.
+            </div>
+        </div>
+    </t>
+</templates>

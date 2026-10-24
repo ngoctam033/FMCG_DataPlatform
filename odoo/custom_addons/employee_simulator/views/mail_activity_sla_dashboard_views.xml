@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_activity_sla_dashboard_search" model="ir.ui.view">
+        <field name="name">mail.activity.sla.dashboard.search</field>
+        <field name="model">mail.activity</field>
+        <field name="arch" type="xml">
+            <search string="Theo dõi xử lý sự cố">
+                <field name="res_name" string="Phiếu kho" filter_domain="[
+                    '|',
+                    ('res_name', 'ilike', self),
+                    ('summary', 'ilike', self)
+                ]"/>
+                <field name="user_id"/>
+                <field name="activity_type_id"/>
+
+                <filter name="sla_all" string="Tất cả" domain="[]"/>
+                <separator/>
+                <filter name="sla_open" string="Đang xử lý" domain="[('active', '=', True)]"/>
+                <filter name="sla_overdue" string="Quá hạn" domain="[
+                    ('active', '=', True),
+                    ('date_deadline', '&lt;', 'today')
+                ]"/>
+                <filter name="sla_due_today" string="Đến hạn hôm nay" domain="[
+                    ('active', '=', True),
+                    ('date_deadline', '=', 'today')
+                ]"/>
+                <filter name="sla_planned" string="Còn trong hạn" domain="[
+                    ('active', '=', True),
+                    ('date_deadline', '&gt;', 'today')
+                ]"/>
+                <filter name="sla_done" string="Đã hoàn thành" domain="[('active', '=', False)]"/>
+                <filter name="sla_done_today" string="Hoàn thành hôm nay" domain="[
+                    ('active', '=', False),
+                    ('date_done', '=', 'today')
+                ]"/>
+                <separator/>
+                <filter name="sla_my" string="Của tôi" domain="[('user_id', '=', uid)]"/>
+
+                <group>
+                    <filter name="group_by_state" string="Trạng thái" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_activity_type" string="Loại sự cố" context="{'group_by': 'activity_type_id'}"/>
+                    <filter name="group_by_user" string="Người phụ trách" context="{'group_by': 'user_id'}"/>
+                    <filter name="group_by_deadline" string="Hạn xử lý" context="{'group_by': 'date_deadline'}"/>
+                    <filter name="group_by_done_date" string="Ngày hoàn thành" context="{'group_by': 'date_done'}"/>
+                    <filter name="group_by_created_date" string="Ngày phát sinh" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="mail_activity_sla_dashboard_list" model="ir.ui.view">
+        <field name="name">mail.activity.sla.dashboard.list</field>
+        <field name="model">mail.activity</field>
+        <field name="arch" type="xml">
+            <list string="Theo dõi xử lý sự cố"
+                  js_class="employee_activity_sla_dashboard_list"
+                  create="0"
+                  edit="0"
+                  delete="0"
+                  duplicate="0"
+                  default_order="active desc, date_deadline asc, id desc"
+                  action="action_open_document"
+                  type="object"
+                  decoration-danger="active and state == 'overdue'"
+                  decoration-warning="active and state == 'today'"
+                  decoration-muted="not active">
+                <field name="active" column_invisible="True"/>
+                <field name="state" string="Trạng thái" widget="badge"
+                       decoration-danger="state == 'overdue'"
+                       decoration-warning="state == 'today'"
+                       decoration-info="state == 'planned'"
+                       decoration-success="state == 'done'"/>
+                <field name="activity_type_id" string="Loại sự cố"/>
+                <field name="summary" string="Nội dung"/>
+                <field name="res_name" string="Phiếu kho" decoration-bf="1"/>
+                <field name="user_id" string="Người phụ trách" widget="many2one_avatar_user"/>
+                <field name="create_date" string="Ngày phát sinh" optional="show"/>
+                <field name="date_deadline" string="Hạn xử lý" widget="remaining_days" optional="show"/>
+                <field name="date_done" string="Ngày hoàn thành" optional="show"/>
+                <field name="feedback" string="Kết quả xử lý" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_mail_activity_sla_dashboard" model="ir.actions.act_window">
+        <field name="name">Theo dõi xử lý sự cố</field>
+        <field name="res_model">mail.activity</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="mail_activity_sla_dashboard_list"/>
+        <field name="search_view_id" ref="mail_activity_sla_dashboard_search"/>
+        <field name="domain" eval="[('activity_type_id', 'in', [
+            ref('employee_simulator.mail_activity_missing_lot'),
+            ref('employee_simulator.mail_activity_simulate_cancel'),
+            ref('employee_simulator.mail_activity_backorder'),
+            ref('employee_simulator.mail_activity_simulator_error'),
+            ref('employee_simulator.mail_activity_missing_quantity'),
+            ref('employee_simulator.mail_activity_expired_lot')
+        ])]"/>
+        <field name="context" eval="{
+            'active_test': False,
+            'force_search_count': 1,
+            'employee_simulator_activity_type_ids': [
+                ref('employee_simulator.mail_activity_missing_lot'),
+                ref('employee_simulator.mail_activity_simulate_cancel'),
+                ref('employee_simulator.mail_activity_backorder'),
+                ref('employee_simulator.mail_activity_simulator_error'),
+                ref('employee_simulator.mail_activity_missing_quantity'),
+                ref('employee_simulator.mail_activity_expired_lot')
+            ]
+        }"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Chưa có hoạt động xử lý sự cố.</p>
+            <p>Các hoạt động phát sinh từ Employee Simulator sẽ xuất hiện tại đây.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_mail_activity_sla_dashboard"
+              name="Theo dõi xử lý sự cố"
+              parent="stock.menu_warehouse_report"
+              action="action_mail_activity_sla_dashboard"
+              sequence="240"
+              groups="stock.group_stock_manager"/>
+</odoo>

@@ -1,0 +1,29 @@
+.o_employee_activity_sla_dashboard {
+    .o_sla_kpi_card {
+        display: flex;
+        min-width: 9.5rem;
+        flex: 1 1 9.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        border: 1px solid var(--border-color, #dee2e6);
+        padding: 0.75rem 1rem;
+        text-align: left;
+
+        &:hover {
+            border-color: currentColor;
+        }
+    }
+
+    .o_sla_kpi_value {
+        font-size: 1.75rem;
+        font-weight: 600;
+        line-height: 1.1;
+    }
+
+    .o_sla_kpi_label {
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+        white-space: normal;
+    }
+}

@@ -4,12 +4,20 @@
     'summary': 'Giả lập các hành vi thao tác của nhân viên trên hệ thống',
     'category': 'Tools',
     'author': 'Antigravity',
-    'depends': ['base', 'stock', 'base_automation'], # Phụ thuộc module stock để gọi stock.picking
+    'depends': ['base', 'mail', 'stock', 'base_automation'], # Phụ thuộc module stock để gọi stock.picking
     'data': [
         'data/cron_data.xml',
         'data/cron_internal_transfer.xml',
         'data/activity_data.xml',
+        'views/mail_activity_sla_dashboard_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'employee_simulator/static/src/views/mail_activity_sla_dashboard.js',
+            'employee_simulator/static/src/views/mail_activity_sla_dashboard.xml',
+            'employee_simulator/static/src/views/mail_activity_sla_dashboard.scss',
+        ],
+    },
     'installable': True,
     'application': False,
     'license': 'LGPL-3',
