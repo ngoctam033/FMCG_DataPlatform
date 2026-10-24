@@ -55,6 +55,11 @@
           "name": "FMCGExecutive-7c9a2d4e.json",
           "path": "FMCGExecutive-7c9a2d4e.json",
           "type": "CustomTheme"
+        },
+        {
+          "name": "WarehouseCommandCenter-v2.svg",
+          "path": "WarehouseCommandCenter-v2.svg",
+          "type": "Image"
         }
       ]
     }

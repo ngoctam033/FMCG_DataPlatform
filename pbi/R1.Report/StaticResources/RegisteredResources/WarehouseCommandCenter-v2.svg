@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="nav" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0F2747"/>
+      <stop offset="1" stop-color="#102F55"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+    <style>
+      .navText{font-family:'Segoe UI',Arial,sans-serif;font-size:17px;fill:#D9E7F5}
+      .navActive{font-family:'Segoe UI Semibold','Segoe UI',Arial,sans-serif;font-size:17px;fill:#FFFFFF}
+      .title{font-family:'Segoe UI Semibold','Segoe UI',Arial,sans-serif;font-size:30px;fill:#0F2747}
+      .sub{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#64748B}
+      .brand{font-family:'Segoe UI Semibold','Segoe UI',Arial,sans-serif;font-size:18px;fill:#FFFFFF;letter-spacing:1px}
+    </style>
+  </defs>
+  <rect width="1920" height="1080" fill="#F5F7FA"/>
+  <rect width="220" height="1080" fill="url(#nav)"/>
+  <circle cx="40" cy="42" r="20" fill="#2563EB"/>
+  <path d="M29 48h7V37h-7zm11 0h7V29h-7zm11 0h7V21h-7z" fill="#FFFFFF"/>
+  <text x="72" y="48" class="brand">FMCG DATA</text>
+  <rect x="12" y="92" width="196" height="54" rx="10" fill="#2563EB"/>
+  <text x="32" y="126" class="navActive">▦  Điều hành kho</text>
+  <text x="32" y="190" class="navText">◇  Tồn kho</text>
+  <text x="32" y="244" class="navText">↓  Nhập kho</text>
+  <text x="32" y="298" class="navText">↑  Xuất kho</text>
+  <text x="32" y="352" class="navText">⇄  Điều chuyển</text>
+  <text x="32" y="406" class="navText">✓  Kiểm kê</text>
+  <text x="32" y="460" class="navText">●  Cảnh báo</text>
+  <text x="246" y="50" class="title">Tổng quan kho</text>
+  <text x="246" y="75" class="sub">Theo dõi tồn kho, nhập hàng, hạn sử dụng và ngoại lệ cần xử lý</text>
+  <rect x="1400" y="22" width="230" height="60" rx="10" fill="#FFFFFF" stroke="#D8E1E8"/>
+  <rect x="1645" y="22" width="251" height="60" rx="10" fill="#FFFFFF" stroke="#D8E1E8"/>
+  <rect x="240" y="104" width="1656" height="152" rx="12" fill="#FFFFFF" stroke="#D8E1E8" filter="url(#shadow)"/>
+  <rect x="240" y="280" width="800" height="360" rx="12" fill="#FFFFFF" stroke="#D8E1E8" filter="url(#shadow)"/>
+  <rect x="1056" y="280" width="500" height="360" rx="12" fill="#FFFFFF" stroke="#D8E1E8" filter="url(#shadow)"/>
+  <rect x="1572" y="280" width="324" height="360" rx="12" fill="#FFFFFF" stroke="#D8E1E8" filter="url(#shadow)"/>
+  <rect x="240" y="664" width="500" height="392" rx="12" fill="#FFFFFF" stroke="#D8E1E8" filter="url(#shadow)"/>
+  <rect x="756" y="664" width="450" height="392" rx="12" fill="#FFFFFF" stroke="#D8E1E8" filter="url(#shadow)"/>
+  <rect x="1222" y="664" width="674" height="392" rx="12" fill="#FFFFFF" stroke="#D8E1E8" filter="url(#shadow)"/>
+</svg>

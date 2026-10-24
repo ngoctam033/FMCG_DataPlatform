@@ -36,35 +36,17 @@ table DimNgay
 		source =
 			let
 				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
-				NativeResult = Value.NativeQuery(
-					Source,
-					"WITH receipt_range AS (
-					    SELECT
-					        COALESCE(MIN(sp.create_date::date), CURRENT_DATE) AS min_date,
-					        COALESCE(MAX(GREATEST(
-					            sp.create_date::date,
-					            COALESCE(sp.scheduled_date::date, sp.create_date::date),
-					            COALESCE(sp.date_done::date, sp.create_date::date)
-					        )), CURRENT_DATE) AS max_date
-					    FROM stock_picking AS sp
-					    INNER JOIN stock_picking_type AS spt
-					        ON spt.id = sp.picking_type_id
-					    WHERE spt.code = 'incoming'
-					)
-					SELECT
-					    day_value::date AS calendar_date,
-					    EXTRACT(YEAR FROM day_value)::bigint AS calendar_year,
-					    EXTRACT(MONTH FROM day_value)::bigint AS calendar_month,
-					    ('Tháng ' || EXTRACT(MONTH FROM day_value)::int)::text AS month_name,
-					    ('Q' || EXTRACT(QUARTER FROM day_value)::int)::text AS calendar_quarter
-					FROM receipt_range
-					CROSS JOIN LATERAL generate_series(
-					    receipt_range.min_date,
-					    receipt_range.max_date,
-					    INTERVAL '1 day'
-					) AS day_value",
-					null,
-					[EnableFolding = true]
-				)
+				RawStockPicking = Value.NativeQuery(Source, "SELECT * FROM stock_picking", null, [EnableFolding = true]),
+				RawPickingType = Value.NativeQuery(Source, "SELECT * FROM stock_picking_type", null, [EnableFolding = true]),
+				IncomingTypes = Table.SelectRows(RawPickingType, each [code] = "incoming"),
+				Incoming = Table.NestedJoin(RawStockPicking, {"picking_type_id"}, Table.SelectColumns(IncomingTypes, {"id"}), {"id"}, "IncomingType", JoinKind.Inner),
+				Dates = List.RemoveNulls(List.Combine({List.Transform(Incoming[create_date], each if _ = null then null else Date.From(_)), List.Transform(Incoming[scheduled_date], each if _ = null then null else Date.From(_)), List.Transform(Incoming[date_done], each if _ = null then null else Date.From(_))})),
+				MinDate = if List.IsEmpty(Dates) then Date.From(DateTime.LocalNow()) else List.Min(Dates),
+				MaxDate = if List.IsEmpty(Dates) then Date.From(DateTime.LocalNow()) else List.Max(Dates),
+				Calendar = Table.FromList(List.Dates(MinDate, Duration.Days(MaxDate - MinDate) + 1, #duration(1, 0, 0, 0)), Splitter.SplitByNothing(), {"calendar_date"}),
+				AddedYear = Table.AddColumn(Calendar, "calendar_year", each Date.Year([calendar_date]), Int64.Type),
+				AddedMonth = Table.AddColumn(AddedYear, "calendar_month", each Date.Month([calendar_date]), Int64.Type),
+				AddedMonthName = Table.AddColumn(AddedMonth, "month_name", each "Tháng " & Text.From([calendar_month]), type text),
+				NativeResult = Table.AddColumn(AddedMonthName, "calendar_quarter", each "Q" & Text.From(Date.QuarterOfYear([calendar_date])), type text)
 			in
 				NativeResult

@@ -41,20 +41,6 @@
                       "Entity": "FactBoSungHang"
                     }
                   },
-                  "Property": "Tổng SL cần bổ sung tối thiểu"
-                }
-              },
-              "queryRef": "FactBoSungHang.Tổng SL cần bổ sung tối thiểu",
-              "nativeQueryRef": "Tổng SL cần bổ sung tối thiểu"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "FactBoSungHang"
-                    }
-                  },
                   "Property": "Tổng SL đề xuất tới mức tối đa"
                 }
               },

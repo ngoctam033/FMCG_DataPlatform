@@ -67,25 +67,6 @@
                           "Entity": "FactBoSungHang"
                         }
                       },
-                      "Property": "Tồn khả dụng"
-                    }
-                  },
-                  "Function": 0
-                }
-              },
-              "queryRef": "Sum(FactBoSungHang.Tồn khả dụng)",
-              "nativeQueryRef": "Tồn khả dụng"
-            },
-            {
-              "field": {
-                "Aggregation": {
-                  "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "FactBoSungHang"
-                        }
-                      },
                       "Property": "Mức tồn tối thiểu"
                     }
                   },

@@ -22,15 +22,11 @@ table DimViTriKho
 		source =
 			let
 				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
-				NativeResult = Value.NativeQuery(
-					Source,
-					"SELECT
-					    sl.id::bigint AS location_id,
-					    COALESCE(sl.complete_name, sl.name, '(Không xác định)')::text AS location_name,
-					    sl.usage::text AS usage_type
-					FROM stock_location AS sl",
-					null,
-					[EnableFolding = true]
-				)
+				RawStockLocation = Value.NativeQuery(Source, "SELECT * FROM stock_location", null, [EnableFolding = true]),
+				Selected = Table.SelectColumns(RawStockLocation, {"id", "complete_name", "name", "usage"}),
+				AddedName = Table.AddColumn(Selected, "location_name", each if [complete_name] <> null then [complete_name] else if [name] <> null then [name] else "(Không xác định)", type text),
+				Projected = Table.SelectColumns(AddedName, {"id", "location_name", "usage"}),
+				Renamed = Table.RenameColumns(Projected, {{"id", "location_id"}, {"usage", "usage_type"}}),
+				NativeResult = Table.TransformColumnTypes(Renamed, {{"location_id", Int64.Type}, {"location_name", type text}, {"usage_type", type text}})
 			in
 				NativeResult

@@ -17,17 +17,13 @@ table DimNhaCungCap
 		source =
 			let
 				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
-				NativeResult = Value.NativeQuery(
-					Source,
-					"SELECT -1::bigint AS supplier_id, '(Không có nhà cung cấp)'::text AS supplier_name
-					UNION ALL
-					SELECT
-					    rp.id::bigint AS supplier_id,
-					    COALESCE(rp.name, '(Nhà cung cấp chưa đặt tên)')::text AS supplier_name
-					FROM res_partner AS rp
-					WHERE rp.supplier_rank > 0",
-					null,
-					[EnableFolding = true]
-				)
+				RawResPartner = Value.NativeQuery(Source, "SELECT * FROM res_partner", null, [EnableFolding = true]),
+				Suppliers = Table.SelectRows(RawResPartner, each [supplier_rank] > 0),
+				Selected = Table.SelectColumns(Suppliers, {"id", "name"}),
+				Renamed = Table.RenameColumns(Selected, {{"id", "supplier_id"}, {"name", "supplier_name"}}),
+				FilledNames = Table.ReplaceValue(Renamed, null, "(Nhà cung cấp chưa đặt tên)", Replacer.ReplaceValue, {"supplier_name"}),
+				Unknown = #table(type table [supplier_id = Int64.Type, supplier_name = text], {{-1, "(Không có nhà cung cấp)"}}),
+				Result = Table.Combine({Unknown, FilledNames}),
+				NativeResult = Table.TransformColumnTypes(Result, {{"supplier_id", Int64.Type}, {"supplier_name", type text}})
 			in
 				NativeResult

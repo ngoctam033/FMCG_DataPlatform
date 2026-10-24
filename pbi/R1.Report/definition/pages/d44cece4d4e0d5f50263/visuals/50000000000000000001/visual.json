@@ -1,0 +1,129 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "50000000000000000001",
+  "position": {
+    "x": 240,
+    "y": 104,
+    "z": 1000,
+    "height": 152,
+    "width": 1656,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTonKho"
+                    }
+                  },
+                  "Property": "Giá trị tồn kho ước tính"
+                }
+              },
+              "queryRef": "FactTonKho.Giá trị tồn kho ước tính",
+              "nativeQueryRef": "Giá trị tồn kho ước tính"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTonKho"
+                    }
+                  },
+                  "Property": "Tuổi tồn TB (ngày)"
+                }
+              },
+              "queryRef": "FactTonKho.Tuổi tồn TB (ngày)",
+              "nativeQueryRef": "Tuổi tồn TB (ngày)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTonKho"
+                    }
+                  },
+                  "Property": "Tồn kho khả dụng"
+                }
+              },
+              "queryRef": "FactTonKho.Tồn kho khả dụng",
+              "nativeQueryRef": "Tồn kho khả dụng"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTonKho"
+                    }
+                  },
+                  "Property": "Tỷ lệ tồn đã giữ chỗ"
+                }
+              },
+              "queryRef": "FactTonKho.Tỷ lệ tồn đã giữ chỗ",
+              "nativeQueryRef": "Tỷ lệ tồn đã giữ chỗ"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactNhapKho"
+                    }
+                  },
+                  "Property": "Tỷ lệ nhận hàng"
+                }
+              },
+              "queryRef": "FactNhapKho.Tỷ lệ nhận hàng",
+              "nativeQueryRef": "Tỷ lệ nhận hàng"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactNhapKho"
+                    }
+                  },
+                  "Property": "Thời gian xử lý TB (giờ)"
+                }
+              },
+              "queryRef": "FactNhapKho.Thời gian xử lý TB (giờ)",
+              "nativeQueryRef": "Thời gian xử lý TB (giờ)"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                "Value": "'Chỉ số điều hành kho'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

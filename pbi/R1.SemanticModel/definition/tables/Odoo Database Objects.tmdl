@@ -24,12 +24,10 @@ table 'Odoo Database Objects'
 						#"OdooDatabase",
 						[CreateNavigationProperties = false]
 					),
-					DatabaseObjects = Value.NativeQuery(
-						Source,
-						"select table_schema::text as schema_name, table_name::text as table_name from information_schema.tables where table_schema = 'public' and table_type = 'BASE TABLE' order by table_name",
-						null,
-						[EnableFolding = true]
-					)
+					PublicTables = Table.SelectRows(Source, each [Schema] = "public" and [Kind] = "Table"),
+					Selected = Table.SelectColumns(PublicTables, {"Schema", "Item"}),
+					Renamed = Table.RenameColumns(Selected, {{"Schema", "schema_name"}, {"Item", "table_name"}}),
+					DatabaseObjects = Table.Sort(Renamed, {{"table_name", Order.Ascending}})
 				in
 					DatabaseObjects
 

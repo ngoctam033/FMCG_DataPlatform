@@ -22,21 +22,16 @@ table DimTrangThai
 		mode: import
 		source =
 			let
-				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
-				NativeResult = Value.NativeQuery(
-					Source,
-					"SELECT *
-					FROM (
-					    VALUES
-					        ('draft', 'Nháp', 1),
-					        ('waiting', 'Đang chờ', 2),
-					        ('confirmed', 'Đang chờ', 3),
-					        ('assigned', 'Sẵn sàng', 4),
-					        ('done', 'Hoàn tất', 5),
-					        ('cancel', 'Đã hủy', 6)
-					) AS status(state_key, state_name, state_order)",
-					null,
-					[EnableFolding = true]
+				NativeResult = #table(
+					type table [state_key = text, state_name = text, state_order = Int64.Type],
+					{
+						{"draft", "Nháp", 1},
+						{"waiting", "Đang chờ", 2},
+						{"confirmed", "Đang chờ", 3},
+						{"assigned", "Sẵn sàng", 4},
+						{"done", "Hoàn tất", 5},
+						{"cancel", "Đã hủy", 6}
+					}
 				)
 			in
 				NativeResult

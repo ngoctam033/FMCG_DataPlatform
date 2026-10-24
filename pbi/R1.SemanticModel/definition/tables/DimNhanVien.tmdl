@@ -17,18 +17,17 @@ table DimNhanVien
 		source =
 			let
 				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
-				NativeResult = Value.NativeQuery(
-					Source,
-					"SELECT -1::bigint AS employee_id, '(Chưa phân công)'::text AS employee_name
-					UNION ALL
-					SELECT
-					    ru.id::bigint AS employee_id,
-					    COALESCE(rp.name, '(Người dùng chưa đặt tên)')::text AS employee_name
-					FROM res_users AS ru
-					LEFT JOIN res_partner AS rp
-					    ON rp.id = ru.partner_id",
-					null,
-					[EnableFolding = true]
-				)
+				RawResUsers = Value.NativeQuery(Source, "SELECT * FROM res_users", null, [EnableFolding = true]),
+				RawResPartner = Value.NativeQuery(Source, "SELECT * FROM res_partner", null, [EnableFolding = true]),
+				Users = Table.SelectColumns(RawResUsers, {"id", "partner_id"}),
+				Partners = Table.SelectColumns(RawResPartner, {"id", "name"}),
+				Joined = Table.NestedJoin(Users, {"partner_id"}, Partners, {"id"}, "Partner", JoinKind.LeftOuter),
+				Expanded = Table.ExpandTableColumn(Joined, "Partner", {"name"}, {"employee_name"}),
+				Selected = Table.SelectColumns(Expanded, {"id", "employee_name"}),
+				Renamed = Table.RenameColumns(Selected, {{"id", "employee_id"}}),
+				FilledNames = Table.ReplaceValue(Renamed, null, "(Người dùng chưa đặt tên)", Replacer.ReplaceValue, {"employee_name"}),
+				Unknown = #table(type table [employee_id = Int64.Type, employee_name = text], {{-1, "(Chưa phân công)"}}),
+				Result = Table.Combine({Unknown, FilledNames}),
+				NativeResult = Table.TransformColumnTypes(Result, {{"employee_id", Int64.Type}, {"employee_name", type text}})
 			in
 				NativeResult

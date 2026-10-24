@@ -81,25 +81,6 @@
                           "Entity": "FactBoSungHang"
                         }
                       },
-                      "Property": "Tồn khả dụng"
-                    }
-                  },
-                  "Function": 0
-                }
-              },
-              "queryRef": "Sum(FactBoSungHang.Tồn khả dụng)",
-              "nativeQueryRef": "Tồn khả dụng"
-            },
-            {
-              "field": {
-                "Aggregation": {
-                  "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "FactBoSungHang"
-                        }
-                      },
                       "Property": "Mức tồn tối thiểu"
                     }
                   },
@@ -127,25 +108,6 @@
               },
               "queryRef": "Sum(FactBoSungHang.Mức tồn tối đa)",
               "nativeQueryRef": "Mức tồn tối đa"
-            },
-            {
-              "field": {
-                "Aggregation": {
-                  "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "FactBoSungHang"
-                        }
-                      },
-                      "Property": "SL cần bổ sung tối thiểu"
-                    }
-                  },
-                  "Function": 0
-                }
-              },
-              "queryRef": "Sum(FactBoSungHang.SL cần bổ sung tối thiểu)",
-              "nativeQueryRef": "SL cần bổ sung tối thiểu"
             },
             {
               "field": {

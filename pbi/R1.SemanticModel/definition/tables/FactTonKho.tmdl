@@ -7,6 +7,10 @@ table FactTonKho
 	measure 'Tổng SL giữ chỗ' = SUM(FactTonKho[Số lượng giữ chỗ])
 		formatString: #,0.00
 
+	/// Tỷ trọng hàng đã được giữ chỗ trên tổng tồn thực tế.
+	measure 'Tỷ lệ tồn đã giữ chỗ' = DIVIDE([Tổng SL giữ chỗ], [Tồn kho thực tế], 0)
+		formatString: 0.0%
+
 	measure 'Tồn kho khả dụng' = SUM(FactTonKho[Số lượng khả dụng])
 		formatString: #,0.00
 
@@ -103,12 +107,25 @@ table FactTonKho
 		source =
 			let
 				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
-				NativeResult = Value.NativeQuery(
-					Source,
-					"SELECT sq.id::bigint AS quant_id, sq.product_id::bigint AS product_id, sq.location_id::bigint AS location_id, COALESCE(sq.lot_id, -1)::bigint AS lot_id, COALESCE(lot.name, '(Không theo dõi lô)')::text AS lot_name, sq.in_date::date AS in_date, GREATEST(CURRENT_DATE - COALESCE(sq.in_date::date, CURRENT_DATE), 0)::bigint AS aging_days, COALESCE(sq.quantity, 0)::double precision AS on_hand_qty, COALESCE(sq.reserved_quantity, 0)::double precision AS reserved_qty, (COALESCE(sq.quantity, 0) - COALESCE(sq.reserved_quantity, 0))::double precision AS available_qty, COALESCE((pp.standard_price ->> sq.company_id::text)::double precision, 0::double precision) AS standard_price, (COALESCE(sq.quantity, 0) * COALESCE((pp.standard_price ->> sq.company_id::text)::double precision, 0::double precision))::double precision AS inventory_value, (COALESCE(sq.reserved_quantity, 0) > COALESCE(sq.quantity, 0)) AS is_over_reserved FROM stock_quant sq INNER JOIN stock_location sl ON sl.id = sq.location_id LEFT JOIN stock_lot lot ON lot.id = sq.lot_id INNER JOIN product_product pp ON pp.id = sq.product_id WHERE sl.usage = 'internal'",
-					null,
-					[EnableFolding = true]
-				)
+				RawStockQuant = Value.NativeQuery(Source, "SELECT * FROM stock_quant", null, [EnableFolding = true]),
+				RawStockLocation = Value.NativeQuery(Source, "SELECT * FROM stock_location", null, [EnableFolding = true]),
+				RawStockLot = Value.NativeQuery(Source, "SELECT * FROM stock_lot", null, [EnableFolding = true]),
+				RawProductProduct = Value.NativeQuery(Source, "SELECT * FROM product_product", null, [EnableFolding = true]),
+				InternalLocations = Table.SelectRows(RawStockLocation, each [usage] = "internal"),
+				Quants = Table.NestedJoin(RawStockQuant, {"location_id"}, Table.SelectColumns(InternalLocations, {"id"}), {"id"}, "InternalLocation", JoinKind.Inner),
+				JoinedLot = Table.NestedJoin(Quants, {"lot_id"}, Table.SelectColumns(RawStockLot, {"id", "name"}), {"id"}, "Lot", JoinKind.LeftOuter),
+				ExpandedLot = Table.ExpandTableColumn(JoinedLot, "Lot", {"name"}, {"lot_name"}),
+				JoinedProduct = Table.NestedJoin(ExpandedLot, {"product_id"}, Table.SelectColumns(RawProductProduct, {"id", "standard_price"}), {"id"}, "Product", JoinKind.Inner),
+				ExpandedProduct = Table.ExpandTableColumn(JoinedProduct, "Product", {"standard_price"}, {"standard_price_raw"}),
+				Filled = Table.ReplaceValue(Table.ReplaceValue(Table.ReplaceValue(ExpandedProduct, null, 0, Replacer.ReplaceValue, {"quantity", "reserved_quantity"}), null, -1, Replacer.ReplaceValue, {"lot_id"}), null, "(Không theo dõi lô)", Replacer.ReplaceValue, {"lot_name"}),
+				AddedAge = Table.AddColumn(Filled, "aging_days", each List.Max({Duration.Days(Date.From(DateTime.LocalNow()) - (if [in_date] = null then Date.From(DateTime.LocalNow()) else Date.From([in_date]))), 0}), Int64.Type),
+				AddedAvailable = Table.AddColumn(AddedAge, "available_qty", each [quantity] - [reserved_quantity], type number),
+				AddedPrice = Table.AddColumn(AddedAvailable, "standard_price", each let value = [standard_price_raw], companyKey = Text.From([company_id]), parsedValue = if value = null or Value.Is(value, type record) then value else try Json.Document(Text.ToBinary(Text.From(value))) otherwise value, priceValue = if parsedValue = null then 0 else if Value.Is(parsedValue, type record) then Record.FieldOrDefault(parsedValue, companyKey, 0) else parsedValue in Number.From(priceValue), type number),
+				AddedValue = Table.AddColumn(AddedPrice, "inventory_value", each [quantity] * [standard_price], type number),
+				AddedOverReserved = Table.AddColumn(AddedValue, "is_over_reserved", each [reserved_quantity] > [quantity], type logical),
+				Selected = Table.SelectColumns(AddedOverReserved, {"id", "product_id", "location_id", "lot_id", "lot_name", "in_date", "aging_days", "quantity", "reserved_quantity", "available_qty", "standard_price", "inventory_value", "is_over_reserved"}),
+				Renamed = Table.RenameColumns(Selected, {{"id", "quant_id"}, {"quantity", "on_hand_qty"}, {"reserved_quantity", "reserved_qty"}}),
+				NativeResult = Table.TransformColumnTypes(Renamed, {{"quant_id", Int64.Type}, {"product_id", Int64.Type}, {"location_id", Int64.Type}, {"lot_id", Int64.Type}, {"in_date", type date}, {"aging_days", Int64.Type}, {"on_hand_qty", type number}, {"reserved_qty", type number}, {"available_qty", type number}, {"standard_price", type number}, {"inventory_value", type number}, {"is_over_reserved", type logical}})
 			in
 				NativeResult
 

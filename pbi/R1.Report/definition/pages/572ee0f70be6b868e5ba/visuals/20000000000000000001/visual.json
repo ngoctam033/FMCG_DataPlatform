@@ -23,11 +23,11 @@
                       "Entity": "FactBoSungHang"
                     }
                   },
-                  "Property": "🔴 SKU hết hàng"
+				  "Property": "SKU cần bổ sung"
                 }
               },
-              "queryRef": "FactBoSungHang.🔴 SKU hết hàng",
-              "nativeQueryRef": "🔴 SKU hết hàng"
+			  "queryRef": "FactBoSungHang.SKU cần bổ sung",
+			  "nativeQueryRef": "SKU cần bổ sung"
             },
             {
               "field": {
@@ -37,11 +37,11 @@
                       "Entity": "FactBoSungHang"
                     }
                   },
-                  "Property": "🟠 SKU dưới Min"
+				  "Property": "Tổng SL đề xuất tới mức tối đa"
                 }
               },
-              "queryRef": "FactBoSungHang.🟠 SKU dưới Min",
-              "nativeQueryRef": "🟠 SKU dưới Min"
+			  "queryRef": "FactBoSungHang.Tổng SL đề xuất tới mức tối đa",
+			  "nativeQueryRef": "Tổng SL đề xuất tới mức tối đa"
             },
             {
               "field": {
@@ -51,11 +51,11 @@
                       "Entity": "FactBoSungHang"
                     }
                   },
-                  "Property": "🔴 SKU vượt 120% Max"
+				  "Property": "Tỷ lệ SKU dưới Min"
                 }
               },
-              "queryRef": "FactBoSungHang.🔴 SKU vượt 120% Max",
-              "nativeQueryRef": "🔴 SKU vượt 120% Max"
+			  "queryRef": "FactBoSungHang.Tỷ lệ SKU dưới Min",
+			  "nativeQueryRef": "Tỷ lệ SKU dưới Min"
             },
             {
               "field": {

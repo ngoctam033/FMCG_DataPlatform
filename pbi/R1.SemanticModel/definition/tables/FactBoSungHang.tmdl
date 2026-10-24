@@ -13,24 +13,24 @@ table FactBoSungHang
 	measure 'Tỷ lệ SKU dưới Min' = DIVIDE([SKU cần bổ sung], DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), 0)
 		formatString: 0.0%
 
-	/// Khẩn cấp: không còn lượng khả dụng.
-	measure '🔴 SKU hết hàng' = CALCULATE(DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), FactBoSungHang[Tồn khả dụng] <= 0)
+	/// Không suy diễn hết hàng từ orderpoint vì qty_on_hand không được lưu trong PostgreSQL.
+	measure '🔴 SKU hết hàng' = BLANK()
 		formatString: #,0
 
-	/// Cảnh báo: còn hàng nhưng thấp hơn mức tồn tối thiểu.
-	measure '🟠 SKU dưới Min' = CALCULATE(DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), FactBoSungHang[Tồn khả dụng] > 0, FactBoSungHang[Tồn khả dụng] < FactBoSungHang[Mức tồn tối thiểu])
+	/// Odoo đã tính nhu cầu bổ sung trong qty_to_order_computed/qty_to_order_manual.
+	measure '🟠 SKU dưới Min' = [SKU cần bổ sung]
 		formatString: #,0
 
 	/// Theo dõi: tồn từ Min đến Min cộng biên an toàn 20%.
-	measure '🔵 SKU gần Min' = CALCULATE(DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), FactBoSungHang[Mức tồn tối thiểu] > 0, FactBoSungHang[Tồn khả dụng] >= FactBoSungHang[Mức tồn tối thiểu], FactBoSungHang[Tồn khả dụng] <= FactBoSungHang[Mức tồn tối thiểu] * 1.2)
+	measure '🔵 SKU gần Min' = BLANK()
 		formatString: #,0
 
 	/// Cảnh báo dư hàng: tồn cao hơn Max nhưng chưa vượt 120% Max.
-	measure '🟠 SKU vượt Max' = CALCULATE(DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), FactBoSungHang[Mức tồn tối đa] > 0, FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa], FactBoSungHang[Tồn khả dụng] <= FactBoSungHang[Mức tồn tối đa] * 1.2)
+	measure '🟠 SKU vượt Max' = BLANK()
 		formatString: #,0
 
 	/// Khẩn cấp dư hàng: tồn cao hơn 120% Max.
-	measure '🔴 SKU vượt 120% Max' = CALCULATE(DISTINCTCOUNT(FactBoSungHang[Mã sản phẩm]), FactBoSungHang[Mức tồn tối đa] > 0, FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa] * 1.2)
+	measure '🔴 SKU vượt 120% Max' = BLANK()
 		formatString: #,0
 
 	column 'Mã quy tắc'
@@ -58,6 +58,7 @@ table FactBoSungHang
 
 	column 'Tồn khả dụng'
 		dataType: double
+		isHidden
 		sourceColumn: available_qty
 		summarizeBy: sum
 
@@ -73,6 +74,7 @@ table FactBoSungHang
 
 	column 'SL cần bổ sung tối thiểu'
 		dataType: double
+		isHidden
 		sourceColumn: min_replenishment_qty
 		summarizeBy: sum
 
@@ -86,13 +88,13 @@ table FactBoSungHang
 		sourceColumn: needs_replenishment
 		summarizeBy: none
 
-	/// Nhãn trực quan dùng trong bảng và drill-through cảnh báo.
-	column 'Trạng thái cảnh báo' = SWITCH(TRUE(), FactBoSungHang[Tồn khả dụng] <= 0, "🔴 Hết hàng", FactBoSungHang[Mức tồn tối đa] > 0 && FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa] * 1.2, "🔴 Vượt 120% Max", FactBoSungHang[Tồn khả dụng] < FactBoSungHang[Mức tồn tối thiểu], "🟠 Dưới Min", FactBoSungHang[Mức tồn tối đa] > 0 && FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa], "🟠 Vượt Max", FactBoSungHang[Mức tồn tối thiểu] > 0 && FactBoSungHang[Tồn khả dụng] <= FactBoSungHang[Mức tồn tối thiểu] * 1.2, "🔵 Gần Min", "🟢 Bình thường")
+	/// Nhãn dựa trên kết quả replenishment chính thức do Odoo đã tính.
+	column 'Trạng thái cảnh báo' = IF(FactBoSungHang[Cần bổ sung], "🟠 Cần bổ sung", "🟢 Không cần bổ sung")
 		dataType: string
 		sortByColumn: 'Thứ tự cảnh báo'
 		summarizeBy: none
 
-	column 'Thứ tự cảnh báo' = SWITCH(TRUE(), FactBoSungHang[Tồn khả dụng] <= 0, 1, FactBoSungHang[Mức tồn tối đa] > 0 && FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa] * 1.2, 2, FactBoSungHang[Tồn khả dụng] < FactBoSungHang[Mức tồn tối thiểu], 3, FactBoSungHang[Mức tồn tối đa] > 0 && FactBoSungHang[Tồn khả dụng] > FactBoSungHang[Mức tồn tối đa], 4, FactBoSungHang[Mức tồn tối thiểu] > 0 && FactBoSungHang[Tồn khả dụng] <= FactBoSungHang[Mức tồn tối thiểu] * 1.2, 5, 6)
+	column 'Thứ tự cảnh báo' = IF(FactBoSungHang[Cần bổ sung], 1, 2)
 		dataType: int64
 		isHidden
 		summarizeBy: none
@@ -102,12 +104,18 @@ table FactBoSungHang
 		source =
 			let
 				Source = PostgreSQL.Database(#"OdooServer" & ":" & #"OdooPort", #"OdooDatabase", [CreateNavigationProperties = false]),
-				NativeResult = Value.NativeQuery(
-					Source,
-					"WITH stock AS (SELECT sq.product_id, sq.location_id, SUM(COALESCE(sq.quantity, 0) - COALESCE(sq.reserved_quantity, 0)) AS available_qty FROM stock_quant sq GROUP BY sq.product_id, sq.location_id) SELECT op.id::bigint AS orderpoint_id, COALESCE(op.name, 'OP/' || op.id::text)::text AS orderpoint_name, op.product_id::bigint AS product_id, op.location_id::bigint AS location_id, COALESCE(stock.available_qty, 0)::double precision AS available_qty, COALESCE(op.product_min_qty, 0)::double precision AS min_qty, COALESCE(op.product_max_qty, 0)::double precision AS max_qty, GREATEST(COALESCE(op.product_min_qty, 0) - COALESCE(stock.available_qty, 0), 0)::double precision AS min_replenishment_qty, GREATEST(COALESCE(op.product_max_qty, 0) - COALESCE(stock.available_qty, 0), 0)::double precision AS target_replenishment_qty, (COALESCE(stock.available_qty, 0) < COALESCE(op.product_min_qty, 0)) AS needs_replenishment FROM stock_warehouse_orderpoint op LEFT JOIN stock ON stock.product_id = op.product_id AND stock.location_id = op.location_id WHERE COALESCE(op.active, true)",
-					null,
-					[EnableFolding = true]
-				)
+				RawOrderpoint = Value.NativeQuery(Source, "SELECT * FROM stock_warehouse_orderpoint", null, [EnableFolding = true]),
+				ActiveOrderpoints = Table.SelectRows(RawOrderpoint, each [active] = null or [active] = true),
+				Filled = Table.ReplaceValue(Table.ReplaceValue(Table.ReplaceValue(Table.ReplaceValue(ActiveOrderpoints, null, 0, Replacer.ReplaceValue, {"product_min_qty", "product_max_qty", "qty_to_order_computed", "qty_to_order_manual"}), null, "", Replacer.ReplaceValue, {"name"}), null, -1, Replacer.ReplaceValue, {"product_id"}), null, -1, Replacer.ReplaceValue, {"location_id"}),
+				AddedName = Table.AddColumn(Filled, "orderpoint_name", each if [name] = "" then "OP/" & Text.From([id]) else [name], type text),
+				AddedOrderQty = Table.AddColumn(AddedName, "effective_order_qty", each if [qty_to_order_manual] <> 0 then [qty_to_order_manual] else [qty_to_order_computed], type number),
+				AddedAvailable = Table.AddColumn(AddedOrderQty, "available_qty", each null, type nullable number),
+				AddedMinimum = Table.AddColumn(AddedAvailable, "min_replenishment_qty", each [effective_order_qty], type number),
+				AddedTarget = Table.AddColumn(AddedMinimum, "target_replenishment_qty", each [effective_order_qty], type number),
+				AddedNeeds = Table.AddColumn(AddedTarget, "needs_replenishment", each [effective_order_qty] > 0, type logical),
+				Selected = Table.SelectColumns(AddedNeeds, {"id", "orderpoint_name", "product_id", "location_id", "available_qty", "product_min_qty", "product_max_qty", "min_replenishment_qty", "target_replenishment_qty", "needs_replenishment"}),
+				Renamed = Table.RenameColumns(Selected, {{"id", "orderpoint_id"}, {"product_min_qty", "min_qty"}, {"product_max_qty", "max_qty"}}),
+				NativeResult = Table.TransformColumnTypes(Renamed, {{"orderpoint_id", Int64.Type}, {"orderpoint_name", type text}, {"product_id", Int64.Type}, {"location_id", Int64.Type}, {"available_qty", type nullable number}, {"min_qty", type number}, {"max_qty", type number}, {"min_replenishment_qty", type number}, {"target_replenishment_qty", type number}, {"needs_replenishment", type logical}})
 			in
 				NativeResult
 
