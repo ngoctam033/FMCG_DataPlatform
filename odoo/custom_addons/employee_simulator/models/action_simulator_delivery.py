@@ -135,7 +135,7 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
             'location_dest_id': destination_location.id if destination_location else False,
             'scheduled_date': now + timedelta(days=random.randint(1, 3)),
             'move_ids': [Command.create({
-                'name': f'Xuất hàng giả lập: {product.name}',
+                'description_picking': f'Xuất hàng giả lập: {product.name}',
                 'product_id': product.id,
                 'product_uom_qty': demand_qty,
                 'product_uom': product.uom_id.id,
