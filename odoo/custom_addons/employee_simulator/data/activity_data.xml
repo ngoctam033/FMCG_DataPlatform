@@ -52,5 +52,15 @@
             <field name="delay_count">0</field>
             <field name="delay_unit">days</field>
         </record>
+        <record id="mail_activity_replenish_lot_stock" model="mail.activity.type">
+            <field name="name">Nhập bổ sung hàng theo Lot/Serial</field>
+            <field name="summary">
+                Không có Lot/Serial đủ tồn để xuất kho
+            </field>
+            <field name="icon">fa-truck</field>
+            <field name="res_model">stock.picking</field>
+            <field name="delay_count">0</field>
+            <field name="delay_unit">days</field>
+        </record>
     </data>
 </odoo>

@@ -15,6 +15,10 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
             'employee_simulator.mail_activity_missing_lot',
             raise_if_not_found=False,
         )
+        replenish_activity_type = self.env.ref(
+            'employee_simulator.mail_activity_replenish_lot_stock'
+        )
+
         pickings = self.env['stock.picking'].search([
             ('activity_ids', 'any', [
                 ('activity_type_id', '=', activity_type.id),
@@ -26,6 +30,7 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
         Quant = self.env['stock.quant']
         for picking in pickings:
             is_fully_processed = True
+            unavailable_lines = self.env['stock.move.line']
 
             for line in picking.move_line_ids:
                 product = line.product_id
@@ -65,6 +70,39 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
                     line.write({'lot_id': selected_lot.id})
                 else:
                     is_fully_processed = False
+                    unavailable_lines |= line
+
+            if unavailable_lines:
+                existing_activity = picking.activity_ids.filtered(
+                    lambda activity:
+                        activity.activity_type_id == replenish_activity_type
+                )
+
+                if not existing_activity:
+                    product_details = '<br/>'.join(
+                        (
+                            f'- {line.product_id.display_name}: '
+                            f'{line.quantity_product_uom} '
+                            f'{line.product_uom_id.name}'
+                        )
+                        for line in unavailable_lines
+                    )
+
+                    assignee = (
+                        picking.user_id
+                        or self.env.ref('base.user_admin')
+                    )
+
+                    picking.activity_schedule(
+                        activity_type_id=replenish_activity_type.id,
+                        summary='Không có Lot/Serial đủ tồn để xuất kho',
+                        note=(
+                            'Cần nhập bổ sung hàng có Lot/Serial '
+                            'cho các sản phẩm:<br/>'
+                            f'{product_details}'
+                        ),
+                        user_id=assignee.id,
+                    )
 
             if is_fully_processed:
                 activities = picking.activity_ids.filtered(
