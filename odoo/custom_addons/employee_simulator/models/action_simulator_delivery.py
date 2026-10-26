@@ -24,6 +24,9 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
                 ('activity_type_id', '=', activity_type.id),
                 ('date_deadline', '<', fields.Date.today()),
             ]),
+            ('activity_ids', 'not any', [
+                ('activity_type_id', '=', replenish_activity_type.id),
+            ]),
             ('picking_type_id.code', '=', 'outgoing'),
         ], limit=500)
 
