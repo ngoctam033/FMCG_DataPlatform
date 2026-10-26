@@ -4,7 +4,13 @@
     'summary': 'Giả lập các hành vi thao tác của nhân viên trên hệ thống',
     'category': 'Tools',
     'author': 'Antigravity',
-    'depends': ['base', 'mail', 'stock', 'base_automation'], # Phụ thuộc module stock để gọi stock.picking
+    'depends': [
+        'base',
+        'mail',
+        'stock',
+        'base_automation',
+        'fmcg_inventory_learning',
+    ],
     'data': [
         'data/cron_data.xml',
         'data/cron_internal_transfer.xml',
