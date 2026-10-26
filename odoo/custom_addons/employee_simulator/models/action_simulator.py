@@ -393,6 +393,7 @@ class EmployeeSimulator(models.AbstractModel):
         backorder_act_type = self.env.ref('employee_simulator.mail_activity_backorder')
         pickings = self.env['stock.picking'].search([
             ('state', '=', 'assigned'),
+            ('products_availability_state', 'in', ['available']),
             ('activity_ids', 'not any', [
                 ('activity_type_id', 'in', [
                     expired_lot_act_type.id,
