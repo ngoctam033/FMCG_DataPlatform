@@ -606,14 +606,22 @@ class EmployeeSimulator(models.AbstractModel):
         if not activity_type:
             return
 
-        domain = [
-            ('activity_ids.activity_type_id', '=', activity_type.id),
-            ('activity_ids', 'not any', [('activity_type_id', '=', warning_act_type.id)]),
-            ('activity_ids', 'not any', [('activity_type_id', '=', missing_lot_act_type.id)]),
-            ('activity_ids', 'not any', [('activity_type_id', '=', expired_lot_act_type.id)]),
-        ]
-        
-        pickings = self.env['stock.picking'].search(domain, limit=10)
+        overdue_activities = self.env['mail.activity'].search([
+            ('res_model', '=', 'stock.picking'),
+            ('activity_type_id', '=', activity_type.id),
+            ('date_deadline', '<', fields.Date.context_today(self)),
+        ], order='date_deadline asc, id asc')
+
+        excluded_activity_types = (
+            warning_act_type | missing_lot_act_type | expired_lot_act_type
+        )
+        picking_ids = list(dict.fromkeys(overdue_activities.mapped('res_id')))
+        pickings = self.env['stock.picking'].browse(picking_ids).exists().filtered(
+            lambda picking: not any(
+                activity.activity_type_id in excluded_activity_types
+                for activity in picking.activity_ids
+            )
+        )[:10]
 
         for picking in pickings:
             _logger.info("[CRON SIMULATE BACKORDER] Đang xử lý tạo backorder cho phiếu: %s", picking.name)

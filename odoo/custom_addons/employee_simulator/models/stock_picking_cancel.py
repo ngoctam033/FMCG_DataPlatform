@@ -1,4 +1,4 @@
-from odoo import api, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 import logging
 _logger = logging.getLogger(__name__)
@@ -44,14 +44,20 @@ class EmployeeSimulatorCancel(models.AbstractModel):
         """
         activity_type = self.env.ref('employee_simulator.mail_activity_backorder', raise_if_not_found=False)
         missing_lot_act_type = self.env.ref('employee_simulator.mail_activity_missing_lot', raise_if_not_found=False)
-        # Chỉ lấy các phiếu kho có activity backorder và không bị vướng các cảnh báo khác
-        domain = [
-            ('activity_ids.activity_type_id', '=', activity_type.id),
-            ('activity_ids', 'not any', [('activity_type_id', '=', missing_lot_act_type.id)]),
-        ]
-        
-        # Limit 5 hoặc 10 tuỳ theo lưu lượng mong muốn
-        pickings = self.env['stock.picking'].search(domain, limit=5)
+        # Ưu tiên các phiếu có activity Backorder quá hạn lâu nhất.
+        overdue_activities = self.env['mail.activity'].search([
+            ('res_model', '=', 'stock.picking'),
+            ('activity_type_id', '=', activity_type.id),
+            ('date_deadline', '<', fields.Date.context_today(self)),
+        ], order='date_deadline asc, id asc')
+
+        picking_ids = list(dict.fromkeys(overdue_activities.mapped('res_id')))
+        pickings = self.env['stock.picking'].browse(picking_ids).exists().filtered(
+            lambda picking: not any(
+                activity.activity_type_id == missing_lot_act_type
+                for activity in picking.activity_ids
+            )
+        )[:5]
 
         for picking in pickings:
             target_activities = picking.activity_ids.filtered(lambda a: a.activity_type_id.id == activity_type.id)
@@ -109,10 +115,16 @@ class EmployeeSimulatorCancel(models.AbstractModel):
             raise_if_not_found=False,
         )
 
-        pickings = self.env['stock.picking'].search([
-            ('state', 'in', ['done', 'cancel']),
-            ('activity_ids.activity_type_id', '=', activity_type.id),
-        ], limit=100)
+        overdue_activities = self.env['mail.activity'].search([
+            ('res_model', '=', 'stock.picking'),
+            ('activity_type_id', '=', activity_type.id),
+            ('date_deadline', '<', fields.Date.context_today(self)),
+        ], order='date_deadline asc, id asc')
+
+        picking_ids = list(dict.fromkeys(overdue_activities.mapped('res_id')))
+        pickings = self.env['stock.picking'].browse(picking_ids).exists().filtered(
+            lambda picking: picking.state in ('done', 'cancel')
+        )[:100]
 
         state_labels = dict(self.env['stock.picking']._fields['state'].selection)
         for picking in pickings:
