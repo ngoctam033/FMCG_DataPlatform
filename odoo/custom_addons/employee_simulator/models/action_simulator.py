@@ -390,10 +390,14 @@ class EmployeeSimulator(models.AbstractModel):
             ('all_group_ids', 'in', [stock_user_group.id]),
         ])
         expired_lot_act_type = self.env.ref('employee_simulator.mail_activity_expired_lot')
+        backorder_act_type = self.env.ref('employee_simulator.mail_activity_backorder')
         pickings = self.env['stock.picking'].search([
             ('state', '=', 'assigned'),
             ('activity_ids', 'not any', [
-                ('activity_type_id', '=', expired_lot_act_type.id),
+                ('activity_type_id', 'in', [
+                    expired_lot_act_type.id,
+                    backorder_act_type.id,
+                ]),
             ]),
         ])
 
