@@ -8,7 +8,7 @@
         
         <!-- 2. Bật tính năng: Product Packagings -->
         <record id="base.group_user" model="res.groups">
-            <field name="implied_ids" eval="[(4, ref('product.group_stock_packaging'))]"/>
+            <field name="implied_ids" eval="[(4, ref('uom.group_uom'))]"/>
         </record>
 
         <!-- 3. Bật tính năng: Đa kho (Storage Locations) và Đa luồng (Multi-Step Routes) -->

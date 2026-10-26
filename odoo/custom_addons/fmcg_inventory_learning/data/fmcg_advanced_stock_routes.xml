@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- ============================================================ -->
+        <!-- DISTRIBUTION NETWORK: FAC -> CDC -> RDC                      -->
+        <!-- Kept in one operating company so stock moves remain direct. -->
+        <!-- ============================================================ -->
+        <record id="warehouse_cdc" model="stock.warehouse">
+            <field name="name">FMCG Central Distribution Center</field>
+            <field name="code">CDC</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="reception_steps">three_steps</field>
+            <field name="delivery_steps">pick_ship</field>
+            <field name="resupply_wh_ids" eval="[(4, ref('warehouse_factory'))]"/>
+        </record>
+        <record id="warehouse_rdc_north" model="stock.warehouse">
+            <field name="name">FMCG Northern Regional DC</field>
+            <field name="code">RDCN</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="reception_steps">three_steps</field>
+            <field name="delivery_steps">pick_ship</field>
+            <field name="resupply_wh_ids" eval="[(4, ref('warehouse_cdc'))]"/>
+        </record>
+        <record id="warehouse_rdc_south" model="stock.warehouse">
+            <field name="name">FMCG Southern Regional DC</field>
+            <field name="code">RDCS</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="reception_steps">three_steps</field>
+            <field name="delivery_steps">pick_ship</field>
+            <field name="resupply_wh_ids" eval="[(4, ref('warehouse_cdc'))]"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- FAC SPECIAL-PURPOSE LOCATIONS                                -->
+        <!-- ============================================================ -->
+        <record id="location_fac_bulk_storage" model="stock.location">
+            <field name="name">Bulk Storage</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_fac_picking_area" model="stock.location">
+            <field name="name">Picking Area</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_quarantine_inspection" model="stock.location">
+            <field name="name">Quarantine Inspection</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_near_expiry" model="stock.location">
+            <field name="name">Near Expiry</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_promotion_clearance" model="stock.location">
+            <field name="name">Promotion and Clearance</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_recall_receiving" model="stock.location">
+            <field name="name">Recall Receiving</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_recall_quarantine" model="stock.location">
+            <field name="name">Recall Quarantine</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_returnable_packaging" model="stock.location">
+            <field name="name">Returnable Packaging</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_packaging_inspection" model="stock.location">
+            <field name="name">Packaging Inspection</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_packaging_clean" model="stock.location">
+            <field name="name">Clean Reusable Packaging</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_packaging_repair" model="stock.location">
+            <field name="name">Packaging Repair</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_recall_inspection" model="stock.location">
+            <field name="name">Recall Inspection</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_damage_inspection" model="stock.location">
+            <field name="name">Damage Inspection</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- OPERATION TYPES: QUARANTINE, EXPIRY, RECALL AND PACKAGING    -->
+        <!-- ============================================================ -->
+        <record id="picking_type_quarantine_reinspection" model="stock.picking.type">
+            <field name="name">Quarantine Reinspection</field><field name="code">internal</field>
+            <field name="sequence_code">QREIN</field><field name="sequence">50</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_factory_quarantine"/><field name="default_location_dest_id" ref="location_quarantine_inspection"/>
+        </record>
+        <record id="picking_type_quarantine_pass" model="stock.picking.type">
+            <field name="name">Quarantine Reinspection - Pass</field><field name="code">internal</field>
+            <field name="sequence_code">QPASS</field><field name="sequence">51</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_quarantine_inspection"/><field name="default_location_dest_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+        </record>
+        <record id="picking_type_quarantine_reject" model="stock.picking.type">
+            <field name="name">Quarantine Reinspection - Reject</field><field name="code">outgoing</field>
+            <field name="sequence_code">QREJ</field><field name="sequence">52</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_quarantine_inspection"/><field name="default_location_dest_id" ref="stock.stock_location_suppliers"/>
+        </record>
+        <record id="picking_type_quarantine_damaged" model="stock.picking.type">
+            <field name="name">Quarantine Reinspection - Damaged</field><field name="code">internal</field>
+            <field name="sequence_code">QDMG</field><field name="sequence">53</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_quarantine_inspection"/><field name="default_location_dest_id" ref="location_damaged_goods"/>
+        </record>
+        <record id="picking_type_near_expiry" model="stock.picking.type">
+            <field name="name">Move to Near Expiry</field><field name="code">internal</field>
+            <field name="sequence_code">NEXP</field><field name="sequence">55</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/><field name="default_location_dest_id" ref="location_near_expiry"/>
+        </record>
+        <record id="picking_type_expiry_promotion" model="stock.picking.type">
+            <field name="name">Near Expiry to Promotion</field><field name="code">internal</field>
+            <field name="sequence_code">NPROM</field><field name="sequence">56</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_near_expiry"/><field name="default_location_dest_id" ref="location_promotion_clearance"/>
+        </record>
+        <record id="picking_type_damaged_scrap" model="stock.picking.type">
+            <field name="name">Damaged Goods Disposal</field><field name="code">internal</field>
+            <field name="sequence_code">DSCRP</field><field name="sequence">57</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_damaged_goods"/><field name="default_location_dest_id" ref="location_fmcg_scrap"/>
+        </record>
+        <record id="picking_type_expired_scrap" model="stock.picking.type">
+            <field name="name">Expired Goods Disposal</field><field name="code">internal</field>
+            <field name="sequence_code">ESCRP</field><field name="sequence">58</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_near_expiry"/><field name="default_location_dest_id" ref="location_fmcg_scrap"/>
+        </record>
+        <record id="picking_type_recall_receipt" model="stock.picking.type">
+            <field name="name">Product Recall Receipt</field><field name="code">incoming</field>
+            <field name="sequence_code">RECALL</field><field name="sequence">60</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="stock.stock_location_customers"/><field name="default_location_dest_id" ref="location_recall_receiving"/>
+            <field name="use_create_lots" eval="False"/><field name="use_existing_lots" eval="True"/>
+        </record>
+        <record id="picking_type_recall_quarantine" model="stock.picking.type">
+            <field name="name">Recall to Quarantine</field><field name="code">internal</field>
+            <field name="sequence_code">RCQ</field><field name="sequence">61</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_recall_receiving"/><field name="default_location_dest_id" ref="location_recall_quarantine"/>
+        </record>
+        <record id="picking_type_packaging_return" model="stock.picking.type">
+            <field name="name">Returnable Packaging Receipt</field><field name="code">incoming</field>
+            <field name="sequence_code">PKRET</field><field name="sequence">65</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="stock.stock_location_customers"/><field name="default_location_dest_id" ref="location_returnable_packaging"/>
+        </record>
+        <record id="picking_type_packaging_inspection" model="stock.picking.type">
+            <field name="name">Returnable Packaging Inspection</field><field name="code">internal</field>
+            <field name="sequence_code">PKQC</field><field name="sequence">66</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_returnable_packaging"/><field name="default_location_dest_id" ref="location_packaging_inspection"/>
+        </record>
+        <record id="picking_type_packaging_clean" model="stock.picking.type">
+            <field name="name">Packaging Inspection - Clean</field><field name="code">internal</field>
+            <field name="sequence_code">PKCLN</field><field name="sequence">67</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_packaging_inspection"/><field name="default_location_dest_id" ref="location_packaging_clean"/>
+        </record>
+        <record id="picking_type_packaging_repair" model="stock.picking.type">
+            <field name="name">Packaging Inspection - Repair</field><field name="code">internal</field>
+            <field name="sequence_code">PKRPR</field><field name="sequence">68</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_packaging_inspection"/><field name="default_location_dest_id" ref="location_packaging_repair"/>
+        </record>
+        <record id="picking_type_packaging_reinspection" model="stock.picking.type">
+            <field name="name">Packaging Repair Reinspection</field><field name="code">internal</field>
+            <field name="sequence_code">PKREIN</field><field name="sequence">69</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_packaging_repair"/><field name="default_location_dest_id" ref="location_packaging_inspection"/>
+        </record>
+        <record id="picking_type_recall_inspection" model="stock.picking.type">
+            <field name="name">Recall Inspection</field><field name="code">internal</field>
+            <field name="sequence_code">RCINSP</field><field name="sequence">70</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_recall_quarantine"/><field name="default_location_dest_id" ref="location_recall_inspection"/>
+        </record>
+        <record id="picking_type_damage_inspection" model="stock.picking.type">
+            <field name="name">Damage Inspection</field><field name="code">internal</field>
+            <field name="sequence_code">DMGINSP</field><field name="sequence">71</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_damaged_goods"/><field name="default_location_dest_id" ref="location_damage_inspection"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- AUTOMATIC/SELECTABLE ROUTES                                  -->
+        <!-- ============================================================ -->
+        <record id="route_fac_bulk_replenishment" model="stock.route">
+            <field name="name">FAC: Replenish Picking Area from Bulk</field>
+            <field name="sequence">35</field><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_selectable" eval="True"/><field name="product_categ_selectable" eval="True"/>
+            <field name="warehouse_selectable" eval="True"/><field name="warehouse_ids" eval="[(4, ref('warehouse_factory'))]"/>
+        </record>
+        <record id="picking_type_bulk_replenishment" model="stock.picking.type">
+            <field name="name">Bulk to Picking Replenishment</field><field name="code">internal</field>
+            <field name="sequence_code">REPL</field><field name="sequence">48</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_fac_bulk_storage"/><field name="default_location_dest_id" ref="location_fac_picking_area"/>
+        </record>
+        <record id="rule_fac_bulk_to_picking" model="stock.rule">
+            <field name="name">FAC: Bulk Storage → Picking Area</field><field name="sequence">10</field>
+            <field name="action">pull</field><field name="auto">manual</field><field name="procure_method">make_to_stock</field>
+            <field name="route_id" ref="route_fac_bulk_replenishment"/><field name="warehouse_id" ref="warehouse_factory"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="location_src_id" ref="location_fac_bulk_storage"/><field name="location_dest_id" ref="location_fac_picking_area"/>
+            <field name="location_dest_from_rule" eval="True"/><field name="picking_type_id" ref="picking_type_bulk_replenishment"/>
+        </record>
+
+        <record id="route_fac_recall_quarantine" model="stock.route">
+            <field name="name">FAC: Product Recall Quarantine</field><field name="sequence">36</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="product_selectable" eval="False"/><field name="product_categ_selectable" eval="False"/>
+            <field name="warehouse_selectable" eval="True"/><field name="warehouse_ids" eval="[(4, ref('warehouse_factory'))]"/>
+        </record>
+        <record id="rule_fac_recall_to_quarantine" model="stock.rule">
+            <field name="name">FAC: Recall Receiving → Recall Quarantine</field><field name="sequence">10</field>
+            <field name="action">push</field><field name="auto">manual</field><field name="procure_method">make_to_stock</field>
+            <field name="route_id" ref="route_fac_recall_quarantine"/><field name="warehouse_id" ref="warehouse_factory"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="location_src_id" ref="location_recall_receiving"/><field name="location_dest_id" ref="location_recall_quarantine"/>
+            <field name="location_dest_from_rule" eval="True"/><field name="picking_type_id" ref="picking_type_recall_quarantine"/>
+        </record>
+
+        <record id="route_fac_returnable_packaging_inspection" model="stock.route">
+            <field name="name">FAC: Returnable Packaging Inspection</field><field name="sequence">37</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="product_selectable" eval="False"/><field name="product_categ_selectable" eval="False"/>
+            <field name="warehouse_selectable" eval="True"/><field name="warehouse_ids" eval="[(4, ref('warehouse_factory'))]"/>
+        </record>
+        <record id="rule_fac_packaging_to_inspection" model="stock.rule">
+            <field name="name">FAC: Returnable Packaging → Inspection</field><field name="sequence">10</field>
+            <field name="action">push</field><field name="auto">manual</field><field name="procure_method">make_to_stock</field>
+            <field name="route_id" ref="route_fac_returnable_packaging_inspection"/><field name="warehouse_id" ref="warehouse_factory"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="location_src_id" ref="location_returnable_packaging"/><field name="location_dest_id" ref="location_packaging_inspection"/>
+            <field name="location_dest_from_rule" eval="True"/><field name="picking_type_id" ref="picking_type_packaging_inspection"/>
+        </record>
+
+        <!-- Deterministic workflow legs. Quality disposition branches remain manual. -->
+        <record id="route_fac_quarantine_reinspection" model="stock.route">
+            <field name="name">FAC: Quarantine Reinspection</field><field name="sequence">38</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_selectable" eval="False"/><field name="product_categ_selectable" eval="False"/>
+            <field name="warehouse_selectable" eval="True"/><field name="warehouse_ids" eval="[(4, ref('warehouse_factory'))]"/>
+        </record>
+        <record id="rule_fac_quarantine_to_reinspection" model="stock.rule">
+            <field name="name">FAC: Quarantine → Reinspection</field><field name="sequence">10</field>
+            <field name="action">push</field><field name="auto">manual</field><field name="procure_method">make_to_stock</field>
+            <field name="route_id" ref="route_fac_quarantine_reinspection"/><field name="warehouse_id" ref="warehouse_factory"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="location_src_id" ref="location_factory_quarantine"/><field name="location_dest_id" ref="location_quarantine_inspection"/>
+            <field name="location_dest_from_rule" eval="True"/><field name="picking_type_id" ref="picking_type_quarantine_reinspection"/>
+        </record>
+
+        <record id="route_fac_packaging_reinspection" model="stock.route">
+            <field name="name">FAC: Repaired Packaging Reinspection</field><field name="sequence">39</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_selectable" eval="False"/><field name="product_categ_selectable" eval="False"/>
+            <field name="warehouse_selectable" eval="True"/><field name="warehouse_ids" eval="[(4, ref('warehouse_factory'))]"/>
+        </record>
+        <record id="rule_fac_packaging_repair_to_reinspection" model="stock.rule">
+            <field name="name">FAC: Packaging Repair → Reinspection</field><field name="sequence">10</field>
+            <field name="action">push</field><field name="auto">manual</field><field name="procure_method">make_to_stock</field>
+            <field name="route_id" ref="route_fac_packaging_reinspection"/><field name="warehouse_id" ref="warehouse_factory"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="location_src_id" ref="location_packaging_repair"/><field name="location_dest_id" ref="location_packaging_inspection"/>
+            <field name="location_dest_from_rule" eval="True"/><field name="picking_type_id" ref="picking_type_packaging_reinspection"/>
+        </record>
+
+        <record id="route_fac_recall_inspection" model="stock.route">
+            <field name="name">FAC: Recall Inspection</field><field name="sequence">40</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_selectable" eval="False"/><field name="product_categ_selectable" eval="False"/>
+            <field name="warehouse_selectable" eval="True"/><field name="warehouse_ids" eval="[(4, ref('warehouse_factory'))]"/>
+        </record>
+        <record id="rule_fac_recall_quarantine_to_inspection" model="stock.rule">
+            <field name="name">FAC: Recall Quarantine → Recall Inspection</field><field name="sequence">10</field>
+            <field name="action">push</field><field name="auto">manual</field><field name="procure_method">make_to_stock</field>
+            <field name="route_id" ref="route_fac_recall_inspection"/><field name="warehouse_id" ref="warehouse_factory"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="location_src_id" ref="location_recall_quarantine"/><field name="location_dest_id" ref="location_recall_inspection"/>
+            <field name="location_dest_from_rule" eval="True"/><field name="picking_type_id" ref="picking_type_recall_inspection"/>
+        </record>
+
+        <record id="route_fac_damage_inspection" model="stock.route">
+            <field name="name">FAC: Damaged Goods Inspection</field><field name="sequence">41</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_selectable" eval="False"/><field name="product_categ_selectable" eval="False"/>
+            <field name="warehouse_selectable" eval="True"/><field name="warehouse_ids" eval="[(4, ref('warehouse_factory'))]"/>
+        </record>
+        <record id="rule_fac_damaged_to_inspection" model="stock.rule">
+            <field name="name">FAC: Damaged Goods → Damage Inspection</field><field name="sequence">10</field>
+            <field name="action">push</field><field name="auto">manual</field><field name="procure_method">make_to_stock</field>
+            <field name="route_id" ref="route_fac_damage_inspection"/><field name="warehouse_id" ref="warehouse_factory"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="location_src_id" ref="location_damaged_goods"/><field name="location_dest_id" ref="location_damage_inspection"/>
+            <field name="location_dest_from_rule" eval="True"/><field name="picking_type_id" ref="picking_type_damage_inspection"/>
+        </record>
+
+        <!-- Cross-dock is opt-in per product/category to avoid bypassing QC for all receipts. -->
+        <record id="route_fac_cross_dock_selected" model="stock.route">
+            <field name="name">FAC: Selected Product Cross-Dock</field><field name="sequence">15</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_selectable" eval="True"/><field name="product_categ_selectable" eval="True"/><field name="warehouse_selectable" eval="False"/>
+        </record>
+        <record id="rule_fac_cross_dock_selected" model="stock.rule">
+            <field name="name">FAC: Input → Output (Cross-Dock)</field><field name="sequence">5</field>
+            <field name="action">push</field><field name="auto">manual</field><field name="procure_method">make_to_stock</field>
+            <field name="route_id" ref="route_fac_cross_dock_selected"/><field name="warehouse_id" ref="warehouse_factory"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="location_src_id" model="stock.location" search="[('complete_name', '=', 'FAC/Input')]"/>
+            <field name="location_dest_id" model="stock.location" search="[('complete_name', '=', 'FAC/Output')]"/>
+            <field name="location_dest_from_rule" eval="True"/><field name="picking_type_id" model="stock.picking.type" search="[('warehouse_id', '=', ref('warehouse_factory')), ('sequence_code', '=', 'XD')]"/>
+        </record>
+    </data>
+</odoo>

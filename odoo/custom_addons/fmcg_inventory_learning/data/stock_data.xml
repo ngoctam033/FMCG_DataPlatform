@@ -1,57 +1,271 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
-        <!-- VỊ TRÍ KHO BÃI (Tất cả đều phải gán cụ thể cho 1 Công ty) -->
-        
-        <!-- 1. Kho Lạnh -->
-        <record id="location_cold_storage" model="stock.location">
-            <field name="name">Kho Lạnh (Chilled)</field>
-            <field name="location_id" ref="stock.stock_location_stock"/>
-            <field name="usage">internal</field>
-            <field name="company_id" ref="base.main_company"/> <!-- Thuộc Công ty 1 -->
-        </record>
-
-        <!-- 2. Kho Đồ Khô (Bổ sung) -->
-        <record id="location_dry_storage" model="stock.location">
-            <field name="name">Kho Đồ Khô (Dry)</field>
-            <field name="location_id" ref="stock.stock_location_stock"/>
-            <field name="usage">internal</field>
-            <field name="company_id" ref="base.main_company"/>
-        </record>
-
-        <!-- 3. Khu Hàng Hỏng / Cách ly (Bổ sung) -->
-        <record id="location_quarantine" model="stock.location">
-            <field name="name">Khu Vực Phế Liệu (Scrap)</field>
-            <field name="location_id" ref="stock.stock_location_stock"/>
-            <field name="usage">inventory</field> <!-- Vị trí ảo để xả kho -->
-
-            <field name="company_id" ref="base.main_company"/>
-        </record>
-
-        <!-- QUY TẮC CẤT HÀNG (PUTAWAY RULES) -->
-        
-        <!-- Rule 1: Sữa -> Kho Lạnh -->
-        <record id="putaway_rule_milk_cold" model="stock.putaway.rule">
-            <field name="location_in_id" ref="stock.stock_location_stock"/>
-            <field name="location_out_id" ref="location_cold_storage"/>
-            <field name="category_id" ref="product_category_fmcg_milk"/>
-            <field name="company_id" ref="base.main_company"/>
-        </record>
-
-        <!-- Rule 2: Hóa mỹ phẩm -> Kho Đồ Khô (Bổ sung) -->
-        <record id="putaway_rule_cosmetics_dry" model="stock.putaway.rule">
-            <field name="location_in_id" ref="stock.stock_location_stock"/>
-            <field name="location_out_id" ref="location_dry_storage"/>
-            <field name="category_id" ref="product_category_fmcg_cosmetics"/>
-            <field name="company_id" ref="base.main_company"/>
-        </record>
-
-        <!-- KHO NHÀ MÁY (2-STEP RECEPTION: NHẬN -> QC -> LƯU KHO) -->
+    <!-- Operational warehouse configuration must be reapplied on module upgrade. -->
+    <data noupdate="0">
+        <!-- Odoo generates the standard receipt/QC/storage and pick/pack/ship routes. -->
         <record id="warehouse_factory" model="stock.warehouse">
             <field name="name">FMCG Factory WH</field>
             <field name="code">FAC</field>
             <field name="company_id" ref="company_fmcg_manufacturing"/>
-            <field name="reception_steps">two_steps</field> <!-- Nhận -> QC -> Kho -->
+            <field name="reception_steps">three_steps</field>
+            <field name="delivery_steps">pick_pack_ship</field>
+        </record>
+        <!-- The original warehouse XML ID was installed as noupdate; force its
+             operational settings to be synchronized on upgrades as well. -->
+        <function model="stock.warehouse" name="write">
+            <value eval="[ref('warehouse_factory')]"/>
+            <value eval="{'reception_steps': 'three_steps', 'delivery_steps': 'pick_pack_ship'}"/>
+        </function>
+
+        <!-- FMCG storage zones under FAC/Stock. -->
+        <record id="location_raw_material" model="stock.location">
+            <field name="name">Raw Materials</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_raw_material_dry" model="stock.location">
+            <field name="name">Dry Materials</field>
+            <field name="location_id" ref="location_raw_material"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_raw_material_chilled" model="stock.location">
+            <field name="name">Chilled Materials</field>
+            <field name="location_id" ref="location_raw_material"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_raw_material_packaging" model="stock.location">
+            <field name="name">Packaging Materials</field>
+            <field name="location_id" ref="location_raw_material"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_finished_goods" model="stock.location">
+            <field name="name">Finished Goods</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+
+        <!-- Factory-specific IDs avoid conflicting with legacy Holding-company zones. -->
+        <record id="location_factory_finished_goods_chilled" model="stock.location">
+            <field name="name">Chilled Finished Goods</field>
+            <field name="location_id" ref="location_finished_goods"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_factory_finished_goods_dry" model="stock.location">
+            <field name="name">Dry Finished Goods</field>
+            <field name="location_id" ref="location_finished_goods"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_promotional_goods" model="stock.location">
+            <field name="name">Promotional Goods</field>
+            <field name="location_id" ref="location_finished_goods"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_returns" model="stock.location">
+            <field name="name">Customer Returns</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_return_inspection" model="stock.location">
+            <field name="name">Return Inspection</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_factory_quarantine" model="stock.location">
+            <field name="name">Quarantine</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_damaged_goods" model="stock.location">
+            <field name="name">Damaged Goods</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="location_fmcg_scrap" model="stock.location">
+            <field name="name">FMCG Scrap</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC')]"/>
+            <field name="usage">inventory</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+
+        <!-- Putaway rules route released stock into storage zones by category. -->
+        <record id="putaway_rule_factory_milk_cold" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="location_out_id" ref="location_factory_finished_goods_chilled"/>
+            <field name="category_id" ref="product_category_fmcg_milk"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rule_frozen_cold" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="location_out_id" ref="location_factory_finished_goods_chilled"/>
+            <field name="category_id" ref="product_category_fmcg_frozen"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rule_raw_material" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="location_out_id" ref="location_raw_material_dry"/>
+            <field name="category_id" ref="product_category_fmcg_raw_material"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rule_packaging" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="location_out_id" ref="location_raw_material_packaging"/>
+            <field name="category_id" ref="product_category_fmcg_packaging"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rule_factory_cosmetics_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="location_out_id" ref="location_factory_finished_goods_dry"/>
+            <field name="category_id" ref="product_category_fmcg_cosmetics"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rule_trading_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="location_out_id" ref="location_factory_finished_goods_dry"/>
+            <field name="category_id" ref="product_category_fmcg_trading"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+
+        <!-- Exception and returns operation types. Standard types come from the warehouse. -->
+        <record id="picking_type_qc_to_quarantine" model="stock.picking.type">
+            <field name="name">QC Hold to Quarantine</field>
+            <field name="code">internal</field>
+            <field name="sequence_code">QHOLD</field>
+            <field name="sequence">35</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" model="stock.location" search="[('complete_name', '=', 'FAC/Quality Control')]"/>
+            <field name="default_location_dest_id" ref="location_factory_quarantine"/>
+        </record>
+        <record id="picking_type_quarantine_release" model="stock.picking.type">
+            <field name="name">Quarantine Release</field>
+            <field name="code">internal</field>
+            <field name="sequence_code">QREL</field>
+            <field name="sequence">36</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_factory_quarantine"/>
+            <field name="default_location_dest_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+        </record>
+        <record id="picking_type_customer_return" model="stock.picking.type">
+            <field name="name">Customer Returns</field>
+            <field name="code">incoming</field>
+            <field name="sequence_code">CRET</field>
+            <field name="sequence">40</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="stock.stock_location_customers"/>
+            <field name="default_location_dest_id" ref="location_returns"/>
+            <field name="use_create_lots" eval="False"/>
+            <field name="use_existing_lots" eval="True"/>
+        </record>
+        <record id="picking_type_return_inspection" model="stock.picking.type">
+            <field name="name">Return Inspection</field>
+            <field name="code">internal</field>
+            <field name="sequence_code">RQC</field>
+            <field name="sequence">41</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_returns"/>
+            <field name="default_location_dest_id" ref="location_return_inspection"/>
+        </record>
+        <record id="picking_type_return_inspection_pass" model="stock.picking.type">
+            <field name="name">Return Inspection - Pass</field>
+            <field name="code">internal</field>
+            <field name="sequence_code">RPASS</field>
+            <field name="sequence">42</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_return_inspection"/>
+            <field name="default_location_dest_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+        </record>
+        <record id="picking_type_return_inspection_hold" model="stock.picking.type">
+            <field name="name">Return Inspection - Hold</field>
+            <field name="code">internal</field>
+            <field name="sequence_code">RHOLD</field>
+            <field name="sequence">43</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_return_inspection"/>
+            <field name="default_location_dest_id" ref="location_factory_quarantine"/>
+        </record>
+        <record id="picking_type_return_inspection_damaged" model="stock.picking.type">
+            <field name="name">Return Inspection - Damaged</field>
+            <field name="code">internal</field>
+            <field name="sequence_code">RDMG</field>
+            <field name="sequence">44</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_return_inspection"/>
+            <field name="default_location_dest_id" ref="location_damaged_goods"/>
+        </record>
+        <record id="picking_type_return_to_vendor" model="stock.picking.type">
+            <field name="name">Return to Vendor</field>
+            <field name="code">outgoing</field>
+            <field name="sequence_code">RTV</field>
+            <field name="sequence">45</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_factory_quarantine"/>
+            <field name="default_location_dest_id" ref="stock.stock_location_suppliers"/>
+            <field name="use_create_lots" eval="False"/>
+            <field name="use_existing_lots" eval="True"/>
+        </record>
+        <record id="picking_type_move_to_damaged" model="stock.picking.type">
+            <field name="name">Move to Damaged Goods</field>
+            <field name="code">internal</field>
+            <field name="sequence_code">DMG</field>
+            <field name="sequence">46</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" model="stock.location" search="[('complete_name', '=', 'FAC/Quality Control')]"/>
+            <field name="default_location_dest_id" ref="location_damaged_goods"/>
+        </record>
+
+        <!--
+            Warehouse-only automatic route:
+              Customer Returns -> Return Inspection
+
+            The route deliberately stops at inspection. Pass/Hold/Damaged is a
+            human quality decision and uses one of the disposition operation
+            types above instead of an unconditional push rule.
+        -->
+        <record id="route_fac_customer_return_inspection" model="stock.route">
+            <field name="name">FAC: Customer Return Inspection</field>
+            <field name="sequence">30</field>
+            <field name="active" eval="True"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_selectable" eval="False"/>
+            <field name="product_categ_selectable" eval="False"/>
+            <field name="warehouse_selectable" eval="True"/>
+            <field name="warehouse_ids" eval="[(4, ref('warehouse_factory'))]"/>
+        </record>
+        <record id="rule_fac_customer_returns_to_inspection" model="stock.rule">
+            <field name="name">FAC: Customer Returns → Return Inspection</field>
+            <field name="sequence">10</field>
+            <field name="active" eval="True"/>
+            <field name="action">push</field>
+            <field name="auto">manual</field>
+            <field name="procure_method">make_to_stock</field>
+            <field name="route_id" ref="route_fac_customer_return_inspection"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="location_src_id" ref="location_returns"/>
+            <field name="location_dest_id" ref="location_return_inspection"/>
+            <field name="location_dest_from_rule" eval="True"/>
+            <field name="picking_type_id" ref="picking_type_return_inspection"/>
+            <field name="propagate_cancel" eval="True"/>
         </record>
     </data>
 </odoo>

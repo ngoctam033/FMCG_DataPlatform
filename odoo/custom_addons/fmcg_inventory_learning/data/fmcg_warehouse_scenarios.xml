@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Operational configuration: reapplied on module upgrade. -->
+    <data noupdate="0">
+        <!-- FAC bin structure and cycle-count frequencies. -->
+        <record id="location_fac_bulk_aisle_a01" model="stock.location">
+            <field name="name">Aisle A01</field>
+            <field name="location_id" ref="location_fac_bulk_storage"/>
+            <field name="usage">view</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">FAC-BULK-A01</field>
+        </record>
+        <record id="location_fac_bulk_a01_r01_b01" model="stock.location">
+            <field name="name">Rack R01 / Bin B01</field>
+            <field name="location_id" ref="location_fac_bulk_aisle_a01"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">FAC-A01-R01-B01</field>
+            <field name="cyclic_inventory_frequency">30</field>
+            <field name="removal_strategy_id" ref="product_expiry.removal_fefo"/>
+        </record>
+        <record id="location_fac_bulk_a01_r01_b02" model="stock.location">
+            <field name="name">Rack R01 / Bin B02</field>
+            <field name="location_id" ref="location_fac_bulk_aisle_a01"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">FAC-A01-R01-B02</field>
+            <field name="cyclic_inventory_frequency">30</field>
+            <field name="removal_strategy_id" ref="product_expiry.removal_fefo"/>
+        </record>
+        <record id="location_fac_picking_p01" model="stock.location">
+            <field name="name">Pick Face P01</field>
+            <field name="location_id" ref="location_fac_picking_area"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">FAC-PICK-P01</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="removal_strategy_id" ref="product_expiry.removal_fefo"/>
+        </record>
+        <record id="location_fac_picking_p02" model="stock.location">
+            <field name="name">Pick Face P02</field>
+            <field name="location_id" ref="location_fac_picking_area"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">FAC-PICK-P02</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="removal_strategy_id" ref="product_expiry.removal_fefo"/>
+        </record>
+
+        <!-- Exception-processing locations. -->
+        <record id="location_fac_rework" model="stock.location">
+            <field name="name">Rework</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">FAC-REWORK</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+        <record id="location_fac_repacking" model="stock.location">
+            <field name="name">Repacking</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">FAC-REPACK</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+        <record id="location_fac_relabeling" model="stock.location">
+            <field name="name">Relabeling</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">FAC-RELABEL</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+
+        <!-- Manual disposition operations: QA chooses the applicable branch. -->
+        <record id="picking_type_damage_to_rework" model="stock.picking.type">
+            <field name="name">Damage Inspection - Rework</field>
+            <field name="code">internal</field><field name="sequence_code">DMGRWK</field><field name="sequence">72</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_damage_inspection"/><field name="default_location_dest_id" ref="location_fac_rework"/>
+        </record>
+        <record id="picking_type_recall_to_rework" model="stock.picking.type">
+            <field name="name">Recall Inspection - Rework</field>
+            <field name="code">internal</field><field name="sequence_code">RCRWK</field><field name="sequence">73</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_recall_inspection"/><field name="default_location_dest_id" ref="location_fac_rework"/>
+        </record>
+        <record id="picking_type_damage_to_repacking" model="stock.picking.type">
+            <field name="name">Damage Inspection - Repacking</field>
+            <field name="code">internal</field><field name="sequence_code">DMGRPK</field><field name="sequence">74</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_damage_inspection"/><field name="default_location_dest_id" ref="location_fac_repacking"/>
+        </record>
+        <record id="picking_type_recall_to_relabeling" model="stock.picking.type">
+            <field name="name">Recall Inspection - Relabeling</field>
+            <field name="code">internal</field><field name="sequence_code">RCLBL</field><field name="sequence">75</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_recall_inspection"/><field name="default_location_dest_id" ref="location_fac_relabeling"/>
+        </record>
+        <record id="picking_type_rework_reinspection" model="stock.picking.type">
+            <field name="name">Rework - Reinspection</field>
+            <field name="code">internal</field><field name="sequence_code">RWREIN</field><field name="sequence">76</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_fac_rework"/><field name="default_location_dest_id" ref="location_quarantine_inspection"/>
+        </record>
+        <record id="picking_type_repacking_reinspection" model="stock.picking.type">
+            <field name="name">Repacking - Reinspection</field>
+            <field name="code">internal</field><field name="sequence_code">RPREIN</field><field name="sequence">77</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_fac_repacking"/><field name="default_location_dest_id" ref="location_quarantine_inspection"/>
+        </record>
+        <record id="picking_type_relabeling_reinspection" model="stock.picking.type">
+            <field name="name">Relabeling - Reinspection</field>
+            <field name="code">internal</field><field name="sequence_code">RLREIN</field><field name="sequence">78</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_fac_relabeling"/><field name="default_location_dest_id" ref="location_quarantine_inspection"/>
+        </record>
+        <record id="picking_type_recall_to_scrap" model="stock.picking.type">
+            <field name="name">Recall Inspection - Disposal</field>
+            <field name="code">internal</field><field name="sequence_code">RCSCRP</field><field name="sequence">79</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_recall_inspection"/><field name="default_location_dest_id" ref="location_fmcg_scrap"/>
+        </record>
+        <record id="picking_type_damage_inspection_to_scrap" model="stock.picking.type">
+            <field name="name">Damage Inspection - Disposal</field>
+            <field name="code">internal</field><field name="sequence_code">DMSCRP</field><field name="sequence">80</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/><field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="default_location_src_id" ref="location_damage_inspection"/><field name="default_location_dest_id" ref="location_fmcg_scrap"/>
+        </record>
+
+        <!-- Regional replenishment policies. Odoo selects the generated resupply routes. -->
+        <record id="orderpoint_cdc_beverage_water" model="stock.warehouse.orderpoint">
+            <field name="warehouse_id" ref="warehouse_cdc"/><field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="product_id" search="[('default_code', '=', 'BEV-WATER-500')]"/><field name="product_min_qty">500</field><field name="product_max_qty">2000</field><field name="trigger">auto</field><field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="orderpoint_cdc_snack" model="stock.warehouse.orderpoint">
+            <field name="warehouse_id" ref="warehouse_cdc"/><field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="product_id" search="[('default_code', '=', 'FOOD-SNACK-POTATO-50')]"/><field name="product_min_qty">400</field><field name="product_max_qty">1600</field><field name="trigger">auto</field><field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="orderpoint_cdc_frozen_dumpling" model="stock.warehouse.orderpoint">
+            <field name="warehouse_id" ref="warehouse_cdc"/><field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="product_id" search="[('default_code', '=', 'FROZEN-DUMPLING-500')]"/><field name="product_min_qty">200</field><field name="product_max_qty">800</field><field name="trigger">auto</field><field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="orderpoint_rdcn_beverage_water" model="stock.warehouse.orderpoint">
+            <field name="warehouse_id" ref="warehouse_rdc_north"/><field name="location_id" model="stock.location" search="[('complete_name', '=', 'RDCN/Stock')]"/>
+            <field name="product_id" search="[('default_code', '=', 'BEV-WATER-500')]"/><field name="product_min_qty">100</field><field name="product_max_qty">500</field><field name="trigger">auto</field><field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="orderpoint_rdcn_snack" model="stock.warehouse.orderpoint">
+            <field name="warehouse_id" ref="warehouse_rdc_north"/><field name="location_id" model="stock.location" search="[('complete_name', '=', 'RDCN/Stock')]"/>
+            <field name="product_id" search="[('default_code', '=', 'FOOD-SNACK-POTATO-50')]"/><field name="product_min_qty">80</field><field name="product_max_qty">400</field><field name="trigger">auto</field><field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="orderpoint_rdcs_beverage_water" model="stock.warehouse.orderpoint">
+            <field name="warehouse_id" ref="warehouse_rdc_south"/><field name="location_id" model="stock.location" search="[('complete_name', '=', 'RDCS/Stock')]"/>
+            <field name="product_id" search="[('default_code', '=', 'BEV-WATER-500')]"/><field name="product_min_qty">150</field><field name="product_max_qty">700</field><field name="trigger">auto</field><field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="orderpoint_rdcs_frozen_dumpling" model="stock.warehouse.orderpoint">
+            <field name="warehouse_id" ref="warehouse_rdc_south"/><field name="location_id" model="stock.location" search="[('complete_name', '=', 'RDCS/Stock')]"/>
+            <field name="product_id" search="[('default_code', '=', 'FROZEN-DUMPLING-500')]"/><field name="product_min_qty">60</field><field name="product_max_qty">300</field><field name="trigger">auto</field><field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+    </data>
+
+    <!-- Scenario seed records: preserve dates and identifiers on later upgrades. -->
+    <data noupdate="1">
+        <record id="lot_beverage_water_fresh" model="stock.lot">
+            <field name="name">BEV-WATER-FRESH-001</field><field name="product_id" search="[('default_code', '=', 'BEV-WATER-500')]"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="expiration_date" eval="datetime.now() + timedelta(days=180)"/><field name="use_date" eval="datetime.now() + timedelta(days=150)"/><field name="removal_date" eval="datetime.now() + timedelta(days=135)"/><field name="alert_date" eval="datetime.now() + timedelta(days=120)"/>
+            <field name="note">Fresh lot for FEFO and distribution scenarios.</field>
+        </record>
+        <record id="lot_beverage_water_near_expiry" model="stock.lot">
+            <field name="name">BEV-WATER-NEAR-001</field><field name="product_id" search="[('default_code', '=', 'BEV-WATER-500')]"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="expiration_date" eval="datetime.now() + timedelta(days=20)"/><field name="use_date" eval="datetime.now() + timedelta(days=12)"/><field name="removal_date" eval="datetime.now() + timedelta(days=7)"/><field name="alert_date" eval="datetime.now() - timedelta(days=1)"/>
+            <field name="note">Near-expiry lot used to test alerts and FEFO reservation.</field>
+        </record>
+        <record id="lot_beverage_water_expired" model="stock.lot">
+            <field name="name">BEV-WATER-EXPIRED-001</field><field name="product_id" search="[('default_code', '=', 'BEV-WATER-500')]"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="expiration_date" eval="datetime.now() - timedelta(days=5)"/><field name="use_date" eval="datetime.now() - timedelta(days=15)"/><field name="removal_date" eval="datetime.now() - timedelta(days=20)"/><field name="alert_date" eval="datetime.now() - timedelta(days=30)"/>
+            <field name="note">Expired lot for quarantine and disposal scenarios.</field>
+        </record>
+        <record id="lot_snack_fresh" model="stock.lot">
+            <field name="name">SNACK-FRESH-001</field><field name="product_id" search="[('default_code', '=', 'FOOD-SNACK-POTATO-50')]"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="expiration_date" eval="datetime.now() + timedelta(days=150)"/><field name="use_date" eval="datetime.now() + timedelta(days=120)"/><field name="removal_date" eval="datetime.now() + timedelta(days=105)"/><field name="alert_date" eval="datetime.now() + timedelta(days=90)"/>
+        </record>
+        <record id="lot_frozen_dumpling_fresh" model="stock.lot">
+            <field name="name">FROZEN-DUMPLING-FRESH-001</field><field name="product_id" search="[('default_code', '=', 'FROZEN-DUMPLING-500')]"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="expiration_date" eval="datetime.now() + timedelta(days=270)"/><field name="use_date" eval="datetime.now() + timedelta(days=240)"/><field name="removal_date" eval="datetime.now() + timedelta(days=225)"/><field name="alert_date" eval="datetime.now() + timedelta(days=210)"/>
+        </record>
+        <record id="lot_frozen_dumpling_recall" model="stock.lot">
+            <field name="name">FROZEN-DUMPLING-RECALL-001</field><field name="product_id" search="[('default_code', '=', 'FROZEN-DUMPLING-500')]"/><field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="expiration_date" eval="datetime.now() + timedelta(days=120)"/><field name="use_date" eval="datetime.now() + timedelta(days=90)"/><field name="removal_date" eval="datetime.now() + timedelta(days=75)"/><field name="alert_date" eval="datetime.now() + timedelta(days=60)"/>
+            <field name="note">Lot marked by scenario convention for product-recall testing.</field>
+        </record>
+
+        <!-- Empty reusable/disposable packages ready for packing workflows. -->
+        <record id="package_fac_pallet_0001" model="stock.package"><field name="name">PALLET-FAC-0001</field><field name="package_type_id" ref="package_type_fmcg_euro_pallet"/></record>
+        <record id="package_fac_pallet_0002" model="stock.package"><field name="name">PALLET-FAC-0002</field><field name="package_type_id" ref="package_type_fmcg_euro_pallet"/></record>
+        <record id="package_fac_carton_0001" model="stock.package"><field name="name">CARTON-FAC-0001</field><field name="package_type_id" ref="package_type_fmcg_carton"/></record>
+        <record id="package_fac_tote_0001" model="stock.package"><field name="name">TOTE-FAC-0001</field><field name="package_type_id" ref="package_type_fmcg_picking_tote"/></record>
+        <record id="package_fac_thermal_0001" model="stock.package"><field name="name">THERMAL-FAC-0001</field><field name="package_type_id" ref="package_type_fmcg_thermal_box"/></record>
+    </data>
+</odoo>

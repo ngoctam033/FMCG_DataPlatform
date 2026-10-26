@@ -18,7 +18,9 @@
         'data/fmcg_supplierinfo_data.xml',
         
         'data/stock_data.xml',
+        'data/fmcg_advanced_stock_routes.xml',
         'data/fmcg_inventory_data.xml',
+        'data/fmcg_warehouse_scenarios.xml',
         # 'data/fmcg_mrp_data.xml',
     ],
     'installable': True,
