@@ -477,6 +477,25 @@ class EmployeeSimulator(models.AbstractModel):
                         note='Hệ thống tự động phát hiện thiếu hàng khi Validate. Cần xử lý tạo Backorder.',
                         user_id=selected_user.id
                     )
+                elif action_result.get('res_model') == 'expiry.picking.confirmation':
+                    has_expired_lot_activity = any(
+                        activity.activity_type_id.id == expired_lot_act_type.id
+                        for activity in simulated_picking.activity_ids
+                    )
+                    if not has_expired_lot_activity:
+                        expired_lot_name = action_result.get('context', {}).get('expired_lot_name') or 'Không xác định'
+                        expired_product_name = action_result.get('context', {}).get('expired_product_name') or 'Không xác định'
+                        simulated_picking.activity_schedule(
+                            'employee_simulator.mail_activity_expired_lot',
+                            summary='Cần xử lý xác nhận hàng hết hạn',
+                            note=(
+                                'Cron Validate phát hiện popup xác nhận hàng hết hạn.'
+                                f'<br/>Sản phẩm: <b>{expired_product_name}</b>'
+                                f'<br/>Lô: <b>{expired_lot_name}</b>'
+                                '<br/>Vui lòng kiểm tra và xác nhận thủ công trên phiếu kho.'
+                            ),
+                            user_id=selected_user.id,
+                        )
                 else:
                     import json
                     formatted_json = json.dumps(action_result, indent=4, default=str)
