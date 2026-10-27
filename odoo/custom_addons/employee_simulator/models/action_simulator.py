@@ -646,9 +646,26 @@ class EmployeeSimulator(models.AbstractModel):
         for picking in pickings:
             _logger.info("[CRON SIMULATE BACKORDER] Đang xử lý tạo backorder cho phiếu: %s", picking.name)
             target_activities = picking.activity_ids.filtered(lambda a: a.activity_type_id.id == activity_type.id)
-            user_id = target_activities[0].user_id.id if target_activities else self.env.user.id
+            activity_user = target_activities[0].user_id if target_activities else self.env.user
 
-            simulated_picking = picking.with_user(user_id)
+            if (
+                activity_user.has_group('stock.group_stock_user')
+                and picking.company_id in activity_user.company_ids
+            ):
+                simulated_user = activity_user
+            else:
+                stock_group = self.env.ref('stock.group_stock_user')
+                simulated_user = self.env['res.users'].sudo().search([
+                    ('active', '=', True),
+                    ('all_group_ids', 'in', [stock_group.id]),
+                    ('company_ids', 'in', [picking.company_id.id]),
+                ], order='id', limit=1)
+                simulated_user.ensure_one()
+
+            allowed_company_ids = [picking.company_id.id]
+            simulated_picking = picking.with_user(simulated_user).with_context(
+                allowed_company_ids=allowed_company_ids,
+            )
             
             context = {
                 'button_validate_picking_ids': [simulated_picking.id],
@@ -656,9 +673,12 @@ class EmployeeSimulator(models.AbstractModel):
                 'default_company_id': simulated_picking.company_id.id,
             }
             
-            wizard = self.env['stock.backorder.confirmation'].with_user(user_id).with_company(picking.company_id.id).with_context(context).create({
-                'pick_ids': [(4, simulated_picking.id)]
-            })
+            wizard = (
+                self.env['stock.backorder.confirmation']
+                .with_user(simulated_user)
+                .with_context(context, allowed_company_ids=allowed_company_ids)
+                .create({'pick_ids': [(4, simulated_picking.id)]})
+            )
             try:
                 action_result = wizard.process()
             except UserError as e:
@@ -668,7 +688,7 @@ class EmployeeSimulator(models.AbstractModel):
                         'employee_simulator.mail_activity_simulator_error', 
                         summary='Lỗi xác nhận phiếu trống',
                         note=f'Hệ thống tự động xử lý Backorder thất bại: <b>{str(e)}</b><br/>Vui lòng kiểm tra lại.',
-                        user_id=user_id
+                        user_id=simulated_user.id
                     )
                 elif "Lot/Serial" in str(e):
                     # Kiểm tra để tránh tạo trùng lặp Activity
@@ -678,7 +698,7 @@ class EmployeeSimulator(models.AbstractModel):
                             'employee_simulator.mail_activity_missing_lot', 
                             summary='Thiếu Lot/Serial khi tạo Backorder',
                             note=f'Xử lý Backorder thất bại do thiếu Lot/Serial: <b>{str(e)}</b>',
-                            user_id=user_id
+                            user_id=simulated_user.id
                         )
                 else:
                     _logger.exception("[CRON SIMULATE BACKORDER] Phiếu %s bị lỗi khi xử lý: %s", picking.name, str(e))
@@ -691,7 +711,7 @@ class EmployeeSimulator(models.AbstractModel):
                         'employee_simulator.mail_activity_expired_lot',
                         summary='Xác nhận hàng hết hạn',
                         note='Hệ thống phát hiện lô hàng đã hết hạn khi Validate. Cần xử lý xác nhận xuất/nhập.',
-                        user_id=user_id
+                        user_id=simulated_user.id
                     )
                 else:
                     # NẾU KHÁC POPUP HẾT HẠN THÌ MỚI IN LOG RA ĐỂ XEM ĐÓ LÀ GÌ
