@@ -46,6 +46,12 @@
                     <span class="o_sla_kpi_value" t-out="dashboardData.doneToday"/>
                     <span class="o_sla_kpi_label">Hoàn thành hôm nay</span>
                 </button>
+                <button type="button" class="o_sla_kpi_card btn bg-danger-subtle text-danger-emphasis"
+                        data-filters="sla_repeated,group_by_source_record,group_by_activity_type"
+                        t-on-click="setSearchContext">
+                    <span class="o_sla_kpi_value" t-out="dashboardData.repeated"/>
+                    <span class="o_sla_kpi_label">Sự cố tái diễn</span>
+                </button>
             </div>
             <div class="mt-2 text-muted small">
                 Nhấn vào KPI để lọc danh sách. Màu đỏ: quá hạn; vàng: đến hạn hôm nay; xanh: còn trong hạn hoặc đã hoàn thành.

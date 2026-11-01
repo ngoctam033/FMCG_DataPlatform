@@ -34,7 +34,7 @@ export class EmployeeActivitySlaDashboard extends Component {
         const count = (extraDomain = []) =>
             this.orm.searchCount("mail.activity", [...baseDomain, ...extraDomain], { context });
 
-        const [total, open, overdue, dueToday, planned, done, doneToday] = await Promise.all([
+        const [total, open, overdue, dueToday, planned, done, doneToday, repeated] = await Promise.all([
             count(),
             count([["active", "=", true]]),
             count([["active", "=", true], ["date_deadline", "<", today]]),
@@ -42,9 +42,10 @@ export class EmployeeActivitySlaDashboard extends Component {
             count([["active", "=", true], ["date_deadline", ">", today]]),
             count([["active", "=", false]]),
             count([["active", "=", false], ["date_done", "=", today]]),
+            count([["is_repeated_issue", "=", true]]),
         ]);
 
-        this.dashboardData = { total, open, overdue, dueToday, planned, done, doneToday };
+        this.dashboardData = { total, open, overdue, dueToday, planned, done, doneToday, repeated };
     }
 
     setSearchContext(ev) {

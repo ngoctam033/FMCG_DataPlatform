@@ -34,10 +34,14 @@
                     ('date_done', '=', 'today')
                 ]"/>
                 <separator/>
+                <filter name="sla_repeated" string="Sự cố tái diễn"
+                        domain="[('is_repeated_issue', '=', True)]"/>
                 <filter name="sla_my" string="Của tôi" domain="[('user_id', '=', uid)]"/>
 
                 <group>
                     <filter name="group_by_state" string="Trạng thái" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_source_record" string="Phiếu nghiệp vụ"
+                            context="{'group_by': 'res_name'}"/>
                     <filter name="group_by_activity_type" string="Loại sự cố" context="{'group_by': 'activity_type_id'}"/>
                     <filter name="group_by_user" string="Người phụ trách" context="{'group_by': 'user_id'}"/>
                     <filter name="group_by_deadline" string="Hạn xử lý" context="{'group_by': 'date_deadline'}"/>
@@ -80,6 +84,7 @@
                             confirm="Hệ thống sẽ giữ activity được tạo đầu tiên và xóa các activity đang mở bị gắn lại cùng loại trên cùng một phiếu. Bạn có chắc chắn muốn tiếp tục?"/>
                 </header>
                 <field name="active" column_invisible="True"/>
+                <field name="is_repeated_issue" column_invisible="True"/>
                 <field name="state" string="Trạng thái" widget="badge"
                        decoration-danger="state == 'overdue'"
                        decoration-warning="state == 'today'"
