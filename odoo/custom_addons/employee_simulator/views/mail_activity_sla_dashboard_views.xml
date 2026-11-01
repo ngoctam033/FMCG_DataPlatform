@@ -39,7 +39,7 @@
                 <filter name="sla_my" string="Của tôi" domain="[('user_id', '=', uid)]"/>
 
                 <group>
-                    <filter name="group_by_state" string="Trạng thái" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_active" string="Đang hoạt động" context="{'group_by': 'active'}"/>
                     <filter name="group_by_source_record" string="Phiếu nghiệp vụ"
                             context="{'group_by': 'res_name'}"/>
                     <filter name="group_by_activity_type" string="Loại sự cố" context="{'group_by': 'activity_type_id'}"/>

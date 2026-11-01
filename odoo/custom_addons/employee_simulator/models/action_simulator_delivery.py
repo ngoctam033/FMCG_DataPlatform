@@ -112,6 +112,14 @@ class EmployeeSimulatorDelivery(models.AbstractModel):
                     lambda activity: activity.activity_type_id == activity_type
                 )
                 activities.action_done()
+                if activities:
+                    _logger.info(
+                        "[CRON OUTGOING MISSING LOT] Đã xử lý xong phiếu %s "
+                        "(id=%s) và đóng activity_ids=%s",
+                        picking.name,
+                        picking.id,
+                        activities.ids,
+                    )
 
     @api.model
     def cron_simulate_delivery_picking_create(self):

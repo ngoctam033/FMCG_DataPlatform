@@ -591,29 +591,91 @@ class EmployeeSimulator(models.AbstractModel):
         def make_code(prefix, salt):
             rand_str = ''.join(random.choices(string.ascii_uppercase, k=3))
             return f"SIM-{prefix}-{time_str}-{salt}-{rand_str}"
+
+        Quant = self.env['stock.quant']
             
         for picking in pickings:
-            is_fully_processed = True 
+            is_fully_processed = True
+            picking_type = picking.picking_type_id
             
             for line in picking.move_line_ids:
-                if line.product_id.tracking == 'none' or (line.lot_id or line.lot_name):
+                product = line.product_id
+                if product.tracking == 'none' or line.lot_id:
                     continue
-                
-                if line.product_id.tracking == 'lot':
-                    line.write({'lot_name': make_code('LOT', f"L{line.id}")})
-                
-                elif line.product_id.tracking == 'serial':
-                    qty = line.product_uom_qty or line.qty_done or 1.0 
-                    if qty <= 1.0:
-                        line.write({'lot_name': make_code('SN', f"L{line.id}")})
+
+                if (
+                    picking_type.use_existing_lots
+                    and not picking_type.use_create_lots
+                ):
+                    candidate_quants = Quant.search([
+                        ('product_id', '=', product.id),
+                        ('location_id', 'child_of', line.location_id.id),
+                        ('lot_id', '!=', False),
+                        ('quantity', '>', 0),
+                        ('company_id', '=', picking.company_id.id),
+                    ], order='in_date, id')
+
+                    selected_lot = self.env['stock.lot']
+                    required_qty = line.quantity_product_uom
+                    for lot in candidate_quants.lot_id:
+                        available_qty = Quant._get_available_quantity(
+                            product,
+                            line.location_id,
+                            lot_id=lot,
+                            strict=False,
+                        )
+                        has_enough_stock = product.uom_id.compare(
+                            available_qty,
+                            required_qty,
+                        ) >= 0
+                        is_valid_serial = (
+                            product.tracking != 'serial'
+                            or product.uom_id.compare(required_qty, 1.0) <= 0
+                        )
+                        if has_enough_stock and is_valid_serial:
+                            selected_lot = lot
+                            break
+
+                    if selected_lot:
+                        line.write({
+                            'lot_id': selected_lot.id,
+                            'lot_name': False,
+                        })
                     else:
-                        is_fully_processed = False 
+                        is_fully_processed = False
+
+                elif picking_type.use_create_lots:
+                    if line.lot_name:
                         continue
+
+                    if product.tracking == 'serial':
+                        required_qty = line.quantity_product_uom
+                        if product.uom_id.compare(required_qty, 1.0) > 0:
+                            is_fully_processed = False
+                            continue
+                        prefix = 'SN'
+                    else:
+                        prefix = 'LOT'
+
+                    line.write({
+                        'lot_name': make_code(prefix, f"L{line.id}"),
+                    })
+
+                else:
+                    is_fully_processed = False
 
             if is_fully_processed:
                 target_activities = picking.activity_ids.filtered(lambda a: a.activity_type_id.id == activity_type.id)
                 for activity in target_activities:
                     activity.action_done()
+                if target_activities:
+                    _logger.info(
+                        "[CRON MISSING LOT] Đã xử lý xong phiếu %s (id=%s) "
+                        "và đóng activity_ids=%s",
+                        picking.name,
+                        picking.id,
+                        target_activities.ids,
+                    )
     @api.model
     def cron_simulate_backorder_create(self):
         """
