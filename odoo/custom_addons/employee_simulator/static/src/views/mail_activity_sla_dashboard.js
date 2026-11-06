@@ -22,17 +22,11 @@ export class EmployeeActivitySlaDashboard extends Component {
         onWillUpdateProps((nextProps) => this.loadDashboardData(nextProps));
     }
 
-    getBaseDomain(props) {
-        const activityTypeIds = props.list.context.employee_simulator_activity_type_ids || [];
-        return [["activity_type_id", "in", activityTypeIds]];
-    }
-
     async loadDashboardData(props) {
         const today = DateTime.local().toISODate();
-        const baseDomain = this.getBaseDomain(props);
         const context = { ...props.list.context, active_test: false };
         const count = (extraDomain = []) =>
-            this.orm.searchCount("mail.activity", [...baseDomain, ...extraDomain], { context });
+            this.orm.searchCount("mail.activity", extraDomain, { context });
 
         const [total, open, overdue, dueToday, planned, done, doneToday, repeated] = await Promise.all([
             count(),
