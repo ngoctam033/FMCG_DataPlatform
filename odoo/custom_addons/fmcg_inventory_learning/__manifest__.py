@@ -3,7 +3,7 @@
     'version': '1.0',
     'category': 'Inventory/Inventory',
     'summary': 'Master data for FMCG inventory simulation',
-    'depends': ['stock', 'product_expiry', 'sale_management', 'purchase', 'uom'],
+    'depends': ['stock', 'base_automation', 'product_expiry', 'sale_management', 'purchase', 'uom'],
     'data': [
         'data/res_partner_data.xml',
         'data/fmcg_partners_data.xml',
@@ -18,6 +18,7 @@
         'data/fmcg_supplierinfo_data.xml',
         
         'data/stock_data.xml',
+        'data/stock_picking_check_availability_activity_data.xml',
         'data/fmcg_advanced_stock_routes.xml',
         'data/fmcg_inventory_data.xml',
         'data/fmcg_warehouse_scenarios.xml',
