@@ -10,11 +10,10 @@
         'stock',
         'base_automation',
         'fmcg_inventory_learning',
+        'fmcg_business_automation',
     ],
     'data': [
-        'data/cron_data.xml',
-        'data/cron_internal_transfer.xml',
-        'data/activity_data.xml',
+        'data/ir_cron_data.xml',
         'views/mail_activity_sla_dashboard_views.xml',
     ],
     'assets': {
