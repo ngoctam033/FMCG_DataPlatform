@@ -49,12 +49,13 @@
             <field name="base_automation_id" ref="automation_log_archived_mail_activity"/>
             <field name="state">code</field>
             <field name="code"><![CDATA[
+activity = record.with_user(record.user_id)
 log(
     "Archived mail.activity id=%s, activity_type_id=%s, activity_type=%s"
     % (
-        record.id,
-        record.activity_type_id.id,
-        record.activity_type_id.display_name,
+        activity.id,
+        activity.activity_type_id.id,
+        activity.activity_type_id.display_name,
     ),
     level="info",
 )
@@ -75,12 +76,13 @@ log(
             <field name="base_automation_id" ref="automation_confirm_picking_on_activity_done"/>
             <field name="state">code</field>
             <field name="code"><![CDATA[
+activity = record.with_user(record.user_id)
 if (
-    record.activity_type_id
-    == env.ref('fmcg_business_automation.mail_activity_type_confirm_draft_picking')
-    and record.res_model == 'stock.picking'
+    activity.activity_type_id
+    == activity.env.ref('fmcg_business_automation.mail_activity_type_confirm_draft_picking')
+    and activity.res_model == 'stock.picking'
 ):
-    source_record = env['stock.picking'].browse(record.res_id)
+    source_record = activity.env['stock.picking'].browse(activity.res_id)
     if source_record.state == 'draft':
         source_record.action_confirm()
             ]]></field>
