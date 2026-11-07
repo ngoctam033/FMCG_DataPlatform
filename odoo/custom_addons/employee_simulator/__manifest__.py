@@ -6,6 +6,7 @@
     'author': 'Antigravity',
     'depends': [
         'base',
+        'web_refresher',
         'mail',
         'stock',
         'base_automation',
