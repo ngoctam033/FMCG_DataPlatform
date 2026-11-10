@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_generate_fixed_cashflow_scenario" model="ir.cron">
+        <field name="name">FMCG: Generate Daily Cash-flow Scenario</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+company = env.ref('base.main_company')
+year = datetime.date.today().year + 1
+scenario_start = datetime.date(year, 1, 1)
+scenario_end = datetime.date(year, 12, 31)
+journal = env.ref('fmcg_inventory_learning.journal_fmcg_simulation')
+cash_account = env.ref('account.1_chart1111')
+capital_account = env.ref('account.1_chart41111')
+revenue_account = env.ref('account.1_chart5111')
+variable_cost_account = env.ref('account.1_chart632')
+fixed_cost_account = env.ref('account.1_chart6427')
+analytic_distribution = env.ref('fmcg_inventory_learning.analytic_account_fmcg_distribution')
+analytic_factory = env.ref('fmcg_inventory_learning.analytic_account_fmcg_manufacturing')
+analytic_holding = env.ref('fmcg_inventory_learning.analytic_account_fmcg_holding')
+billion = 1000000000.0
+monthly_scenario = [
+    (3.2 * billion, 1.8 * billion, 1.2 * billion),
+    (2.8 * billion, 2.0 * billion, 1.2 * billion),
+    (1.5 * billion, 2.3 * billion, 1.2 * billion),
+    (0.8 * billion, 2.2 * billion, 1.2 * billion),
+    (0.6 * billion, 1.5 * billion, 1.2 * billion),
+    (2.0 * billion, 1.0 * billion, 1.2 * billion),
+    (4.5 * billion, 1.5 * billion, 1.2 * billion),
+    (6.0 * billion, 2.0 * billion, 1.2 * billion),
+    (7.5 * billion, 2.5 * billion, 1.2 * billion),
+    (8.5 * billion, 3.0 * billion, 1.2 * billion),
+    (10.0 * billion, 4.0 * billion, 1.2 * billion),
+    (12.0 * billion, 5.0 * billion, 1.2 * billion),
+]
+
+opening_ref = 'FMCG-CF-D-%s-OPENING' % year
+opening_move = env['account.move'].search([
+    ('ref', '=', opening_ref),
+    ('company_id', '=', company.id),
+], limit=1)
+if not opening_move:
+    opening_move = env['account.move'].create({
+        'move_type': 'entry',
+        'journal_id': journal.id,
+        'company_id': company.id,
+        'date': scenario_start,
+        'ref': opening_ref,
+        'line_ids': [
+            (0, 0, {
+                'name': 'Opening cash for daily cash-flow scenario',
+                'account_id': cash_account.id,
+                'debit': 5.0 * billion,
+                'credit': 0.0,
+            }),
+            (0, 0, {
+                'name': 'Opening capital for daily cash-flow scenario',
+                'account_id': capital_account.id,
+                'debit': 0.0,
+                'credit': 5.0 * billion,
+            }),
+        ],
+    })
+    opening_move.action_post()
+
+last_daily_move = env['account.move'].search([
+    ('ref', '=like', 'FMCG-CF-D-%s%%' % year),
+    ('ref', 'not ilike', 'OPENING'),
+    ('company_id', '=', company.id),
+], order='date desc, id desc', limit=1)
+next_date = last_daily_move.date + datetime.timedelta(days=1) if last_daily_move else scenario_start
+
+for batch_index in range(30):
+    if next_date > scenario_end:
+        break
+
+    month_index = next_date.month - 1
+    monthly_inflow, monthly_variable, monthly_fixed = monthly_scenario[month_index]
+    first_day = datetime.date(year, next_date.month, 1)
+    following_month = datetime.date(
+        year + (next_date.month == 12),
+        (next_date.month % 12) + 1,
+        1,
+    )
+    days_in_month = (following_month - first_day).days
+
+    inflow_weight_total = 0.0
+    variable_weight_total = 0.0
+    for day_number in range(1, days_in_month + 1):
+        weighted_date = datetime.date(year, next_date.month, day_number)
+        is_weekend = weighted_date.weekday() >= 5
+        inflow_weight_total += 0.65 if is_weekend else 1.10
+        variable_weight_total += 0.80 if is_weekend else 1.05
+
+    is_weekend = next_date.weekday() >= 5
+    inflow_weight = 0.65 if is_weekend else 1.10
+    variable_weight = 0.80 if is_weekend else 1.05
+    daily_inflow = round(monthly_inflow * inflow_weight / inflow_weight_total)
+    daily_variable = round(monthly_variable * variable_weight / variable_weight_total)
+    daily_fixed = 0.0
+    if next_date.day == 5:
+        daily_fixed = round(monthly_fixed * 0.70)
+    elif next_date.day == 20:
+        daily_fixed = round(monthly_fixed * 0.30)
+
+    ref = 'FMCG-CF-D-%s' % next_date.strftime('%Y%m%d')
+    move = env['account.move'].search([
+        ('ref', '=', ref),
+        ('company_id', '=', company.id),
+    ], limit=1)
+    if not move:
+        line_ids = [
+            (0, 0, {
+                'name': '%s cash receipts' % next_date,
+                'account_id': cash_account.id,
+                'debit': daily_inflow,
+                'credit': 0.0,
+            }),
+            (0, 0, {
+                'name': '%s simulated revenue' % next_date,
+                'account_id': revenue_account.id,
+                'debit': 0.0,
+                'credit': daily_inflow,
+                'analytic_distribution': {str(analytic_distribution.id): 100.0},
+            }),
+            (0, 0, {
+                'name': '%s variable costs' % next_date,
+                'account_id': variable_cost_account.id,
+                'debit': daily_variable,
+                'credit': 0.0,
+                'analytic_distribution': {str(analytic_factory.id): 100.0},
+            }),
+            (0, 0, {
+                'name': '%s variable cash payment' % next_date,
+                'account_id': cash_account.id,
+                'debit': 0.0,
+                'credit': daily_variable,
+            }),
+        ]
+        if daily_fixed:
+            line_ids += [
+                (0, 0, {
+                    'name': '%s fixed costs' % next_date,
+                    'account_id': fixed_cost_account.id,
+                    'debit': daily_fixed,
+                    'credit': 0.0,
+                    'analytic_distribution': {str(analytic_holding.id): 100.0},
+                }),
+                (0, 0, {
+                    'name': '%s fixed cash payment' % next_date,
+                    'account_id': cash_account.id,
+                    'debit': 0.0,
+                    'credit': daily_fixed,
+                }),
+            ]
+        move = env['account.move'].create({
+            'move_type': 'entry',
+            'journal_id': journal.id,
+            'company_id': company.id,
+            'date': next_date,
+            'ref': ref,
+            'line_ids': line_ids,
+        })
+        move.action_post()
+
+    next_date += datetime.timedelta(days=1)
+        ]]></field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(minutes=10)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

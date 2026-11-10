@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_bulk_schedule_activity" model="ir.actions.server">
+        <field name="name">Gắn hoạt động hàng loạt</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="group_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+picking_ids = records.ids
+
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Lên lịch hoạt động hàng loạt',
+    'res_model': 'mail.activity.schedule',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'active_model': 'stock.picking',
+        'active_ids': picking_ids,
+        'active_id': picking_ids[0] if picking_ids else False,
+        'default_res_model': 'stock.picking',
+        'default_res_ids': picking_ids,
+    },
+}
+        ]]></field>
+    </record>
+</odoo>

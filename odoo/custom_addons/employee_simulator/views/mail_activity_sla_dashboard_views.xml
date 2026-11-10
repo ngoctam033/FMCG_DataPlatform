@@ -64,7 +64,6 @@
         <field name="model">mail.activity</field>
         <field name="arch" type="xml">
             <list string="Theo dõi xử lý sự cố"
-                  js_class="employee_activity_sla_dashboard_list"
                   create="0"
                   edit="0"
                   delete="0"

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Activity nhắc bổ sung Lot/Serial cho stock.move.line -->
+    <record id="mail_activity_type_missing_lot_serial" model="mail.activity.type">
+        <field name="name">Bổ sung Lot/Serial cho phiếu kho</field>
+        <field name="summary">Kiểm tra và bổ sung Lot/Serial cho các dòng dịch chuyển kho</field>
+        <field name="res_model">stock.picking</field>
+        <field name="icon">fa-barcode</field>
+        <field name="decoration_type">warning</field>
+        <field name="delay_count">0</field>
+        <field name="delay_unit">days</field>
+        <field name="delay_from">current_date</field>
+    </record>
+
+    <!-- Server action trên mail.activity -->
+    <record id="server_action_missing_lot_serial_not_implemented" model="ir.actions.server">
+        <field name="name">Bổ sung Lot/Serial - Chưa triển khai</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.res_model != 'stock.picking' or env['stock.picking'].browse(record.res_id).state != 'cancel':
+    raise UserError('Nghiệp vụ bổ sung Lot/Serial cho stock.move.line chưa được triển khai.')
+        ]]></field>
+    </record>
+
+    <!-- Chỉ chạy khi archive activity thuộc loại bổ sung Lot/Serial -->
+    <record id="automation_archive_missing_lot_serial" model="base.automation">
+        <field name="name">Khi lưu trữ activity bổ sung Lot/Serial</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain" eval="[('activity_type_id', '=', ref('fmcg_business_automation.mail_activity_type_missing_lot_serial'))]"/>
+        <field name="action_server_ids" eval="[(4, ref('fmcg_business_automation.server_action_missing_lot_serial_not_implemented'))]"/>
+    </record>
+</odoo>

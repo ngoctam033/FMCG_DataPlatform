@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            Budgetary positions based on the Vietnamese chart of accounts.
+            Revenue budgets are positive; expense budgets are negative.
+        -->
+        <record id="budget_post_fmcg_revenue" model="account.budget.post">
+            <field name="name">FMCG - Sales Revenue</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="account_ids" eval="[(6, 0, [ref('account.1_chart5111')])]"/>
+        </record>
+
+        <record id="budget_post_fmcg_cogs" model="account.budget.post">
+            <field name="name">FMCG - Cost of Goods Sold</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="account_ids" eval="[(6, 0, [ref('account.1_chart632')])]"/>
+        </record>
+
+        <record id="budget_post_fmcg_manufacturing" model="account.budget.post">
+            <field name="name">FMCG - Manufacturing Costs</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="account_ids" eval="[(6, 0, [
+                ref('account.1_chart621'),
+                ref('account.1_chart622'),
+                ref('account.1_chart6271'),
+                ref('account.1_chart6272'),
+                ref('account.1_chart6273'),
+                ref('account.1_chart6274'),
+                ref('account.1_chart6275'),
+                ref('account.1_chart6277'),
+                ref('account.1_chart6278')
+            ])]"/>
+        </record>
+
+        <record id="budget_post_fmcg_selling" model="account.budget.post">
+            <field name="name">FMCG - Selling Costs</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="account_ids" eval="[(6, 0, [
+                ref('account.1_chart6411'),
+                ref('account.1_chart6412'),
+                ref('account.1_chart6413'),
+                ref('account.1_chart6414'),
+                ref('account.1_chart6415'),
+                ref('account.1_chart6417'),
+                ref('account.1_chart6418')
+            ])]"/>
+        </record>
+
+        <record id="budget_post_fmcg_administration" model="account.budget.post">
+            <field name="name">FMCG - Administration Costs</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="account_ids" eval="[(6, 0, [
+                ref('account.1_chart6421'),
+                ref('account.1_chart6422'),
+                ref('account.1_chart6423'),
+                ref('account.1_chart6424'),
+                ref('account.1_chart6425'),
+                ref('account.1_chart6426'),
+                ref('account.1_chart6427'),
+                ref('account.1_chart6428')
+            ])]"/>
+        </record>
+
+        <!-- Consolidated FMCG sample budget for the next calendar year. -->
+        <record id="budget_fmcg_next_year" model="crossovered.budget">
+            <field name="name" eval="'FMCG Budget %s - Consolidated' % (datetime.now().year + 1)"/>
+            <field name="creating_user_id" ref="user_accounting_simulator"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="date_from" eval="'%s-01-01' % (datetime.now().year + 1)"/>
+            <field name="date_to" eval="'%s-12-31' % (datetime.now().year + 1)"/>
+            <field name="state">draft</field>
+        </record>
+
+        <record id="budget_line_fmcg_revenue_distribution" model="crossovered.budget.lines">
+            <field name="crossovered_budget_id" ref="budget_fmcg_next_year"/>
+            <field name="general_budget_id" ref="budget_post_fmcg_revenue"/>
+            <field name="analytic_account_id" ref="analytic_account_fmcg_distribution"/>
+            <field name="date_from" eval="'%s-01-01' % (datetime.now().year + 1)"/>
+            <field name="date_to" eval="'%s-12-31' % (datetime.now().year + 1)"/>
+            <field name="planned_amount" eval="40000000000.0"/>
+        </record>
+
+        <record id="budget_line_fmcg_cogs_distribution" model="crossovered.budget.lines">
+            <field name="crossovered_budget_id" ref="budget_fmcg_next_year"/>
+            <field name="general_budget_id" ref="budget_post_fmcg_cogs"/>
+            <field name="analytic_account_id" ref="analytic_account_fmcg_distribution"/>
+            <field name="date_from" eval="'%s-01-01' % (datetime.now().year + 1)"/>
+            <field name="date_to" eval="'%s-12-31' % (datetime.now().year + 1)"/>
+            <field name="planned_amount" eval="-25000000000.0"/>
+        </record>
+
+        <record id="budget_line_fmcg_manufacturing_factory" model="crossovered.budget.lines">
+            <field name="crossovered_budget_id" ref="budget_fmcg_next_year"/>
+            <field name="general_budget_id" ref="budget_post_fmcg_manufacturing"/>
+            <field name="analytic_account_id" ref="analytic_account_fmcg_manufacturing"/>
+            <field name="date_from" eval="'%s-01-01' % (datetime.now().year + 1)"/>
+            <field name="date_to" eval="'%s-12-31' % (datetime.now().year + 1)"/>
+            <field name="planned_amount" eval="-12000000000.0"/>
+        </record>
+
+        <record id="budget_line_fmcg_selling_distribution" model="crossovered.budget.lines">
+            <field name="crossovered_budget_id" ref="budget_fmcg_next_year"/>
+            <field name="general_budget_id" ref="budget_post_fmcg_selling"/>
+            <field name="analytic_account_id" ref="analytic_account_fmcg_distribution"/>
+            <field name="date_from" eval="'%s-01-01' % (datetime.now().year + 1)"/>
+            <field name="date_to" eval="'%s-12-31' % (datetime.now().year + 1)"/>
+            <field name="planned_amount" eval="-4000000000.0"/>
+        </record>
+
+        <record id="budget_line_fmcg_administration_holding" model="crossovered.budget.lines">
+            <field name="crossovered_budget_id" ref="budget_fmcg_next_year"/>
+            <field name="general_budget_id" ref="budget_post_fmcg_administration"/>
+            <field name="analytic_account_id" ref="analytic_account_fmcg_holding"/>
+            <field name="date_from" eval="'%s-01-01' % (datetime.now().year + 1)"/>
+            <field name="date_to" eval="'%s-12-31' % (datetime.now().year + 1)"/>
+            <field name="planned_amount" eval="-1200000000.0"/>
+        </record>
+    </data>
+</odoo>

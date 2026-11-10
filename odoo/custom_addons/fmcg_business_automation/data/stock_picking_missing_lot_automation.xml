@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. Server Action chạy trên stock.move.line -->
+    <record id="action_missing_lot_serial" model="ir.actions.server">
+        <field name="name">Nhắc bổ sung Lot/Serial</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+activity_type = env.ref(
+    'fmcg_business_automation.mail_activity_type_missing_lot_serial'
+)
+
+for line in records:
+    picking = line.picking_id
+    if not picking:
+        continue
+
+    existing = env['mail.activity'].search_count([
+        ('res_model', '=', 'stock.picking'),
+        ('res_id', '=', picking.id),
+        ('activity_type_id', '=', activity_type.id),
+    ])
+
+    if not existing:
+        picking.activity_schedule(
+            activity_type_id=activity_type.id,
+            user_id=(picking.user_id or env.user).id,
+            summary='Bổ sung Lot/Serial',
+        )
+        ]]></field>
+    </record>
+
+    <!-- 2. Automated Action -->
+    <record id="automation_missing_lot_serial" model="base.automation">
+        <field name="name">Stock Move Line: Check Missing Lot/Serial</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[('picking_id', '!=', False), ('picking_id.picking_type_id.code', '=', 'incoming')]</field>
+        <field name="action_server_ids" eval="[(4, ref('action_missing_lot_serial'))]"/>
+    </record>
+</odoo>

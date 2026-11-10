@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="fmcg_stock_picking_dashboard.StockPickingOperationalListRenderer"
+       t-inherit="web.ListRenderer"
+       t-inherit-mode="primary">
+        <xpath expr="//div[hasclass('o_list_renderer')]" position="before">
+            <StockPickingOperationalDashboard list="props.list"/>
+        </xpath>
+    </t>
+
+    <t t-name="fmcg_stock_picking_dashboard.StockPickingOperationalDashboard">
+        <div class="o_fmcg_stock_picking_dashboard container-fluid py-3 border-bottom bg-view">
+            <div class="d-flex flex-wrap align-items-stretch gap-2">
+                <button type="button" class="o_picking_kpi_card btn bg-100 text-body"
+                        data-filters="dashboard_all_open" t-on-click="setSearchContext"
+                        title="Tất cả phiếu chưa hoàn tất hoặc hủy">
+                    <span class="o_picking_kpi_value" t-out="dashboardData.total"/>
+                    <span class="o_picking_kpi_label">Tổng đang mở</span>
+                </button>
+                <button type="button" class="o_picking_kpi_card btn bg-secondary-subtle text-secondary-emphasis"
+                        data-filters="dashboard_draft" t-on-click="setSearchContext"
+                        title="Phiếu còn ở trạng thái nháp">
+                    <span class="o_picking_kpi_value" t-out="dashboardData.draft"/>
+                    <span class="o_picking_kpi_label">Chưa xác nhận</span>
+                </button>
+                <button type="button" class="o_picking_kpi_card btn bg-warning-subtle text-warning-emphasis"
+                        data-filters="dashboard_waiting_operation" t-on-click="setSearchContext"
+                        title="Đang chờ một dịch chuyển hoặc công đoạn nguồn">
+                    <span class="o_picking_kpi_value" t-out="dashboardData.waitingOperation"/>
+                    <span class="o_picking_kpi_label">Chờ công đoạn trước</span>
+                </button>
+                <button type="button" class="o_picking_kpi_card btn bg-warning-subtle text-warning-emphasis"
+                        data-filters="dashboard_waiting_stock" t-on-click="setSearchContext"
+                        title="Chưa được cấp phát đủ hàng hoặc chưa đến thời điểm giữ chỗ">
+                    <span class="o_picking_kpi_value" t-out="dashboardData.waitingStock"/>
+                    <span class="o_picking_kpi_label">Chờ cấp phát hàng</span>
+                </button>
+                <button type="button" class="o_picking_kpi_card btn bg-success-subtle text-success-emphasis"
+                        data-filters="dashboard_ready" t-on-click="setSearchContext"
+                        title="Đã được giữ chỗ và có thể xử lý">
+                    <span class="o_picking_kpi_value" t-out="dashboardData.ready"/>
+                    <span class="o_picking_kpi_label">Sẵn sàng xử lý</span>
+                </button>
+                <button type="button" class="o_picking_kpi_card btn bg-danger-subtle text-danger-emphasis"
+                        data-filters="dashboard_late_availability" t-on-click="setSearchContext"
+                        title="Không có hàng hoặc hàng dự kiến có sau lịch xử lý">
+                    <span class="o_picking_kpi_value" t-out="dashboardData.lateAvailability"/>
+                    <span class="o_picking_kpi_label">Hàng không kịp lịch</span>
+                </button>
+                <button type="button" class="o_picking_kpi_card btn bg-danger-subtle text-danger-emphasis"
+                        data-filters="dashboard_overdue" t-on-click="setSearchContext"
+                        title="Ngày dự kiến xử lý đã qua nhưng phiếu chưa hoàn tất">
+                    <span class="o_picking_kpi_value" t-out="dashboardData.overdue"/>
+                    <span class="o_picking_kpi_label">Quá lịch xử lý</span>
+                </button>
+                <button type="button" class="o_picking_kpi_card btn bg-info-subtle text-info-emphasis"
+                        data-filters="dashboard_backorder" t-on-click="setSearchContext"
+                        title="Phần hàng còn lại của phiếu đã xử lý một phần">
+                    <span class="o_picking_kpi_value" t-out="dashboardData.backorder"/>
+                    <span class="o_picking_kpi_label">Backorder đang mở</span>
+                </button>
+                <button type="button" class="o_picking_kpi_card btn bg-danger-subtle text-danger-emphasis"
+                        data-filters="dashboard_activity_overdue" t-on-click="setSearchContext"
+                        title="Có activity xử lý đã quá hạn">
+                    <span class="o_picking_kpi_value" t-out="dashboardData.activityOverdue"/>
+                    <span class="o_picking_kpi_label">Activity quá hạn</span>
+                </button>
+            </div>
+            <div class="mt-2 text-muted small">
+                Nhấn vào thẻ để lọc danh sách. Các thẻ rủi ro có thể cùng tính một phiếu; ví dụ một backorder cũng có thể đồng thời quá lịch và thiếu hàng.
+            </div>
+        </div>
+    </t>
+</templates>

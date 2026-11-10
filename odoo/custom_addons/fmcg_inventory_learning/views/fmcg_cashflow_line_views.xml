@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Cash-flow reporting deliberately reuses Odoo accounting models.
+        No reporting model, SQL view, or additional stored field is introduced.
+    -->
+
+    <record id="view_fmcg_cashflow_move_line_search" model="ir.ui.view">
+        <field name="name">fmcg.cashflow.account.move.line.search</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <search string="FMCG Cash-flow">
+                <field name="date"/>
+                <field name="account_id"/>
+                <field name="journal_id"/>
+                <field name="partner_id"/>
+                <separator/>
+                <filter name="posted" string="Posted" domain="[('parent_state', '=', 'posted')]"/>
+                <filter name="scenario" string="FMCG Scenario" domain="[('move_id.ref', '=like', 'FMCG-CF-D-%')]"/>
+                <separator/>
+                <filter name="cash_accounts" string="Cash" domain="[('account_id.code', '=like', '111%')]"/>
+                <filter name="revenue_accounts" string="Revenue" domain="[('account_id.code', '=like', '511%')]"/>
+                <filter name="variable_cost_accounts" string="Variable Cost" domain="[('account_id.code', '=like', '632%')]"/>
+                <filter name="fixed_cost_accounts" string="Fixed Cost" domain="[('account_id.code', '=like', '6427%')]"/>
+                <separator/>
+                <filter name="cash_inflow" string="Cash Inflow" domain="[('account_id.code', '=like', '111%'), ('debit', '&gt;', 0)]"/>
+                <filter name="cash_outflow" string="Cash Outflow" domain="[('account_id.code', '=like', '111%'), ('credit', '&gt;', 0)]"/>
+                <group name="groupby">
+                    <filter name="group_date_day" string="Day" context="{'group_by': 'date:day'}"/>
+                    <filter name="group_date_week" string="Week" context="{'group_by': 'date:week'}"/>
+                    <filter name="group_date_month" string="Month" context="{'group_by': 'date:month'}"/>
+                    <separator/>
+                    <filter name="group_account" string="Account" context="{'group_by': 'account_id'}"/>
+                    <filter name="group_journal" string="Journal" context="{'group_by': 'journal_id'}"/>
+                    <filter name="group_partner" string="Partner" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_fmcg_daily_cashflow_by_account_graph" model="ir.ui.view">
+        <field name="name">fmcg.daily.cashflow.by.account.graph</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <graph string="Daily Cash-flow by Account" type="line" stacked="0" cumulated="0" disable_linking="1">
+                <field name="date" interval="day"/>
+                <field name="account_id"/>
+                <field name="balance" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_fmcg_cumulative_cash_balance_graph" model="ir.ui.view">
+        <field name="name">fmcg.cumulative.cash.balance.graph</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <graph string="Cumulative Daily Cash Balance" type="line" stacked="0" cumulated="1" cumulated_start="1" disable_linking="1">
+                <field name="date" interval="day"/>
+                <field name="balance" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_fmcg_cashflow_analytic_line_search" model="ir.ui.view">
+        <field name="name">fmcg.cashflow.account.analytic.line.search</field>
+        <field name="model">account.analytic.line</field>
+        <field name="arch" type="xml">
+            <search string="FMCG Cash-flow by Cost Center">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="account_id"/>
+                <field name="general_account_id"/>
+                <field name="journal_id"/>
+                <separator/>
+                <filter name="scenario" string="FMCG Scenario" domain="[('move_line_id.move_id.ref', '=like', 'FMCG-CF-D-%')]"/>
+                <filter name="analytic_revenue" string="Revenue" domain="[('general_account_id.code', '=like', '511%')]"/>
+                <filter name="analytic_variable_cost" string="Variable Cost" domain="[('general_account_id.code', '=like', '632%')]"/>
+                <filter name="analytic_fixed_cost" string="Fixed Cost" domain="[('general_account_id.code', '=like', '6427%')]"/>
+                <group name="groupby">
+                    <filter name="group_date_day" string="Day" context="{'group_by': 'date:day'}"/>
+                    <filter name="group_date_week" string="Week" context="{'group_by': 'date:week'}"/>
+                    <filter name="group_date_month" string="Month" context="{'group_by': 'date:month'}"/>
+                    <separator/>
+                    <!-- Odoo appends group filters for every configured analytic plan here. -->
+                    <filter name="account_id" string="Analytic Account" context="{'group_by': 'account_id'}"/>
+                    <filter name="group_general_account" string="Financial Account" context="{'group_by': 'general_account_id'}"/>
+                    <filter name="group_journal" string="Journal" context="{'group_by': 'journal_id'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_fmcg_daily_cashflow_by_cost_center_graph" model="ir.ui.view">
+        <field name="name">fmcg.daily.cashflow.by.cost.center.graph</field>
+        <field name="model">account.analytic.line</field>
+        <field name="arch" type="xml">
+            <graph string="Daily Cash-flow by Cost Center" type="line" stacked="0" cumulated="0" disable_linking="1" js_class="analytic_graph">
+                <field name="date" interval="day"/>
+                <field name="x_plan2_id"/>
+                <field name="amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_fmcg_daily_cashflow_by_account" model="ir.actions.act_window">
+        <field name="name">Daily Cash-flow by Account</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_fmcg_daily_cashflow_by_account_graph"/>
+        <field name="search_view_id" ref="view_fmcg_cashflow_move_line_search"/>
+        <field name="domain">[('parent_state', '=', 'posted'), ('move_id.ref', '=like', 'FMCG-CF-D-%'), ('move_id.ref', 'not ilike', 'OPENING')]</field>
+        <field name="context">{'graph_measure': 'balance'}</field>
+    </record>
+
+    <record id="action_fmcg_cumulative_cash_balance" model="ir.actions.act_window">
+        <field name="name">Cumulative Cash Balance</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_fmcg_cumulative_cash_balance_graph"/>
+        <field name="search_view_id" ref="view_fmcg_cashflow_move_line_search"/>
+        <field name="domain" eval="[('parent_state', '=', 'posted'), ('move_id.ref', '=like', 'FMCG-CF-D-%'), ('account_id', '=', ref('account.1_chart1111'))]"/>
+        <field name="context">{'graph_measure': 'balance'}</field>
+    </record>
+
+    <record id="action_fmcg_daily_cashflow_by_cost_center" model="ir.actions.act_window">
+        <field name="name">Daily Cash-flow by Cost Center</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_fmcg_daily_cashflow_by_cost_center_graph"/>
+        <field name="search_view_id" ref="view_fmcg_cashflow_analytic_line_search"/>
+        <field name="domain">[('move_line_id.move_id.ref', '=like', 'FMCG-CF-D-%')]</field>
+        <field name="context">{'graph_measure': 'amount'}</field>
+    </record>
+
+    <menuitem
+        id="menu_fmcg_cashflow_root"
+        name="FMCG Cash-flow"
+        parent="account.menu_finance_reports"
+        sequence="90"
+        groups="account.group_account_user"
+    />
+    <menuitem
+        id="menu_fmcg_daily_cashflow_by_account"
+        name="Daily Cash-flow by Account"
+        parent="menu_fmcg_cashflow_root"
+        action="action_fmcg_daily_cashflow_by_account"
+        sequence="10"
+        groups="account.group_account_user"
+    />
+    <menuitem
+        id="menu_fmcg_cumulative_cash_balance"
+        name="Cumulative Cash Balance"
+        parent="menu_fmcg_cashflow_root"
+        action="action_fmcg_cumulative_cash_balance"
+        sequence="20"
+        groups="account.group_account_user"
+    />
+    <menuitem
+        id="menu_fmcg_daily_cashflow_by_cost_center"
+        name="Daily Cash-flow by Cost Center"
+        parent="menu_fmcg_cashflow_root"
+        action="action_fmcg_daily_cashflow_by_cost_center"
+        sequence="30"
+        groups="account.group_account_user"
+    />
+</odoo>

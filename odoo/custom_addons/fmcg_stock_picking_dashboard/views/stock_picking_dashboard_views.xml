@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_stock_picking_open_new_tab"
+            model="ir.actions.server">
+
+        <field name="name">Open Picking in New Tab</field>
+
+        <field name="model_id" ref="stock.model_stock_picking"/>
+
+        <field name="binding_model_id"
+               ref="stock.model_stock_picking"/>
+
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list</field>
+
+        <field name="state">code</field>
+
+        <field name="code"><![CDATA[
+if len(records) == 1:
+    action = {
+        'type': 'ir.actions.act_url',
+        'url': '/odoo/action-stock.action_picking_tree_all/%s' % records.id,
+        'target': 'new',
+    }
+        ]]></field>
+
+    </record>
+
+    <record id="stock_picking_dashboard_search" model="ir.ui.view">
+        <field name="name">stock.picking.operational.dashboard.search</field>
+        <field name="model">stock.picking</field>
+        <field name="arch" type="xml">
+            <search string="Theo dõi xử lý phiếu kho">
+                <field name="name" string="Phiếu kho"
+                       filter_domain="['|', ('name', 'ilike', self), ('origin', 'ilike', self)]"/>
+                <field name="origin"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="picking_type_id"/>
+                <field name="user_id"/>
+                <field name="activity_user_id" string="Activity của"/>
+                <field name="activity_type_id" string="Loại activity"/>
+                <filter name="dashboard_activity_overdue" string="Activity quá hạn"
+                        domain="[
+                            ('state', 'not in', ('done', 'cancel')),
+                            ('activity_state', '=', 'overdue')
+                        ]"/>
+                <filter name="dashboard_missing_lot_serial"
+                        string="Thiếu Lot/Serial"
+                        domain="[
+                            ('state', 'not in', ('done', 'cancel')),
+                            '|',
+                            ('picking_type_id.use_create_lots', '=', True),
+                            ('picking_type_id.use_existing_lots', '=', True),
+                            ('move_line_ids', 'any', [
+                                ('product_id.tracking', 'in', ['lot', 'serial']),
+                                ('quantity', '>', 0),
+                                ('lot_id', '=', False),
+                                ('lot_name', '=', False)
+                            ])
+                        ]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="stock_picking_dashboard_list" model="ir.ui.view">
+        <field name="name">stock.picking.operational.dashboard.list</field>
+        <field name="model">stock.picking</field>
+        <field name="arch" type="xml">
+            <list string="Theo dõi xử lý phiếu kho"
+                  create="0"
+                  edit="0"
+                  delete="0"
+                  duplicate="0"
+                  multi_edit="1"
+                  default_order="priority desc, scheduled_date asc, id desc"
+                  decoration-danger="state in ('confirmed', 'waiting') and products_availability_state == 'late'"
+                  decoration-warning="state in ('confirmed', 'waiting')"
+                  decoration-muted="state == 'draft'">
+                <button
+                    name="%(action_stock_picking_open_new_tab)d"
+                    type="action"
+                    icon="fa-external-link"
+                    string="Open"
+                    title="Open in New Tab"
+                />
+                <!-- <field name="company_id" column_invisible="True"/> -->
+                <!-- <field name="priority" widget="priority" nolabel="1" optional="show"/> -->
+                <field name="name" string="Phiếu kho" decoration-bf="1"/>
+                <field name="picking_type_id" string="Loại hoạt động" optional="show"/>
+                <!-- <field name="origin" string="Chứng từ nguồn" optional="show"/> -->
+                <!-- <field name="partner_id" optional="show"/> -->
+                <!-- <field name="location_id" string="Từ"
+                       groups="stock.group_stock_multi_locations"
+                       options="{'no_create': True}" optional="show"/> -->
+                <!-- <field name="location_dest_id" string="Đến"
+                       groups="stock.group_stock_multi_locations"
+                       options="{'no_create': True}" optional="show"/> -->
+                <!-- <field name="user_id" string="Người phụ trách"
+                       widget="many2one_avatar_user" optional="show"/> -->
+                <field name="state" string="Giai đoạn" widget="badge"
+                       decoration-muted="state == 'draft'"
+                       decoration-warning="state in ('confirmed', 'waiting')"
+                       decoration-info="state == 'assigned'"/>
+                <field name="picking_type_code" column_invisible="True"/>
+                <field name="products_availability_state" column_invisible="True"
+                       options="{'lazy': true}"/>
+                <field name="products_availability" string="Tình trạng hàng"
+                       options="{'lazy': true}" optional="show"
+                       invisible="picking_type_code not in ('outgoing', 'internal') or state not in ('confirmed', 'waiting', 'assigned')"
+                       decoration-success="state == 'assigned' or products_availability_state == 'available'"
+                       decoration-warning="state != 'assigned' and products_availability_state in ('expected', 'available')"
+                       decoration-danger="state != 'assigned' and products_availability_state == 'late'"/>
+                <!-- <field name="scheduled_date" string="Ngày dự kiến"
+                       widget="remaining_days" optional="show"/>
+                <field name="date_deadline" string="Deadline"
+                       widget="remaining_days" optional="show"/>
+                <field name="has_deadline_issue" string="Rủi ro deadline" optional="hide"/>
+                <field name="backorder_id" string="Backorder của" optional="show"/> -->
+                <field name="activity_ids" string="Activity tiếp theo"
+                       widget="list_activity" optional="show"/>
+                <!-- <field name="activity_state" column_invisible="True"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/> -->
+                <field name="activity_exception_decoration" widget="activity_exception"/>
+                <field name="json_popover" widget="stock_rescheduling_popover"
+                       nolabel="1" invisible="not json_popover"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_stock_picking_dashboard" model="ir.actions.act_window">
+        <field name="name">Theo dõi xử lý phiếu kho</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="stock_picking_dashboard_list"/>
+        <field name="search_view_id" ref="stock_picking_dashboard_search"/>
+        <field name="domain">[('state', 'not in', ('done', 'cancel'))]</field>
+        <field name="context">{'force_search_count': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Không có phiếu kho nào đang mở.</p>
+            <p>Các phiếu chưa hoàn tất sẽ được phân loại theo giai đoạn và dấu hiệu rủi ro tại đây.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_stock_picking_dashboard"
+              name="Theo dõi xử lý Kho"
+              parent="spreadsheet_dashboard.spreadsheet_dashboard_menu_root"
+              action="action_stock_picking_dashboard"
+              sequence="250"
+              groups="stock.group_stock_user"/>
+</odoo>

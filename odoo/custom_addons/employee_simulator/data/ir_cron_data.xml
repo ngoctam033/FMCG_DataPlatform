@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="0">
+    <!-- 1. Server Action: Complete Activities -->
+    <record id="action_server_done_activities" model="ir.actions.server">
+        <field name="name">Employee Simulator: Complete Activities</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+activity_type_xmlids = [
+    'fmcg_business_automation.mail_activity_type_confirm_draft_picking',
+    'fmcg_business_automation.mail_activity_type_validate_picking',
+    'fmcg_business_automation.mail_activity_type_transfer_trouble',
+    'fmcg_business_automation.mail_activity_type_backorder_request',
+    'fmcg_business_automation.mail_activity_type_missing_lot_serial',
+    'fmcg_inventory_learning.mail_activity_type_check_picking_availability',
+]
+
+activity_type_ids = [
+    env.ref(xmlid).id
+    for xmlid in activity_type_xmlids
+]
+
+activities = env['mail.activity'].search(
+    [('activity_type_id', 'in', activity_type_ids)],
+    order='create_date asc, id asc',
+    limit=100,
+)
+
+if activities:
+    activities.action_done()
+        ]]></field>
+    </record>
     <record id="ir_cron_simulate_create_picking" model="ir.cron">
         <field name="name">Employee Simulator: Create Pickings</field>
         <field name="model_id" ref="stock.model_stock_picking"/>
@@ -16,16 +46,7 @@
         <field name="model_id" ref="mail.model_mail_activity"/>
         <field name="state">code</field>
         <field name="code">
-activity_type_xmlids = [
-    'fmcg_business_automation.mail_activity_type_confirm_draft_picking',
-]
-activity_type_ids = [env.ref(xmlid).id for xmlid in activity_type_xmlids]
-activities = env['mail.activity'].search(
-    [('activity_type_id', 'in', activity_type_ids)],
-    order='create_date asc, id asc',
-    limit=100,
-)
-activities.action_done()
+env.ref('employee_simulator.action_server_done_activities').run()
         </field>
         <field name="user_id" ref="base.user_root"/>
         <field name="interval_number">1</field>
