@@ -36,9 +36,9 @@ if activities:
         <field name="state">code</field>
         <field name="code">model.simulate_create_picking()</field>
         <field name="user_id" ref="base.user_root"/>
-        <field name="interval_number">1</field>
+        <field name="interval_number">360</field>
         <field name="interval_type">minutes</field>
-        <field name="active" eval="True"/>
+        <field name="active" eval="False"/>
     </record>
 
     <record id="ir_cron_action_done_activities" model="ir.cron">
@@ -51,6 +51,6 @@ env.ref('employee_simulator.action_server_done_activities').run()
         <field name="user_id" ref="base.user_root"/>
         <field name="interval_number">1</field>
         <field name="interval_type">minutes</field>
-        <field name="active" eval="True"/>
+        <field name="active" eval="False"/>
     </record>
 </odoo>

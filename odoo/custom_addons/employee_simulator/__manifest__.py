@@ -9,9 +9,11 @@
         'web_refresher',
         'mail',
         'stock',
+        'muk_web_appsbar',
         'base_automation',
         'fmcg_inventory_learning',
         'fmcg_business_automation',
+        'fmcg_stock_picking_dashboard',
     ],
     'data': [
         'data/ir_cron_data.xml',

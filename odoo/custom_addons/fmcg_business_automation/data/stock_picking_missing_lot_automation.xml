@@ -35,7 +35,7 @@ for line in records:
         <field name="name">Stock Move Line: Check Missing Lot/Serial</field>
         <field name="model_id" ref="stock.model_stock_move_line"/>
         <field name="trigger">on_create_or_write</field>
-        <field name="filter_domain">[('picking_id', '!=', False), ('picking_id.picking_type_id.code', '=', 'incoming')]</field>
+        <field name="filter_domain">[('picking_id', '!=', False), ('picking_id.picking_type_id.code', '!=', 'incoming')]</field>
         <field name="action_server_ids" eval="[(4, ref('action_missing_lot_serial'))]"/>
     </record>
 </odoo>

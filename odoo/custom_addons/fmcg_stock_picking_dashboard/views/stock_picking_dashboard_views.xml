@@ -59,6 +59,28 @@ if len(records) == 1:
                                 ('lot_name', '=', False)
                             ])
                         ]"/>
+                <filter
+                    name="missing_lot_serial"
+                    string="Cần tạo Lot/Serial"
+                    domain="[
+                        ('state', 'not in', ['done', 'cancel']),
+                        ('move_ids', 'any', [
+                            ('product_id.tracking', '!=', 'none'),
+                            ('move_line_ids', 'any', [
+                                ('quantity', '>', 0),
+                                ('lot_id', '=', False),
+                                ('lot_name', '=', False)
+                            ])
+                        ])
+                    ]"
+                />
+                <field name="move_line_ids"
+                    string="Tên sản phẩm trong dòng kho"
+                    filter_domain="[
+                        ('move_line_ids', 'any', [
+                            ('product_id.name', 'ilike', self)
+                        ])
+                    ]"/>
             </search>
         </field>
     </record>

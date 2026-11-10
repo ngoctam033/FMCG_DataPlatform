@@ -111,7 +111,7 @@
         <field name="name">Theo dõi xử lý sự cố</field>
         <field name="res_model">mail.activity</field>
         <field name="view_mode">list</field>
-        <field name="view_id" ref="mail_activity_sla_dashboard_list"/>
+        <field name="view_id" ref="mail.mail_activity_view_tree_open_target"/>
         <field name="search_view_id" ref="mail_activity_sla_dashboard_search"/>
         <field name="context" eval="{
             'active_test': False,

@@ -43,7 +43,7 @@
             <field name="name">Log loại hoạt động khi hoàn thành</field>
             <field name="model_id" ref="mail.model_mail_activity"/>
             <field name="trigger">on_archive</field>
-            <field name="active" eval="True"/>
+            <field name="active" eval="False"/>
         </record>
 
         <record id="server_action_log_archived_mail_activity_type" model="ir.actions.server">
