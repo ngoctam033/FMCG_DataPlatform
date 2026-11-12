@@ -14,6 +14,42 @@
             continue
 
         if picking and picking.state in ['assigned']:
+            missing_lot_move = env['stock.move'].search([
+                ('picking_id', '=', picking.id),
+                ('product_id.tracking', 'in', ['lot', 'serial']),
+                ('move_line_ids', 'any', [
+                    ('quantity', '>', 0),
+                    ('lot_id', '=', False),
+                    ('lot_name', '=', False),
+                ]),
+            ], limit=1)
+
+            if missing_lot_move:
+                if picking.picking_type_id.code == 'incoming':
+                    env.ref(
+                        'fmcg_business_automation.action_create_incoming_lot_serial'
+                    ).with_context(
+                        active_model='stock.picking',
+                        active_id=picking.id,
+                        active_ids=picking.ids,
+                        old_values=None,
+                        domain_post=None,
+                    ).run()
+                else:
+                    picking.activity_schedule(
+                        'fmcg_business_automation.mail_activity_type_picking_existing_lot_serial',
+                        date_deadline=activity.date_deadline,
+                        user_id=activity.user_id.id,
+                        summary='Tự động điền Lot/Serial đang có trong kho',
+                        note=(
+                            'Phiếu kho %s thiếu Lot/Serial khi Validate. '
+                            'Vui lòng hoàn tất Activity để tự động điền Lot/Serial '
+                            'đang có trong kho.' % picking.name
+                        ),
+                    )
+
+                    continue
+
             result = picking.button_validate()
 
             is_backorder_wizard = (
@@ -49,6 +85,18 @@
                 raise UserError(
                     'Phiếu kho %s cần xử lý wizard: %s'
                     % (picking.name, result.get('res_model'))
+                )
+
+        elif picking and picking.state == 'confirmed':
+                picking.activity_schedule(
+                    'fmcg_business_automation.mail_activity_type_picking_waiting',
+                    date_deadline=activity.date_deadline,
+                    user_id=activity.user_id.id,
+                    summary='Kiểm tra phiếu kho đang chờ',
+                    note=(
+                        'Phiếu kho %s đang ở trạng thái chờ xử lý do còn '
+                        'phụ thuộc nghiệp vụ.' % picking.name
+                    ),
                 )
 
         elif picking and picking.state in ['draft']:
