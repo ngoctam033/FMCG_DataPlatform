@@ -45,6 +45,15 @@ if len(records) == 1:
                             ('state', 'not in', ('done', 'cancel')),
                             ('activity_state', '=', 'overdue')
                         ]"/>
+                <filter
+                    name="dashboard_missing_moves"
+                    string="Thiếu dòng sản phẩm"
+                    domain="[
+                        ('state', 'not in', ['done', 'cancel']),
+                        ('move_ids', '=', False),
+                        ('move_line_ids', '=', False)
+                    ]"
+                />
                 <filter name="dashboard_missing_lot_serial"
                         string="Thiếu Lot/Serial"
                         domain="[
