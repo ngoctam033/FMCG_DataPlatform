@@ -10,6 +10,7 @@
     ],
     'data': [
         'data/stock_picking_activity_types.xml',
+        'data/action_create_incoming_lot_serial.xml',
     ],
     'installable': True,
     'application': False,
