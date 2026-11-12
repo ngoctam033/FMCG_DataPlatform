@@ -3,7 +3,7 @@
     <!-- 1. Draft: Confirm Picking -->
     <record id="mail_activity_type_picking_draft"
             model="mail.activity.type">
-        <field name="name">Xác nhận phiếu kho</field>
+        <field name="name">Xác nhận phiếu kho nháp</field>
         <field name="summary">Xác nhận phiếu kho nháp</field>
         <field name="res_model">stock.picking</field>
         <field name="icon">fa-file-text-o</field>
@@ -42,6 +42,25 @@
         <field name="icon">fa-check-square-o</field>
         <field name="sequence">40</field>
         <field name="delay_count">0</field>
+    </record>
+
+    <!-- 4.1. Backorder: Require Manual Decision -->
+    <record id="mail_activity_type_picking_backorder_required"
+            model="mail.activity.type">
+        <field name="name">Xử lý Backorder phiếu kho</field>
+        <field name="summary">Phiếu kho cần quyết định tạo Backorder</field>
+        <field name="res_model">stock.picking</field>
+        <field name="icon">fa-exclamation-triangle</field>
+        <field name="sequence">45</field>
+        <field name="delay_count">0</field>
+    </record>
+
+    <!-- Configure Next Activity: Draft -> Assigned -->
+    <record id="fmcg_business_automation.mail_activity_type_picking_draft"
+            model="mail.activity.type">
+        <field name="chaining_type">trigger</field>
+        <field name="triggered_next_type_id"
+            ref="fmcg_business_automation.mail_activity_type_picking_assigned"/>
     </record>
 
     <!-- 5. Done: Final Review -->
