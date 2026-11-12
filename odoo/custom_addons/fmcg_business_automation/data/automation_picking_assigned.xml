@@ -9,6 +9,9 @@
         <field name="code"><![CDATA[
     for activity in records:
         picking = env['stock.picking'].browse(activity.res_id).exists()
+        # Bypass nếu Picking đã hoàn tất
+        if picking and picking.state == 'done':
+            continue
 
         if picking and picking.state in ['assigned']:
             result = picking.button_validate()
