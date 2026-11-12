@@ -94,9 +94,20 @@ activity = record
 picking = env['stock.picking'].browse(activity.res_id).exists()
 
 if picking:
-    picking.activity_schedule(
+    draft_activity_type = env.ref(
         'fmcg_business_automation.mail_activity_type_picking_draft'
     )
+    existing_draft_activity = env['mail.activity'].search([
+        ('res_model', '=', 'stock.picking'),
+        ('res_id', '=', picking.id),
+        ('activity_type_id', '=', draft_activity_type.id),
+        ('active', '=', True),
+    ], limit=1)
+
+    if not existing_draft_activity:
+        picking.activity_schedule(
+            'fmcg_business_automation.mail_activity_type_picking_draft'
+        )
         ]]></field>
     </record>
 
