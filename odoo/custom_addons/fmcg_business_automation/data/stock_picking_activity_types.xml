@@ -55,12 +55,10 @@
         <field name="delay_count">0</field>
     </record>
 
-    <!-- Configure Next Activity: Draft -> Assigned -->
+    <!-- Disable automatic chaining from Draft to Assigned -->
     <record id="fmcg_business_automation.mail_activity_type_picking_draft"
             model="mail.activity.type">
-        <field name="chaining_type">trigger</field>
-        <field name="triggered_next_type_id"
-            ref="fmcg_business_automation.mail_activity_type_picking_assigned"/>
+        <field name="chaining_type">suggest</field>
     </record>
 
     <!-- 5. Done: Final Review -->
