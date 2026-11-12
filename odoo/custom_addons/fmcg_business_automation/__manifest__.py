@@ -16,6 +16,7 @@
         'data/stock_picking_missing_moves_workflow.xml',
         'data/action_create_incoming_lot_serial.xml',
         'data/stock_picking_missing_lot_serial_workflow.xml',
+        'data/stock_picking_existing_lot_workflow.xml',
     ],
     'installable': True,
     'application': False,
