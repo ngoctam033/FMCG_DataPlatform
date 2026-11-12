@@ -14,7 +14,7 @@ for picking in env['stock.picking'].search([
     ('activity_ids', 'any', [
         ('activity_type_id', 'in', activity_type_ids),
     ]),
-], limit=100, order='create_date asc, id asc'):
+], limit=200, order='create_date asc, id asc'):
 
     activity = env['mail.activity'].search([
         ('res_model', '=', 'stock.picking'),
