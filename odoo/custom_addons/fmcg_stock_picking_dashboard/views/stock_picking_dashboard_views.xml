@@ -57,17 +57,29 @@ if len(records) == 1:
                 <filter name="dashboard_missing_lot_serial"
                         string="Thiếu Lot/Serial"
                         domain="[
-                            ('state', 'not in', ('done', 'cancel')),
-                            '|',
-                            ('picking_type_id.use_create_lots', '=', True),
-                            ('picking_type_id.use_existing_lots', '=', True),
-                            ('move_line_ids', 'any', [
-                                ('product_id.tracking', 'in', ['lot', 'serial']),
-                                ('quantity', '>', 0),
-                                ('lot_id', '=', False),
-                                ('lot_name', '=', False)
-                            ])
-                        ]"/>
+                                ('activity_ids.activity_type_id', '=', env.ref('fmcg_business_automation.mail_activity_type_picking_assigned').id),
+                                ('activity_ids', 'not any', [
+                                    ('activity_type_id', '=', env.ref('fmcg_business_automation.mail_activity_type_picking_missing_lot_serial').id),
+                                ]),
+                                ('state', 'not in', ['draft', 'done', 'cancel']),
+                                '|',
+                                    '&',
+                                        ('picking_type_id.use_create_lots', '=', True),
+                                        ('move_line_ids', 'any', [
+                                            ('product_id.tracking', 'in', ['lot', 'serial']),
+                                            ('quantity', '>', 0),
+                                            ('lot_id', '=', False),
+                                            ('lot_name', '=', False),
+                                        ]),
+                                    '&', '&',
+                                        ('picking_type_id.use_create_lots', '=', False),
+                                        ('picking_type_id.use_existing_lots', '=', True),
+                                        ('move_line_ids', 'any', [
+                                            ('product_id.tracking', 'in', ['lot', 'serial']),
+                                            ('quantity', '>', 0),
+                                            ('lot_id', '=', False),
+                                        ]),
+                            ]"/>
                 <filter
                     name="missing_lot_serial"
                     string="Cần tạo Lot/Serial"
