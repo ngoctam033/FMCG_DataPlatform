@@ -10,7 +10,7 @@
     for activity in records:
         picking = env['stock.picking'].browse(activity.res_id).exists()
 
-        if picking and picking.state in ['assigned', 'draft']:
+        if picking and picking.state in ['assigned']:
             result = picking.button_validate()
 
             is_backorder_wizard = (
@@ -47,6 +47,15 @@
                     'Phiếu kho %s cần xử lý wizard: %s'
                     % (picking.name, result.get('res_model'))
                 )
+
+        elif picking and picking.state in ['draft']:
+            env.ref(
+                'fmcg_business_automation.action_schedule_picking_draft'
+            ).with_context(
+                active_model='stock.picking',
+                active_id=picking.id,
+                active_ids=picking.ids,
+            ).run()
 
         else:
             raise UserError(
