@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_complete_latest_picking_activity" model="ir.cron">
+        <field name="name">Picking Simulator: Complete Latest Activity</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+    <field name="code"><![CDATA[
+activity_type_ids = env['ir.model.data'].search([
+    ('module', '=', 'fmcg_business_automation'),
+    ('model', '=', 'mail.activity.type'),
+]).mapped('res_id')
+
+for picking in env['stock.picking'].search([
+    ('activity_ids', 'any', [
+        ('activity_type_id', 'in', activity_type_ids),
+    ]),
+], limit=100, order='create_date asc, id asc'):
+
+    activity = env['mail.activity'].search([
+        ('res_model', '=', 'stock.picking'),
+        ('res_id', '=', picking.id),
+        ('activity_type_id', 'in', activity_type_ids),
+    ], order='create_date desc, id desc', limit=1)
+
+    if activity:
+        activity.action_feedback()
+    ]]></field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

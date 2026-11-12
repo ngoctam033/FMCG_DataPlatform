@@ -9,6 +9,7 @@
         'web_refresher',
         'mail',
         'stock',
+        'spreadsheet_oca',
         'muk_web_appsbar',
         'base_automation',
         'fmcg_inventory_learning',
@@ -17,6 +18,7 @@
     ],
     'data': [
         'data/ir_cron_data.xml',
+        'data/ir_cron_complete_latest_picking_activity.xml',
         'views/mail_activity_sla_dashboard_views.xml',
     ],
     'assets': {
