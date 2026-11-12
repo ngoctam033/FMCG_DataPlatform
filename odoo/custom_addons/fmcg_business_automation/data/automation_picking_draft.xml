@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Server Action: Create Draft Activity -->
+    <record id="action_schedule_picking_draft"
+            model="ir.actions.server">
+        <field name="name">Picking: Create Draft Activity</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id" ref="fmcg_business_automation.mail_activity_type_picking_draft"/>
+        <field name="activity_summary">Xác nhận phiếu kho nháp</field>
+        <field name="activity_user_type">generic</field>
+        <field name="activity_user_field_name">user_id</field>
+    </record>
+
+    <!-- Automation: On Create or Edit -->
+    <record id="automation_picking_draft"
+            model="base.automation">
+        <field name="name">Picking: Draft Activity</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids"
+               eval="[(4, ref('stock.field_stock_picking__state'))]"/>
+        <field name="filter_domain">[('state', '=', 'draft')]</field>
+        <field name="action_server_ids"
+               eval="[(4, ref('action_schedule_picking_draft'))]"/>
+    </record>
+
+
+    <!-- Server Action: Confirm Draft Picking -->
+    <record id="action_confirm_draft_picking"
+            model="ir.actions.server">
+        <field name="name">Picking: Confirm Draft</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+    for activity in records:
+        picking = env['stock.picking'].browse(activity.res_id).exists()
+
+        if picking and picking.state == 'draft':
+            old_state = picking.state
+
+            picking.action_confirm()
+
+            if picking.state == old_state:
+                raise UserError(
+                    'Picking %s (ID: %s) vẫn ở trạng thái %s sau khi xác nhận.'
+                    % (picking.name, picking.id, old_state)
+                )
+        ]]></field>
+    </record>
+
+    <!-- Automation: On Activity Deletion -->
+    <record id="automation_confirm_draft_picking"
+            model="base.automation">
+        <field name="name">Picking: Confirm On Activity Done</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+            eval="[
+                ('activity_type_id', '=', ref('fmcg_business_automation.mail_activity_type_picking_draft')),
+                ('res_model', '=', 'stock.picking')
+            ]"/>
+        <field name="action_server_ids" eval="[(4, ref('action_confirm_draft_picking'))]"/>
+    </record>
+
+</odoo>
