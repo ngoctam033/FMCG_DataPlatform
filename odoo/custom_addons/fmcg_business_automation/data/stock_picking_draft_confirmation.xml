@@ -10,78 +10,42 @@
         <field name="sequence">10</field>
     </record>
 
-    <!-- 2. Server Action: Confirm Source Picking -->
     <record id="action_confirm_draft_picking"
             model="ir.actions.server">
-        <field name="name">Picking: Confirm Draft On Activity Done</field>
+        <field name="name">
+            Picking: Confirm And Verify Draft On Activity Done
+        </field>
         <field name="model_id" ref="mail.model_mail_activity"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-picking = env['stock.picking'].browse(record.res_id).exists()
+    picking = env['stock.picking'].browse(record.res_id).exists()
 
-if picking and picking.state == 'draft':
-    picking.action_confirm()
-        ]]></field>
-    </record>
+    if picking and picking.state == 'draft':
+        picking.action_confirm()
 
-    <record id="action_feedback_picking_missing_moves"
-            model="ir.actions.server">
-        <field name="name">Picking: Feedback Missing Stock Moves</field>
-        <field name="model_id" ref="mail.model_mail_activity"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-picking = env['stock.picking'].browse(record.res_id).exists()
+    if picking and picking.state == 'draft':
+        if not picking.move_ids:
+            env.ref(
+                'fmcg_business_automation.action_feedback_picking_missing_moves'
+            ).with_context(
+                active_model='mail.activity',
+                active_id=record.id,
+                active_ids=[record.id],
+            ).run()
 
-if picking and not picking.move_ids:
-    feedback = (
-        'Không thể xác nhận Picking %s: '
-        'Phiếu chưa có Stock Move (dòng sản phẩm).'
-    ) % picking.name
-
-    picking.message_post_with_source(
-        'mail.message_activity_done',
-        render_values={
-            'activity': record,
-            'feedback': feedback,
-            'display_assignee': record.user_id != env.user,
-        },
-        mail_activity_type_id=record.activity_type_id.id,
-        subtype_xmlid='mail.mt_activities',
-    )
-        ]]></field>
-    </record>
-
-    <!-- Verify Picking State After Confirmation -->
-    <record id="action_verify_picking_confirmed"
-            model="ir.actions.server">
-        <field name="name">Picking: Verify State After Confirmation</field>
-        <field name="model_id" ref="mail.model_mail_activity"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-    if record.res_model == 'stock.picking':
-        picking = env['stock.picking'].browse(record.res_id).exists()
-
-        if picking and picking.state == 'draft':
-            if not picking.move_ids:
-                env.ref('fmcg_business_automation.action_feedback_picking_missing_moves').with_context(
-                    active_model='mail.activity',
-                    active_id=record.id,
-                    active_ids=[record.id],
-                ).run()
-                
-                activity_type = env.ref(
-                    'fmcg_business_automation.mail_activity_type_picking_add_move'
-                )
-                picking.activity_schedule(
-                    activity_type_id=activity_type.id,
-                    summary='Add missing Stock Move',
-                    user_id=record.user_id.id or env.user.id,
-                )
-            else:
-                raise UserError(
-                    'Picking %s vẫn đang ở trạng thái Draft sau khi xác nhận.'
-                    % picking.name
-                )
+            activity_type = env.ref(
+                'fmcg_business_automation.mail_activity_type_picking_add_move'
+            )
+            picking.activity_schedule(
+                activity_type_id=activity_type.id,
+                summary='Add missing Stock Move',
+                user_id=record.user_id.id or env.user.id,
+            )
+        else:
+            raise UserError(
+                'Picking %s vẫn đang ở trạng thái Draft sau khi xác nhận.'
+                % picking.name
+            )
         ]]></field>
     </record>
     <!-- 3. Automation: Activity Done -> Confirm Picking -->
@@ -99,7 +63,6 @@ if picking and not picking.move_ids:
             eval="[
                 (6, 0, [
                     ref('action_confirm_draft_picking'),
-                    ref('action_verify_picking_confirmed')
                 ])
             ]"/>
     </record>
