@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- 1. Server Action: Schedule Activity On Picking Creation -->
+    <record id="action_schedule_confirm_draft_picking"
+            model="ir.actions.server">
+        <field name="name">Picking: Schedule Draft Confirmation</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+activity_type = env.ref(
+    'fmcg_business_automation.mail_activity_type_confirm_draft_picking'
+)
+
+for picking in records:
+    if picking.state == 'draft':
+        picking.activity_schedule(
+            activity_type_id=activity_type.id,
+            summary='Confirm draft stock picking',
+            user_id=env.user.id,
+        )
+        ]]></field>
+    </record>
+
+    <!-- 2. Automation: Schedule Activity On Picking Creation -->
+    <record id="automation_schedule_confirm_draft_picking"
+            model="base.automation">
+        <field name="name">Picking: Schedule Confirmation On Create</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[('state', '=', 'draft')]</field>
+        <field name="action_server_ids"
+               eval="[(4, ref('action_schedule_confirm_draft_picking'))]"/>
+    </record>
+
+</odoo>
