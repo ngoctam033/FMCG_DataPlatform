@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_validate_stock_move_demand_positive"
+            model="ir.actions.server">
+        <field name="name">Stock Move: Demand phải lớn hơn 0</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record and record.product_uom_qty <= 0:
+    raise UserError(
+        'Demand của Stock Move phải lớn hơn 0.\n'
+        'Sản phẩm: %s'
+        % record.product_id.display_name
+    )
+        ]]></field>
+    </record>
+
+    <record id="automation_stock_move_demand_positive" model="base.automation">
+        <field name="name">Stock Move: Demand luôn lớn hơn 0</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="trigger">on_create_or_write</field>
+
+        <field name="trigger_field_ids"
+               eval="[(6, 0, [ref('stock.field_stock_move__product_uom_qty')])]"/>
+
+        <field name="filter_domain">
+            [('product_uom_qty', '=', 0)]
+        </field>
+
+        <field name="action_server_ids"
+               eval="[(4, ref('action_validate_stock_move_demand_positive'))]"/>
+
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

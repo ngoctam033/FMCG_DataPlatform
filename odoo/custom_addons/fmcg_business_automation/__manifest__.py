@@ -9,6 +9,7 @@
         'base_automation',
     ],
     'data': [
+        'data/stock_move_validate_positive_demand.xml',
         'data/mail_activity_unique_active_type.xml',
         'data/stock_picking_draft_confirmation.xml',
         'data/stock_picking_schedule_draft_confirmation.xml',
