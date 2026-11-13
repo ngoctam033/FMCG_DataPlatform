@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Server Action: Validate Initial Picking State -->
+    <record id="action_check_picking_initial_state" model="ir.actions.server">
+        <field name="name">Picking: Check Initial State</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for picking in records:
+    if picking.state != 'draft':
+        raise UserError(
+            'Phiếu kho %s phải có trạng thái Draft khi được tạo mới. '
+            'Trạng thái hiện tại: %s'
+            % (picking.name, picking.state)
+        )
+        ]]></field>
+    </record>
+
+    <record id="action_schedule_picking_confirmed" model="ir.actions.server">
+        <field name="name">Picking: Schedule Confirm Activity</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id"
+            ref="fmcg_business_automation.mail_activity_type_picking_confirmed"/>
+        <field name="activity_summary">Xác nhận phiếu kho</field>
+        <field name="activity_note">Xác nhận phiếu kho để chuyển sang trạng thái Confirmed.</field>
+        <field name="activity_user_type">generic</field>
+        <field name="activity_user_id" ref="base.user_admin"/>
+    </record>
+
+    <!-- Automation: Trigger On Create -->
+    <record id="automation_check_picking_initial_state" model="base.automation">
+        <field name="name">Picking: Require Draft On Create</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="trigger">on_create</field>
+        <field name="action_server_ids"
+            eval="[
+                (4, ref('action_check_picking_initial_state')),
+                (4, ref('action_schedule_picking_confirmed'))
+            ]"/>
+    </record>
+</odoo>

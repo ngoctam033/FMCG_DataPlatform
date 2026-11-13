@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. Server Action: Not Implemented -->
+    <record id="action_picking_assigned_not_implemented"
+            model="ir.actions.server">
+        <field name="name">Picking: Assigned Not Implemented</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+raise UserError('Nghiệp vụ chưa được implement!')
+        ]]></field>
+    </record>
+
+    <!-- 2. Automation: Trigger On Assigned Activity Done -->
+    <record id="automation_picking_assigned_not_implemented"
+            model="base.automation">
+        <field name="name">Picking: Assigned Activity Not Implemented</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+               eval="[
+                   ('activity_type_id', '=', ref('fmcg_business_automation.mail_activity_type_picking_assigned')),
+                   ('res_model', '=', 'stock.picking')
+               ]"/>
+        <field name="action_server_ids"
+               eval="[(4, ref('action_picking_assigned_not_implemented'))]"/>
+    </record>
+</odoo>
