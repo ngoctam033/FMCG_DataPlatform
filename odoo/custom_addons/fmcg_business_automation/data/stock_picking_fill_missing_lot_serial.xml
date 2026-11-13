@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Activity: yêu cầu người phụ trách bổ sung Lot/Serial -->
+    <record id="mail_activity_type_picking_fill_missing_lot_serial"
+            model="mail.activity.type">
+        <field name="name">Picking: Fill Missing Lot/Serial</field>
+        <field name="summary">Fill missing Lot/Serial on stock picking</field>
+        <field name="res_model">stock.picking</field>
+        <field name="icon">fa-tags</field>
+        <field name="sequence">45</field>
+    </record>
+
+    <!-- Chưa implement nghiệp vụ khi activity được hoàn thành -->
+    <record id="action_picking_fill_missing_lot_serial"
+            model="ir.actions.server">
+        <field name="name">Picking: Process Missing Lot/Serial On Activity Done</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+picking = env['stock.picking'].browse(record.res_id).exists()
+
+raise UserError(
+    'Chưa thể hoàn tất Activity bổ sung Lot/Serial cho Picking %s. '
+    'Logic xử lý chưa được triển khai.'
+    % (picking.name if picking else record.res_id)
+)
+        ]]></field>
+    </record>
+
+    <!-- Khi activity bổ sung Lot/Serial được đánh dấu Done -->
+    <record id="automation_picking_fill_missing_lot_serial"
+            model="base.automation">
+        <field name="name">
+            Picking: Process Missing Lot/Serial On Activity Done
+        </field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+               eval="[
+                   (
+                       'activity_type_id',
+                       '=',
+                       ref('mail_activity_type_picking_fill_missing_lot_serial')
+                   ),
+                   ('res_model', '=', 'stock.picking')
+               ]"/>
+        <field name="action_server_ids"
+               eval="[
+                   (4, ref('action_picking_fill_missing_lot_serial'))
+               ]"/>
+    </record>
+
+</odoo>

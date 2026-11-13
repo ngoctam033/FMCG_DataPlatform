@@ -9,6 +9,34 @@
         <field name="icon">fa-check-square-o</field>
         <field name="sequence">40</field>
     </record>
+    <record id="action_notify_picking_missing_lot_serial"
+            model="ir.actions.server">
+        <field name="name">
+            Picking: Notify And Schedule Missing Lot/Serial
+        </field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+picking = env['stock.picking'].browse(record.res_id).exists()
+activity_type = env.ref(
+    'fmcg_business_automation.mail_activity_type_picking_fill_missing_lot_serial'
+)
+picking.message_post_with_source(
+    'fmcg_business_automation.stock_picking_missing_lot_serial_feedback',
+    render_values={
+        'picking': picking,
+    },
+    message_type='comment',
+    subtype_xmlid='mail.mt_note',
+)
+
+picking.activity_schedule(
+    activity_type_id=activity_type.id,
+    summary='Fill missing Lot/Serial',
+    user_id=record.user_id.id or env.user.id,
+)
+        ]]></field>
+    </record>
     <!-- Server Action: Validate And Verify Assigned Picking -->
     <record id="action_validate_assigned_picking"
             model="ir.actions.server">
@@ -19,14 +47,20 @@
 picking = env['stock.picking'].browse(record.res_id).exists()
 
 if picking and picking.state == 'assigned':
-    picking.button_validate()
-
-if picking and picking.state != 'done':
-    raise UserError(
-        'Picking %s chưa hoàn tất sau khi gọi button_validate(). '
-        'Trạng thái hiện tại: %s'
-        % (picking.name, picking.state)
-    )
+    if picking.filtered_domain(
+        env.ref(
+            'fmcg_business_automation.ir_filter_stock_picking_missing_lot_serial'
+        )._get_eval_domain()
+    ):
+        env.ref(
+            'fmcg_business_automation.action_notify_picking_missing_lot_serial'
+        ).with_context(
+            active_model='mail.activity',
+            active_id=record.id,
+            active_ids=[record.id],
+        ).run()
+    else:
+        picking.button_validate()
         ]]></field>
     </record>
 
