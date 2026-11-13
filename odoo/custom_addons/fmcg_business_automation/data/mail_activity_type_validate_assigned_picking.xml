@@ -9,99 +9,24 @@
         <field name="icon">fa-check-square-o</field>
         <field name="sequence">40</field>
     </record>
-
-    <!-- 2. Server Action: Validate Source Picking -->
+    <!-- Server Action: Validate And Verify Assigned Picking -->
     <record id="action_validate_assigned_picking"
             model="ir.actions.server">
-        <field name="name">Picking: Validate On Activity Done</field>
+        <field name="name">Picking: Validate And Verify On Activity Done</field>
         <field name="model_id" ref="mail.model_mail_activity"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
 picking = env['stock.picking'].browse(record.res_id).exists()
 
 if picking and picking.state == 'assigned':
-    zero_quantity_filter = env.ref(
-        'fmcg_business_automation.ir_filter_stock_picking_zero_done_quantity'
-    )
-    zero_quantity_issue = bool(env['stock.picking'].search(
-        zero_quantity_filter._get_eval_domain() + [('id', '=', picking.id)],
-        limit=1,
-    ))
-
-    missing_lot_serial_filter = env.ref(
-        'fmcg_business_automation.ir_filter_stock_picking_missing_lot_serial'
-    )
-    lot_serial_issue = env['stock.picking'].search(
-        missing_lot_serial_filter._get_eval_domain() + [('id', '=', picking.id)],
-        limit=1,
-    )
-
-    if not zero_quantity_issue and not lot_serial_issue:
-        picking.button_validate()
-        ]]></field>
-    </record>
-    <!-- 4. Server Action: Verify Picking State After Validation -->
-    <record id="action_verify_assigned_picking_validated"
-            model="ir.actions.server">
-        <field name="name">Picking: Verify State After Validation</field>
-        <field name="model_id" ref="mail.model_mail_activity"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-picking = env['stock.picking'].browse(record.res_id).exists()
+    picking.button_validate()
 
 if picking and picking.state != 'done':
-    zero_quantity_filter = env.ref(
-        'fmcg_business_automation.ir_filter_stock_picking_zero_done_quantity'
+    raise UserError(
+        'Picking %s chưa hoàn tất sau khi gọi button_validate(). '
+        'Trạng thái hiện tại: %s'
+        % (picking.name, picking.state)
     )
-    zero_quantity_issue = bool(env['stock.picking'].search(
-        zero_quantity_filter._get_eval_domain() + [('id', '=', picking.id)],
-        limit=1,
-    ))
-
-    missing_lot_serial_filter = env.ref(
-        'fmcg_business_automation.ir_filter_stock_picking_missing_lot_serial'
-    )
-    lot_serial_issue = env['stock.picking'].search(
-        missing_lot_serial_filter._get_eval_domain() + [('id', '=', picking.id)],
-        limit=1,
-    )
-
-    if zero_quantity_issue:
-        feedback = env['ir.ui.view']._render_template(
-            'fmcg_business_automation.stock_picking_zero_quantity_feedback',
-            {'picking': picking, 'activity': record},
-        )
-        picking.message_post_with_source(
-            'mail.message_activity_done',
-            render_values={
-                'activity': record,
-                'feedback': feedback,
-                'display_assignee': record.user_id != env.user,
-            },
-            mail_activity_type_id=record.activity_type_id.id,
-            subtype_xmlid='mail.mt_activities',
-        )
-    elif lot_serial_issue:
-        feedback = env['ir.ui.view']._render_template(
-            'fmcg_business_automation.stock_picking_missing_lot_serial_feedback',
-            {'picking': picking, 'activity': record},
-        )
-        picking.message_post_with_source(
-            'mail.message_activity_done',
-            render_values={
-                'activity': record,
-                'feedback': feedback,
-                'display_assignee': record.user_id != env.user,
-            },
-            mail_activity_type_id=record.activity_type_id.id,
-            subtype_xmlid='mail.mt_activities',
-        )
-    else:
-        raise UserError(
-            'Picking %s chưa hoàn tất sau khi gọi button_validate(). '
-            'Trạng thái hiện tại: %s'
-            % (picking.name, picking.state)
-        )
         ]]></field>
     </record>
 
@@ -120,7 +45,6 @@ if picking and picking.state != 'done':
             eval="[
                 (6, 0, [
                     ref('action_validate_assigned_picking'),
-                    ref('action_verify_assigned_picking_validated')
                 ])
             ]"/>
     </record>
