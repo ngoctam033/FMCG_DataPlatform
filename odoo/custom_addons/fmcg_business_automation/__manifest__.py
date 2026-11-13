@@ -15,6 +15,7 @@
         'data/stock_picking_draft_confirmation.xml',
         'data/mail_activity_type_validate_assigned_picking.xml',
         'data/stock_picking_schedule_draft_confirmation.xml',
+        'data/stock_picking_schedule_validate_on_assigned.xml',
     ],
     'installable': True,
     'application': False,
