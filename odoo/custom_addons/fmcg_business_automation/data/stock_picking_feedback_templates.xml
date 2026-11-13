@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="stock_picking_zero_quantity_feedback">
+        Không thể tự động xác nhận Picking <t t-out="picking.name"/>: số lượng Done thực tế
+        đang bằng 0. Vui lòng nhập số lượng thực nhận trong Operations rồi xác nhận lại phiếu.
+    </template>
+
+    <template id="stock_picking_missing_lot_serial_feedback">
+        Không thể tự động xác nhận Picking <t t-out="picking.name"/>:
+        Sản phẩm quản lý Lot/Serial chưa có số Lot/Serial cho số lượng thực tế.
+        Vui lòng bổ sung Lot/Serial rồi xác nhận lại phiếu.
+    </template>
+</odoo>
