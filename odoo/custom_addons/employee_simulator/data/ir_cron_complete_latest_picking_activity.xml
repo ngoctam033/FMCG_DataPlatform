@@ -4,26 +4,39 @@
         <field name="name">Picking Simulator: Complete Latest Activity</field>
         <field name="model_id" ref="stock.model_stock_picking"/>
         <field name="state">code</field>
-    <field name="code"><![CDATA[
+        <field name="code"><![CDATA[
 activity_type_ids = env['ir.model.data'].search([
     ('module', '=', 'fmcg_business_automation'),
     ('model', '=', 'mail.activity.type'),
 ]).mapped('res_id')
 
-for picking in env['stock.picking'].search([
-    ('activity_ids', 'any', [
-        ('activity_type_id', 'in', activity_type_ids),
-    ]),
-], limit=200, order='create_date asc, id asc'):
+pickings = env['stock.picking'].search([
+    ('state', 'not in', ['done', 'cancel']),
+], limit=50, order='create_date asc, id asc')
 
+for picking in pickings:
     activity = env['mail.activity'].search([
         ('res_model', '=', 'stock.picking'),
         ('res_id', '=', picking.id),
         ('activity_type_id', 'in', activity_type_ids),
     ], order='create_date desc, id desc', limit=1)
 
-    if activity:
-        activity.action_feedback()
+    if not activity:
+        if picking.state == 'draft':
+            env.ref(
+                'fmcg_business_automation.action_schedule_picking_confirmed'
+            ).with_context(
+                active_model='stock.picking',
+                active_id=picking.id,
+                active_ids=picking.ids,
+            ).run()
+            continue
+        raise UserError(
+            'Picking %s (state: %s) chưa hoàn tất nhưng không có Activity để xử lý.'
+            % (picking.name, picking.state)
+        )
+
+    activity.action_feedback()
     ]]></field>
         <field name="interval_number">5</field>
         <field name="interval_type">minutes</field>
