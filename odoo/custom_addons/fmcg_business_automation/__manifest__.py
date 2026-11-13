@@ -9,6 +9,7 @@
         'base_automation',
     ],
     'data': [
+        'data/mail_activity_unique_active_type.xml',
         'data/stock_picking_draft_confirmation.xml',
     ],
     'installable': True,
