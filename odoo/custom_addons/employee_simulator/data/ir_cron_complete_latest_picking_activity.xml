@@ -22,15 +22,6 @@ for picking in pickings:
     ], order='create_date desc, id desc', limit=1)
 
     if not activity:
-        if picking.state == 'draft':
-            env.ref(
-                'fmcg_business_automation.action_schedule_picking_confirmed'
-            ).with_context(
-                active_model='stock.picking',
-                active_id=picking.id,
-                active_ids=picking.ids,
-            ).run()
-            continue
         raise UserError(
             'Picking %s (state: %s) chưa hoàn tất nhưng không có Activity để xử lý.'
             % (picking.name, picking.state)
