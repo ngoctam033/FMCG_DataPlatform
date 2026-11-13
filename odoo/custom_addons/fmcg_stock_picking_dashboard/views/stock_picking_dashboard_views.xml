@@ -52,32 +52,6 @@ if len(records) == 1:
                         ('move_line_ids', '=', False)
                     ]"
                 />
-                <filter name="dashboard_missing_lot_serial"
-                        string="Thiếu Lot/Serial"
-                        domain="[
-                                ('activity_ids.activity_type_id', '=', %(fmcg_business_automation.mail_activity_type_picking_assigned)d),
-                                ('activity_ids', 'not any', [
-                                    ('activity_type_id', '=', %(fmcg_business_automation.mail_activity_type_picking_missing_lot_serial)d),
-                                ]),
-                                ('state', 'not in', ['draft', 'done', 'cancel']),
-                                '|',
-                                    '&amp;',
-                                        ('picking_type_id.use_create_lots', '=', True),
-                                        ('move_line_ids', 'any', [
-                                            ('product_id.tracking', 'in', ['lot', 'serial']),
-                                            ('quantity', '>', 0),
-                                            ('lot_id', '=', False),
-                                            ('lot_name', '=', False),
-                                        ]),
-                                    '&amp;', '&amp;',
-                                        ('picking_type_id.use_create_lots', '=', False),
-                                        ('picking_type_id.use_existing_lots', '=', True),
-                                        ('move_line_ids', 'any', [
-                                            ('product_id.tracking', 'in', ['lot', 'serial']),
-                                            ('quantity', '>', 0),
-                                            ('lot_id', '=', False),
-                                        ]),
-                            ]"/>
                 <filter
                     name="missing_lot_serial"
                     string="Cần tạo Lot/Serial"

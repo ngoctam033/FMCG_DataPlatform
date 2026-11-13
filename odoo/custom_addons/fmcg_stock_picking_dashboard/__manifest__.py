@@ -3,7 +3,7 @@
     "version": "19.0.1.0.0",
     "category": "Inventory/Inventory",
     "summary": "Operational dashboard for transfers waiting at each processing stage",
-    "depends": ["stock"],
+    "depends": ["stock", "fmcg_business_automation"],
     "data": [
         'views/stock_picking_bulk_activity_action.xml',
         "views/stock_picking_dashboard_views.xml",
