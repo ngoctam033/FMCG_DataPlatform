@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- 1. Server Action: Schedule Assigned Activity -->
-    <record id="action_schedule_picking_assigned"
-            model="ir.actions.server">
-        <field name="name">Picking: Schedule Assigned Activity</field>
-        <field name="model_id" ref="stock.model_stock_picking"/>
-        <field name="state">next_activity</field>
-        <field name="activity_type_id"
-               ref="fmcg_business_automation.mail_activity_type_picking_assigned"/>
-        <field name="activity_summary">Xử lý phiếu kho sẵn sàng</field>
-        <field name="activity_user_type">specific</field>
-        <field name="activity_user_id" ref="base.user_admin"/>
-    </record>
-
-    <!-- 2. Automation: Trigger When Picking Becomes Assigned -->
+    <!-- Automation: Trigger When Picking Becomes Assigned -->
     <record id="automation_schedule_picking_assigned"
             model="base.automation">
         <field name="name">Picking: Schedule Activity When Assigned</field>
