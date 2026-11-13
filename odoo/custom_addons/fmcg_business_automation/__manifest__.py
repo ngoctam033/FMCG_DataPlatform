@@ -11,6 +11,7 @@
     'data': [
         'data/stock_picking_activity_duplicate_guard.xml',
         'data/stock_picking_state_activity_types.xml',
+        'data/stock_picking_assign_activity.xml',
         'data/stock_picking_assigned_activity_automation.xml',
         'data/stock_picking_initial_state_automation.xml',
         'data/stock_picking_confirm_automation.xml',

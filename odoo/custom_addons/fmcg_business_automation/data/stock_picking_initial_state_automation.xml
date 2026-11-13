@@ -36,7 +36,7 @@ for picking in records:
         <field name="action_server_ids"
             eval="[
                 (4, ref('action_check_picking_initial_state')),
-                (4, ref('action_schedule_picking_confirmed'))
+                (4, ref('action_schedule_picking_assigned'))
             ]"/>
     </record>
 </odoo>
