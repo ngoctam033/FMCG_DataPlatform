@@ -9,6 +9,7 @@
         'base_automation',
     ],
     'data': [
+        'data/stock_picking_state_activity_types.xml',
     ],
     'installable': True,
     'application': False,
