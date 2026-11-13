@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- 1. Activity Type: Add Missing Stock Move -->
+    <record id="mail_activity_type_picking_add_move"
+            model="mail.activity.type">
+        <field name="name">Picking: Add Missing Move</field>
+        <field name="summary">Add a product to the picking</field>
+        <field name="res_model">stock.picking</field>
+        <field name="icon">fa-plus-square</field>
+        <field name="sequence">15</field>
+    </record>
+
+    <!-- 2. Server Action: Generate Random Stock Move -->
+    <record id="action_picking_generate_missing_move"
+            model="ir.actions.server">
+        <field name="name">Picking: Generate Missing Stock Move</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+picking = env['stock.picking'].browse(record.res_id).exists()
+
+if picking and picking.state == 'draft' and not picking.move_ids:
+    products = env['product.product'].search([
+        '&',
+        '|',
+        ('company_id', '=', False),
+        ('company_id', 'parent_of', picking.company_id.id),
+        ('type', '=', 'consu'),
+    ])
+
+    product = products[
+        (picking.id + record.id) % len(products)
+    ]
+    random_qty = ((picking.id * 37 + record.id * 17) % 100) + 1
+    picking.with_company(picking_company).write({
+        'move_ids': [
+            (0, 0, {
+                'product_id': product.id,
+                'product_uom_qty': random_qty,
+            })
+        ]
+    })
+        ]]></field>
+    </record>
+
+    <!-- 3. Automation: Add Move On Activity Done -->
+    <record id="automation_picking_generate_missing_move"
+            model="base.automation">
+        <field name="name">Picking: Generate Missing Move On Activity Done</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+               eval="[
+                   ('activity_type_id', '=', ref('mail_activity_type_picking_add_move')),
+                   ('res_model', '=', 'stock.picking')
+               ]"/>
+        <field name="action_server_ids"
+               eval="[(4, ref('action_picking_generate_missing_move'))]"/>
+    </record>
+
+</odoo>
