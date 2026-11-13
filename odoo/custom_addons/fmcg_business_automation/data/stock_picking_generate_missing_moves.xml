@@ -33,7 +33,7 @@ if picking and picking.state == 'draft' and not picking.move_ids:
         (picking.id + record.id) % len(products)
     ]
     random_qty = ((picking.id * 37 + record.id * 17) % 100) + 1
-    picking.with_company(picking_company).write({
+    picking.with_company(picking.company_id).write({
         'move_ids': [
             (0, 0, {
                 'product_id': product.id,
