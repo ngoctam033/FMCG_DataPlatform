@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- 1. Activity Type: Confirm Draft Picking -->
+    <record id="mail_activity_type_confirm_draft_picking" model="mail.activity.type">
+        <field name="name">Picking: Confirm Draft</field>
+        <field name="summary">Confirm draft stock picking</field>
+        <field name="res_model">stock.picking</field>
+        <field name="icon">fa-check-circle</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <!-- 2. Server Action: Confirm Source Picking -->
+    <record id="action_confirm_draft_picking"
+            model="ir.actions.server">
+        <field name="name">Picking: Confirm Draft On Activity Done</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+picking = env['stock.picking'].browse(record.res_id).exists()
+
+if picking and picking.state == 'draft':
+    picking.action_confirm()
+        ]]></field>
+    </record>
+    <!-- Verify Picking State After Confirmation -->
+    <record id="action_verify_picking_confirmed"
+            model="ir.actions.server">
+        <field name="name">Picking: Verify State After Confirmation</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+    if record.res_model == 'stock.picking':
+        picking = env['stock.picking'].browse(record.res_id).exists()
+
+        if picking and picking.state == 'draft':
+            raise UserError(
+                'Picking %s vẫn đang ở trạng thái Draft sau khi xác nhận.'
+                % picking.name
+            )
+        ]]></field>
+    </record>
+    <!-- 3. Automation: Activity Done -> Confirm Picking -->
+    <record id="automation_confirm_draft_picking"
+            model="base.automation">
+        <field name="name">Picking: Confirm Draft On Activity Done</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+               eval="[
+                   ('activity_type_id', '=', ref('mail_activity_type_confirm_draft_picking')),
+                   ('res_model', '=', 'stock.picking')
+               ]"/>
+        <field name="action_server_ids"
+            eval="[
+                (6, 0, [
+                    ref('action_confirm_draft_picking'),
+                    ref('action_verify_picking_confirmed')
+                ])
+            ]"/>
+    </record>
+</odoo>

@@ -9,6 +9,7 @@
         'base_automation',
     ],
     'data': [
+        'data/stock_picking_draft_confirmation.xml',
     ],
     'installable': True,
     'application': False,
