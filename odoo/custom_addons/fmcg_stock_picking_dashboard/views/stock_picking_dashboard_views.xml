@@ -40,11 +40,9 @@ if len(records) == 1:
                 <field name="user_id"/>
                 <field name="activity_user_id" string="Activity của"/>
                 <field name="activity_type_id" string="Loại activity"/>
-                <filter name="dashboard_activity_overdue" string="Activity quá hạn"
-                        domain="[
-                            ('state', 'not in', ('done', 'cancel')),
-                            ('activity_state', '=', 'overdue')
-                        ]"/>
+                <filter name="dashboard_no_activity"
+                        string="Chưa gắn Activity"
+                        domain="[('activity_ids', '=', False)]"/>
                 <filter
                     name="dashboard_missing_moves"
                     string="Thiếu dòng sản phẩm"
@@ -57,13 +55,13 @@ if len(records) == 1:
                 <filter name="dashboard_missing_lot_serial"
                         string="Thiếu Lot/Serial"
                         domain="[
-                                ('activity_ids.activity_type_id', '=', env.ref('fmcg_business_automation.mail_activity_type_picking_assigned').id),
+                                ('activity_ids.activity_type_id', '=', %(fmcg_business_automation.mail_activity_type_picking_assigned)d),
                                 ('activity_ids', 'not any', [
-                                    ('activity_type_id', '=', env.ref('fmcg_business_automation.mail_activity_type_picking_missing_lot_serial').id),
+                                    ('activity_type_id', '=', %(fmcg_business_automation.mail_activity_type_picking_missing_lot_serial)d),
                                 ]),
                                 ('state', 'not in', ['draft', 'done', 'cancel']),
                                 '|',
-                                    '&',
+                                    '&amp;',
                                         ('picking_type_id.use_create_lots', '=', True),
                                         ('move_line_ids', 'any', [
                                             ('product_id.tracking', 'in', ['lot', 'serial']),
@@ -71,7 +69,7 @@ if len(records) == 1:
                                             ('lot_id', '=', False),
                                             ('lot_name', '=', False),
                                         ]),
-                                    '&', '&',
+                                    '&amp;', '&amp;',
                                         ('picking_type_id.use_create_lots', '=', False),
                                         ('picking_type_id.use_existing_lots', '=', True),
                                         ('move_line_ids', 'any', [
@@ -116,7 +114,7 @@ if len(records) == 1:
                   delete="0"
                   duplicate="0"
                   multi_edit="1"
-                  default_order="priority desc, scheduled_date asc, id desc"
+                  default_order="create_date asc, id asc"
                   decoration-danger="state in ('confirmed', 'waiting') and products_availability_state == 'late'"
                   decoration-warning="state in ('confirmed', 'waiting')"
                   decoration-muted="state == 'draft'">
