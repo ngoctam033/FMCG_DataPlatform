@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mail_activity_type_fill_done_quantity"
+            model="mail.activity.type">
+        <field name="name">Picking: Fill Done Quantity</field>
+        <field name="summary">Nhập số lượng thực tế</field>
+        <field name="res_model">stock.picking</field>
+        <field name="icon">fa-calculator</field>
+        <field name="sequence">50</field>
+    </record>
+
+    <record id="action_fill_done_quantity"
+            model="ir.actions.server">
+        <field name="name">Picking: Fill Random Done Quantity</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+picking = env['stock.picking'].browse(record.res_id).exists()
+
+if picking:
+    for move in picking.move_ids.filtered(
+        lambda m: m.state not in ('done', 'cancel')
+    ):
+        max_quantity = int(move.product_uom_qty)
+
+        if max_quantity <= 0:
+            max_quantity = 1
+
+        seed = int(time.time()) + picking.id + move.id
+        quantity = (seed % max_quantity) + 1
+
+        # Guard cuối cùng
+        quantity = max(1, quantity)
+
+        move.write({
+            'quantity': quantity,
+        })
+    activity_type = env.ref(
+        'fmcg_business_automation.mail_activity_type_validate_assigned_picking'
+    )
+    picking.activity_schedule(
+        activity_type_id=activity_type.id,
+        summary='Validate assigned stock picking',
+        user_id=env.user.id,
+    )
+        ]]></field>
+    </record>
+
+    <record id="automation_fill_done_quantity_on_activity_done"
+            model="base.automation">
+        <field name="name">
+            Picking: Fill Done Quantity On Activity Done
+        </field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+               eval="[
+                   ('activity_type_id', '=', ref('mail_activity_type_fill_done_quantity')),
+                   ('res_model', '=', 'stock.picking')
+               ]"/>
+        <field name="action_server_ids"
+               eval="[
+                   (4, ref('action_fill_done_quantity'))
+               ]"/>
+    </record>
+
+</odoo>

@@ -13,6 +13,7 @@
         'data/ir_filter_stock_picking_missing_lot_serial.xml',
         'data/stock_picking_feedback_templates.xml',
         'data/mail_activity_unique_active_type.xml',
+        'data/stock_picking_fill_done_quantity_activity.xml',
         'data/stock_picking_generate_missing_moves.xml',
         'data/stock_picking_draft_confirmation.xml',
         'data/stock_picking_fill_missing_lot_serial.xml',

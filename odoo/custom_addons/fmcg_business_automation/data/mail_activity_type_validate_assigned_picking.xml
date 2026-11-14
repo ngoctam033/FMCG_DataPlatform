@@ -37,6 +37,38 @@ picking.activity_schedule(
 )
         ]]></field>
     </record>
+
+    <record id="action_notify_picking_fill_done_quantity"
+            model="ir.actions.server">
+        <field name="name">
+            Picking: Notify And Schedule Fill Done Quantity
+        </field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+picking = env['stock.picking'].browse(record.res_id).exists()
+
+activity_type = env.ref(
+    'fmcg_business_automation.mail_activity_type_fill_done_quantity'
+)
+
+picking.message_post_with_source(
+    'fmcg_business_automation.stock_picking_zero_quantity_feedback',
+    render_values={
+        'picking': picking,
+    },
+    message_type='comment',
+    subtype_xmlid='mail.mt_note',
+)
+
+picking.activity_schedule(
+    activity_type_id=activity_type.id,
+    summary='Fill Done Quantity',
+    user_id=record.user_id.id or env.user.id,
+)
+        ]]></field>
+    </record>
+
     <!-- Server Action: Validate And Verify Assigned Picking -->
     <record id="action_validate_assigned_picking"
             model="ir.actions.server">
@@ -47,6 +79,14 @@ picking.activity_schedule(
 picking = env['stock.picking'].browse(record.res_id).exists()
 
 if picking and picking.state == 'assigned':
+    zero_quantity_filter = env.ref(
+        'fmcg_business_automation.ir_filter_stock_picking_zero_done_quantity'
+    )
+    zero_quantity_issue = bool(env['stock.picking'].search(
+        zero_quantity_filter._get_eval_domain() + [('id', '=', picking.id)],
+        limit=1,
+    ))
+
     if picking.filtered_domain(
         env.ref(
             'fmcg_business_automation.ir_filter_stock_picking_missing_lot_serial'
