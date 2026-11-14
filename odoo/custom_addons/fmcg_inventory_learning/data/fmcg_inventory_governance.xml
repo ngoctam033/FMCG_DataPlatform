@@ -1,0 +1,579 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        FMCG inventory governance loaded last.
+
+        Reusable definitions are shared across companies. Operational records
+        (warehouses, locations, routes and orderpoints) remain company-specific.
+        Functions are intentional here because several source records were
+        originally installed with noupdate="1" and must also be corrected on
+        existing databases.
+    -->
+    <data noupdate="0">
+        <!-- ============================================================ -->
+        <!-- SHARED MULTI-COMPANY MASTER DATA                             -->
+        <!-- ============================================================ -->
+        <function model="stock.package.type" name="write">
+            <value eval="[ref('package_type_fmcg_carton')]"/>
+            <value eval="{'company_id': False, 'barcode': 'FMCG-PKG-CARTON', 'sequence_code': 'FMCG-CAR-'}"/>
+        </function>
+        <function model="stock.package.type" name="write">
+            <value eval="[ref('package_type_fmcg_shrink_wrap')]"/>
+            <value eval="{'company_id': False, 'barcode': 'FMCG-PKG-SHRINK', 'sequence_code': 'FMCG-SHR-'}"/>
+        </function>
+        <function model="stock.package.type" name="write">
+            <value eval="[ref('package_type_fmcg_euro_pallet')]"/>
+            <value eval="{'company_id': False, 'barcode': 'FMCG-PKG-PALLET', 'sequence_code': 'FMCG-PAL-'}"/>
+        </function>
+        <function model="stock.package.type" name="write">
+            <value eval="[ref('package_type_fmcg_picking_tote')]"/>
+            <value eval="{'company_id': False, 'barcode': 'FMCG-PKG-TOTE', 'sequence_code': 'FMCG-TOT-'}"/>
+        </function>
+        <function model="stock.package.type" name="write">
+            <value eval="[ref('package_type_fmcg_thermal_box')]"/>
+            <value eval="{'company_id': False, 'barcode': 'FMCG-PKG-THERMAL', 'sequence_code': 'FMCG-THM-'}"/>
+        </function>
+
+        <function model="stock.storage.category" name="write">
+            <value eval="[
+                ref('storage_category_food_grade'),
+                ref('storage_category_finished_goods'),
+                ref('storage_category_packaging'),
+                ref('storage_category_chemical'),
+                ref('storage_category_cold'),
+                ref('storage_category_frozen'),
+            ]"/>
+            <value eval="{'company_id': False}"/>
+        </function>
+
+        <!-- Products and vendors are shared, so their price lists must also be
+             visible to both the Holding and the operating company. -->
+        <function model="product.supplierinfo" name="write">
+            <value eval="[
+                ref('supplierinfo_product_rm_purified_water'),
+                ref('supplierinfo_product_rm_wheat_flour'),
+                ref('supplierinfo_product_rm_seasoning'),
+                ref('supplierinfo_product_rm_potato'),
+                ref('supplierinfo_product_rm_veg_oil'),
+                ref('supplierinfo_product_rm_cleaning_base'),
+                ref('supplierinfo_product_rm_chili_paste'),
+                ref('supplierinfo_product_pm_bottle_generic'),
+                ref('supplierinfo_product_pm_can_330'),
+                ref('supplierinfo_product_pm_pouch_generic'),
+                ref('supplierinfo_product_trade_tissue_10'),
+                ref('supplierinfo_product_trade_toothpaste_180'),
+                ref('supplierinfo_product_trade_shampoo_650'),
+                ref('supplierinfo_product_trade_shower_gel_500'),
+                ref('supplierinfo_product_trade_handwash_500'),
+                ref('supplierinfo_product_trade_floor_cleaner_1l'),
+                ref('supplierinfo_product_trade_fabric_softener_2l'),
+                ref('supplierinfo_product_trade_coffee_3in1_20'),
+                ref('supplierinfo_product_trade_biscuit_300'),
+                ref('supplierinfo_product_trade_fish_sauce_750'),
+                ref('supplierinfo_product_frozen_dumpling_500'),
+                ref('supplierinfo_product_frozen_icecream_450'),
+                ref('supplierinfo_specialist_product_rm_wheat_flour'),
+                ref('supplierinfo_specialist_product_rm_seasoning'),
+                ref('supplierinfo_specialist_product_rm_potato'),
+                ref('supplierinfo_specialist_product_rm_veg_oil'),
+                ref('supplierinfo_specialist_product_rm_chili_paste'),
+                ref('supplierinfo_specialist_product_rm_cleaning_base'),
+                ref('supplierinfo_specialist_product_pm_bottle_generic'),
+                ref('supplierinfo_specialist_product_pm_can_330'),
+                ref('supplierinfo_specialist_product_pm_pouch_generic'),
+                ref('supplierinfo_specialist_product_trade_tissue_10'),
+                ref('supplierinfo_specialist_product_trade_toothpaste_180'),
+                ref('supplierinfo_specialist_product_trade_shampoo_650'),
+                ref('supplierinfo_specialist_product_trade_shower_gel_500'),
+                ref('supplierinfo_specialist_product_trade_handwash_500'),
+                ref('supplierinfo_specialist_product_trade_floor_cleaner_1l'),
+                ref('supplierinfo_specialist_product_trade_fabric_softener_2l'),
+                ref('supplierinfo_specialist_product_trade_coffee_3in1_20'),
+                ref('supplierinfo_specialist_product_trade_biscuit_300'),
+                ref('supplierinfo_specialist_product_trade_fish_sauce_750'),
+                ref('supplierinfo_specialist_product_frozen_dumpling_500'),
+                ref('supplierinfo_specialist_product_frozen_icecream_450'),
+            ]"/>
+            <value eval="{'company_id': False}"/>
+        </function>
+
+        <!-- Every category below contains lot-tracked products with expiration
+             dates, therefore FEFO is the mandatory removal policy. -->
+        <function model="product.category" name="write">
+            <value eval="[
+                ref('product_category_fmcg_milk'),
+                ref('product_category_fmcg_instant_food'),
+                ref('product_category_fmcg_snack'),
+                ref('product_category_fmcg_condiment'),
+                ref('product_category_fmcg_frozen'),
+                ref('product_category_fmcg_raw_material'),
+                ref('product_category_fmcg_cosmetics'),
+                ref('product_category_fmcg_consumables'),
+            ]"/>
+            <value eval="{'removal_strategy_id': ref('product_expiry.removal_fefo')}"/>
+        </function>
+
+        <!-- ============================================================ -->
+        <!-- FAC STORAGE ZONING, BARCODE AND CYCLE COUNT                  -->
+        <!-- ============================================================ -->
+        <record id="location_raw_material" model="stock.location">
+            <field name="barcode">FAC-RM</field>
+            <field name="cyclic_inventory_frequency">30</field>
+        </record>
+        <record id="location_raw_material_dry" model="stock.location">
+            <field name="barcode">FAC-RM-DRY</field>
+            <field name="cyclic_inventory_frequency">30</field>
+            <field name="storage_category_id" ref="storage_category_food_grade"/>
+        </record>
+        <record id="location_raw_material_chilled" model="stock.location">
+            <field name="barcode">FAC-RM-COLD</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_cold"/>
+        </record>
+        <record id="location_raw_material_packaging" model="stock.location">
+            <field name="barcode">FAC-RM-PACK</field>
+            <field name="cyclic_inventory_frequency">30</field>
+            <field name="storage_category_id" ref="storage_category_packaging"/>
+        </record>
+        <record id="location_raw_material_chemical" model="stock.location">
+            <field name="name">Chemical Raw Materials</field>
+            <field name="location_id" ref="location_raw_material"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">FAC-RM-CHEM</field>
+            <field name="cyclic_inventory_frequency">14</field>
+            <field name="storage_category_id" ref="storage_category_chemical"/>
+        </record>
+
+        <record id="location_finished_goods" model="stock.location">
+            <field name="barcode">FAC-FG</field>
+            <field name="cyclic_inventory_frequency">30</field>
+        </record>
+        <record id="location_factory_finished_goods_chilled" model="stock.location">
+            <field name="barcode">FAC-FG-COLD</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_cold"/>
+        </record>
+        <record id="location_factory_finished_goods_dry" model="stock.location">
+            <field name="barcode">FAC-FG-DRY</field>
+            <field name="cyclic_inventory_frequency">14</field>
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_factory_finished_goods_frozen" model="stock.location">
+            <field name="name">Frozen Finished Goods</field>
+            <field name="location_id" ref="location_finished_goods"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">FAC-FG-FROZEN</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_frozen"/>
+        </record>
+        <record id="location_factory_finished_goods_non_food" model="stock.location">
+            <field name="name">Non-Food Finished Goods</field>
+            <field name="location_id" ref="location_finished_goods"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">FAC-FG-NONFOOD</field>
+            <field name="cyclic_inventory_frequency">14</field>
+            <field name="storage_category_id" ref="storage_category_chemical"/>
+        </record>
+        <record id="location_promotional_goods" model="stock.location">
+            <field name="barcode">FAC-FG-PROMO</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+
+        <record id="location_returns" model="stock.location">
+            <field name="barcode">FAC-RETURN</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+        <record id="location_return_inspection" model="stock.location">
+            <field name="barcode">FAC-RETURN-QC</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+        <record id="location_factory_quarantine" model="stock.location">
+            <field name="barcode">FAC-QUARANTINE</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+        <record id="location_damaged_goods" model="stock.location">
+            <field name="barcode">FAC-DAMAGED</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+        <record id="location_fmcg_scrap" model="stock.location">
+            <field name="barcode">FAC-SCRAP</field>
+        </record>
+
+        <record id="location_fac_bulk_storage" model="stock.location">
+            <field name="barcode">FAC-BULK</field>
+            <field name="cyclic_inventory_frequency">30</field>
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_fac_picking_area" model="stock.location">
+            <field name="barcode">FAC-PICK</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_fac_bulk_a01_r01_b01" model="stock.location">
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_fac_bulk_a01_r01_b02" model="stock.location">
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_fac_picking_p01" model="stock.location">
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_fac_picking_p02" model="stock.location">
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+
+        <record id="location_quarantine_inspection" model="stock.location">
+            <field name="barcode">FAC-QUAR-QC</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+        <record id="location_near_expiry" model="stock.location">
+            <field name="barcode">FAC-NEAR-EXP</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_promotion_clearance" model="stock.location">
+            <field name="barcode">FAC-PROMO-CLEAR</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_recall_receiving" model="stock.location">
+            <field name="barcode">FAC-RECALL-IN</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+        <record id="location_recall_quarantine" model="stock.location">
+            <field name="barcode">FAC-RECALL-HOLD</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+        <record id="location_returnable_packaging" model="stock.location">
+            <field name="barcode">FAC-PKG-RETURN</field>
+            <field name="cyclic_inventory_frequency">14</field>
+            <field name="storage_category_id" ref="storage_category_packaging"/>
+        </record>
+        <record id="location_packaging_inspection" model="stock.location">
+            <field name="barcode">FAC-PKG-QC</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_packaging"/>
+        </record>
+        <record id="location_packaging_clean" model="stock.location">
+            <field name="barcode">FAC-PKG-CLEAN</field>
+            <field name="cyclic_inventory_frequency">14</field>
+            <field name="storage_category_id" ref="storage_category_packaging"/>
+        </record>
+        <record id="location_packaging_repair" model="stock.location">
+            <field name="barcode">FAC-PKG-REPAIR</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_packaging"/>
+        </record>
+        <record id="location_recall_inspection" model="stock.location">
+            <field name="barcode">FAC-RECALL-QC</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+        <record id="location_damage_inspection" model="stock.location">
+            <field name="barcode">FAC-DAMAGE-QC</field>
+            <field name="cyclic_inventory_frequency">7</field>
+        </record>
+        <record id="location_fac_rework" model="stock.location">
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_fac_repacking" model="stock.location">
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_fac_relabeling" model="stock.location">
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+
+        <!-- FAC category and product putaway rules. Food, frozen and non-food
+             products are physically segregated after QC release. -->
+        <record id="putaway_rule_factory_milk_cold" model="stock.putaway.rule">
+            <field name="location_out_id" ref="location_factory_finished_goods_dry"/>
+        </record>
+        <record id="putaway_rule_frozen_cold" model="stock.putaway.rule">
+            <field name="location_out_id" ref="location_factory_finished_goods_frozen"/>
+        </record>
+        <record id="putaway_rule_factory_cosmetics_dry" model="stock.putaway.rule">
+            <field name="location_out_id" ref="location_factory_finished_goods_non_food"/>
+        </record>
+        <record id="putaway_rule_factory_instant_food_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="location_out_id" ref="location_factory_finished_goods_dry"/>
+            <field name="category_id" ref="product_category_fmcg_instant_food"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rule_factory_snack_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="location_out_id" ref="location_factory_finished_goods_dry"/>
+            <field name="category_id" ref="product_category_fmcg_snack"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rule_factory_condiment_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="location_out_id" ref="location_factory_finished_goods_dry"/>
+            <field name="category_id" ref="product_category_fmcg_condiment"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rule_factory_home_care_non_food" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="location_out_id" ref="location_factory_finished_goods_non_food"/>
+            <field name="category_id" ref="product_category_fmcg_consumables"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rule_factory_cleaning_base_chemical" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock')]"/>
+            <field name="location_out_id" ref="location_raw_material_chemical"/>
+            <field name="product_id" model="product.product" search="[('default_code', '=', 'RM-CLEANING-BASE')]"/>
+            <field name="sequence">1</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- CDC AND RDC TEMPERATURE / PRODUCT SEGREGATION                -->
+        <!-- ============================================================ -->
+        <record id="location_cdc_dry_goods" model="stock.location">
+            <field name="name">Dry Goods</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">CDC-ZONE-DRY</field>
+            <field name="cyclic_inventory_frequency">14</field>
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_cdc_frozen_goods" model="stock.location">
+            <field name="name">Frozen Goods</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">CDC-ZONE-FROZEN</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_frozen"/>
+        </record>
+        <record id="location_cdc_non_food" model="stock.location">
+            <field name="name">Non-Food Goods</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">CDC-ZONE-NONFOOD</field>
+            <field name="cyclic_inventory_frequency">14</field>
+            <field name="storage_category_id" ref="storage_category_chemical"/>
+        </record>
+
+        <record id="location_rdcn_dry_goods" model="stock.location">
+            <field name="name">Dry Goods</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'RDCN/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">RDCN-ZONE-DRY</field>
+            <field name="cyclic_inventory_frequency">14</field>
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_rdcn_frozen_goods" model="stock.location">
+            <field name="name">Frozen Goods</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'RDCN/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">RDCN-ZONE-FROZEN</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_frozen"/>
+        </record>
+        <record id="location_rdcn_non_food" model="stock.location">
+            <field name="name">Non-Food Goods</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'RDCN/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">RDCN-ZONE-NONFOOD</field>
+            <field name="cyclic_inventory_frequency">14</field>
+            <field name="storage_category_id" ref="storage_category_chemical"/>
+        </record>
+
+        <record id="location_rdcs_dry_goods" model="stock.location">
+            <field name="name">Dry Goods</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'RDCS/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">RDCS-ZONE-DRY</field>
+            <field name="cyclic_inventory_frequency">14</field>
+            <field name="storage_category_id" ref="storage_category_finished_goods"/>
+        </record>
+        <record id="location_rdcs_frozen_goods" model="stock.location">
+            <field name="name">Frozen Goods</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'RDCS/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">RDCS-ZONE-FROZEN</field>
+            <field name="cyclic_inventory_frequency">7</field>
+            <field name="storage_category_id" ref="storage_category_frozen"/>
+        </record>
+        <record id="location_rdcs_non_food" model="stock.location">
+            <field name="name">Non-Food Goods</field>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'RDCS/Stock')]"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="barcode">RDCS-ZONE-NONFOOD</field>
+            <field name="cyclic_inventory_frequency">14</field>
+            <field name="storage_category_id" ref="storage_category_chemical"/>
+        </record>
+
+        <!-- Parent Food goes to dry storage; the exact Frozen category wins
+             because Odoo prioritizes the most specific putaway category. -->
+        <record id="putaway_cdc_food_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="location_out_id" ref="location_cdc_dry_goods"/>
+            <field name="category_id" ref="product_category_fmcg_food"/>
+            <field name="sequence">20</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_cdc_frozen" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="location_out_id" ref="location_cdc_frozen_goods"/>
+            <field name="category_id" ref="product_category_fmcg_frozen"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_cdc_cosmetics_non_food" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="location_out_id" ref="location_cdc_non_food"/>
+            <field name="category_id" ref="product_category_fmcg_cosmetics"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_cdc_home_care_non_food" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="location_out_id" ref="location_cdc_non_food"/>
+            <field name="category_id" ref="product_category_fmcg_consumables"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_cdc_trading_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="location_out_id" ref="location_cdc_dry_goods"/>
+            <field name="category_id" ref="product_category_fmcg_trading"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_cdc_packaging_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock')]"/>
+            <field name="location_out_id" ref="location_cdc_dry_goods"/>
+            <field name="category_id" ref="product_category_fmcg_packaging"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+
+        <record id="putaway_rdcn_food_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCN/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcn_dry_goods"/>
+            <field name="category_id" ref="product_category_fmcg_food"/>
+            <field name="sequence">20</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rdcn_frozen" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCN/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcn_frozen_goods"/>
+            <field name="category_id" ref="product_category_fmcg_frozen"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rdcn_cosmetics_non_food" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCN/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcn_non_food"/>
+            <field name="category_id" ref="product_category_fmcg_cosmetics"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rdcn_home_care_non_food" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCN/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcn_non_food"/>
+            <field name="category_id" ref="product_category_fmcg_consumables"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rdcn_trading_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCN/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcn_dry_goods"/>
+            <field name="category_id" ref="product_category_fmcg_trading"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rdcn_packaging_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCN/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcn_dry_goods"/>
+            <field name="category_id" ref="product_category_fmcg_packaging"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+
+        <record id="putaway_rdcs_food_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCS/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcs_dry_goods"/>
+            <field name="category_id" ref="product_category_fmcg_food"/>
+            <field name="sequence">20</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rdcs_frozen" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCS/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcs_frozen_goods"/>
+            <field name="category_id" ref="product_category_fmcg_frozen"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rdcs_cosmetics_non_food" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCS/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcs_non_food"/>
+            <field name="category_id" ref="product_category_fmcg_cosmetics"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rdcs_home_care_non_food" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCS/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcs_non_food"/>
+            <field name="category_id" ref="product_category_fmcg_consumables"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rdcs_trading_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCS/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcs_dry_goods"/>
+            <field name="category_id" ref="product_category_fmcg_trading"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+        <record id="putaway_rdcs_packaging_dry" model="stock.putaway.rule">
+            <field name="location_in_id" model="stock.location" search="[('complete_name', '=', 'RDCS/Stock')]"/>
+            <field name="location_out_id" ref="location_rdcs_dry_goods"/>
+            <field name="category_id" ref="product_category_fmcg_packaging"/>
+            <field name="sequence">10</field>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- EXPLICIT INTER-WAREHOUSE REPLENISHMENT ROUTES                -->
+        <!-- ============================================================ -->
+        <record id="orderpoint_cdc_beverage_water" model="stock.warehouse.orderpoint">
+            <field name="route_id" model="stock.route" search="[('supplied_wh_id', '=', ref('warehouse_cdc')), ('supplier_wh_id', '=', ref('warehouse_factory'))]"/>
+        </record>
+        <record id="orderpoint_cdc_snack" model="stock.warehouse.orderpoint">
+            <field name="route_id" model="stock.route" search="[('supplied_wh_id', '=', ref('warehouse_cdc')), ('supplier_wh_id', '=', ref('warehouse_factory'))]"/>
+        </record>
+        <record id="orderpoint_cdc_frozen_dumpling" model="stock.warehouse.orderpoint">
+            <field name="route_id" model="stock.route" search="[('supplied_wh_id', '=', ref('warehouse_cdc')), ('supplier_wh_id', '=', ref('warehouse_factory'))]"/>
+        </record>
+        <record id="orderpoint_rdcn_beverage_water" model="stock.warehouse.orderpoint">
+            <field name="route_id" model="stock.route" search="[('supplied_wh_id', '=', ref('warehouse_rdc_north')), ('supplier_wh_id', '=', ref('warehouse_cdc'))]"/>
+        </record>
+        <record id="orderpoint_rdcn_snack" model="stock.warehouse.orderpoint">
+            <field name="route_id" model="stock.route" search="[('supplied_wh_id', '=', ref('warehouse_rdc_north')), ('supplier_wh_id', '=', ref('warehouse_cdc'))]"/>
+        </record>
+        <record id="orderpoint_rdcs_beverage_water" model="stock.warehouse.orderpoint">
+            <field name="route_id" model="stock.route" search="[('supplied_wh_id', '=', ref('warehouse_rdc_south')), ('supplier_wh_id', '=', ref('warehouse_cdc'))]"/>
+        </record>
+        <record id="orderpoint_rdcs_frozen_dumpling" model="stock.warehouse.orderpoint">
+            <field name="route_id" model="stock.route" search="[('supplied_wh_id', '=', ref('warehouse_rdc_south')), ('supplier_wh_id', '=', ref('warehouse_cdc'))]"/>
+        </record>
+    </data>
+</odoo>
