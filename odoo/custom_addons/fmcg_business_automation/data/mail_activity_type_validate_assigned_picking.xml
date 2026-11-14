@@ -99,6 +99,15 @@ if picking and picking.state == 'assigned':
             active_id=record.id,
             active_ids=[record.id],
         ).run()
+    elif zero_quantity_issue:
+        env.ref(
+            'fmcg_business_automation.action_notify_picking_fill_done_quantity'
+        ).with_context(
+            active_model='mail.activity',
+            active_id=record.id,
+            active_ids=[record.id],
+        ).run()
+
     else:
         picking.button_validate()
         ]]></field>

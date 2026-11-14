@@ -20,11 +20,86 @@
         <field name="code"><![CDATA[
 picking = env['stock.picking'].browse(record.res_id).exists()
 
-raise UserError(
-    'Chưa thể hoàn tất Activity bổ sung Lot/Serial cho Picking %s. '
-    'Logic xử lý chưa được triển khai.'
-    % (picking.name if picking else record.res_id)
+requires_existing_lot_filter = env.ref(
+    'fmcg_business_automation.'
+    'ir_filter_stock_picking_requires_existing_lot_serial'
 )
+
+requires_existing_lot = bool(
+    picking.filtered_domain(
+        requires_existing_lot_filter._get_eval_domain()
+    )
+)
+
+if requires_existing_lot:
+    env.ref(
+        'fmcg_business_automation.'
+        'action_picking_assign_existing_lot_serial'
+    ).with_context(
+        active_model='mail.activity',
+        active_id=record.id,
+        active_ids=[record.id],
+    ).run()
+
+else:
+    visible_moves = picking.move_ids.filtered(
+        lambda move: move.show_details_visible
+    )
+    for move in visible_moves:
+        missing_lines = move.move_line_ids.filtered(
+            lambda line:
+                line.quantity > 0
+                and not line.lot_id
+                and not line.lot_name
+                and line.product_id.tracking in ('lot', 'serial')
+        )
+
+        if move.has_tracking == 'lot':
+            lot_name = 'SIM-LOT-%s-%s' % (
+                picking.id,
+                move.id,
+            )
+
+            missing_lines.write({
+                'lot_name': lot_name,
+            })
+
+        elif move.has_tracking == 'serial':
+            # Chỉ gán Serial cho các dòng đã có quantity = 1.
+            # Các dòng quantity khác 1 được giữ nguyên để tránh gán sai Serial.
+            serial_lines = missing_lines.filtered(
+                lambda line: line.quantity == 1
+            )
+
+            for move_line in serial_lines:
+                move_line.write({
+                    'lot_name': 'SIM-SN-%s-%s-%s' % (
+                        picking.id,
+                        move.id,
+                        move_line.id,
+                    ),
+                })
+
+    missing_lot_serial_filter = env.ref(
+        'fmcg_business_automation.ir_filter_stock_picking_missing_lot_serial'
+    )
+
+    if picking.filtered_domain(
+        missing_lot_serial_filter._get_eval_domain()
+    ):
+        raise UserError(
+            'Picking %s vẫn còn thiếu Lot/Serial sau khi xử lý.'
+            % picking.display_name
+        )
+
+    validate_activity_type = env.ref(
+        'fmcg_business_automation.mail_activity_type_validate_assigned_picking'
+    )
+    picking.activity_schedule(
+        activity_type_id=validate_activity_type.id,
+        summary='Validate assigned stock picking',
+        user_id=record.user_id.id or env.user.id,
+    )
         ]]></field>
     </record>
 

@@ -18,8 +18,11 @@
         'data/stock_picking_draft_confirmation.xml',
         'data/stock_picking_fill_missing_lot_serial.xml',
         'data/mail_activity_type_validate_assigned_picking.xml',
+        'data/stock_picking_assign_existing_lot_serial.xml',
         'data/stock_picking_schedule_draft_confirmation.xml',
+        'data/stock_picking_draft_confirmation_on_state_change.xml',
         'data/stock_picking_schedule_validate_on_assigned.xml',
+        'data/stock_picking_check_availability_on_confirmed.xml'
     ],
     'installable': True,
     'application': False,

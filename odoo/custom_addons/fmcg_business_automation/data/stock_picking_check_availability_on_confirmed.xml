@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_activity_type_check_picking_availability" model="mail.activity.type">
+        <field name="name">Kiểm tra khả dụng</field>
+        <field name="summary">Kiểm tra khả dụng của phiếu kho</field>
+        <field name="icon">fa-cubes</field>
+        <field name="sequence">10</field>
+        <field name="delay_count">0</field>
+        <field name="res_model">stock.picking</field>
+    </record>
+
+    <record id="action_feedback_picking_availability"
+            model="ir.actions.server">
+        <field name="name">Picking: Feedback Not Enough Stock</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+picking = env['stock.picking'].browse(record.res_id).exists()
+
+if picking:
+    feedback = (
+        'Picking %s chưa đủ hàng để reservation. '
+        'Vui lòng bổ sung tồn kho tại location nguồn và kiểm tra khả dụng lại.'
+    ) % picking.name
+
+    picking.message_post_with_source(
+        'mail.message_activity_done',
+        render_values={
+            'activity': record,
+            'feedback': feedback,
+            'display_assignee': record.user_id != env.user,
+        },
+        mail_activity_type_id=record.activity_type_id.id,
+        subtype_xmlid='mail.mt_activities',
+    )
+        ]]></field>
+    </record>
+
+    <record id="action_complete_check_picking_availability"
+            model="ir.actions.server">
+        <field name="name">
+            Kiểm tra picking sau khi hoàn tất activity khả dụng
+        </field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+picking = env['stock.picking'].browse(record.res_id).exists()
+
+if picking:
+    picking.action_assign()
+
+    if picking.state != 'assigned':
+        env.ref(
+            'fmcg_business_automation.action_feedback_picking_availability'
+        ).with_context(
+            active_model='mail.activity',
+            active_id=record.id,
+            active_ids=[record.id],
+        ).run()
+
+        activity_type = env.ref(
+            'fmcg_business_automation.mail_activity_type_check_picking_availability'
+        )
+
+        record.write({
+            'active': True,
+            'feedback': False,
+        })
+        ]]></field>
+    </record>
+
+    <record id="automation_complete_check_picking_availability"
+            model="base.automation">
+        <field name="name">
+            Hoàn tất kiểm tra khả dụng khi picking đã Ready
+        </field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+            eval="[
+                ('activity_type_id', '=', ref('mail_activity_type_check_picking_availability')),
+                ('res_model', '=', 'stock.picking')
+            ]"/>
+        <field name="action_server_ids"
+            eval="[(4, ref('action_complete_check_picking_availability'))]"/>
+    </record>
+
+    <record id="automation_check_picking_availability_on_confirmed"
+            model="base.automation">
+        <field name="name">
+            Yêu cầu kiểm tra khả dụng khi picking đã xác nhận nhưng chờ hàng
+        </field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids"
+            eval="[(6, 0, [ref('stock.field_stock_picking__state')])]"/>
+        <field name="filter_pre_domain">
+            [('state', '!=', 'confirmed')]
+        </field>
+        <field name="filter_domain">
+            [('state', '=', 'confirmed')]
+        </field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="server_action_check_picking_availability_on_confirmed"
+            model="ir.actions.server">
+        <field name="name">
+            Tạo activity kiểm tra hàng đang chờ khả dụng
+        </field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="usage">base_automation</field>
+        <field name="base_automation_id"
+            ref="automation_check_picking_availability_on_confirmed"/>
+        <field name="state">next_activity</field>
+        <field name="activity_type_id"
+            ref="mail_activity_type_check_picking_availability"/>
+        <field name="activity_summary">
+            Kiểm tra khả dụng của phiếu kho
+        </field>
+        <field name="activity_note">
+            Picking đã xác nhận nhưng chưa đủ hàng để reservation. Vui lòng kiểm tra tồn kho.
+        </field>
+        <field name="activity_date_deadline_range">0</field>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_user_type">generic</field>
+        <field name="activity_user_field_name">user_id</field>
+    </record>
+</odoo>
