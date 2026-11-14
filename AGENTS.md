@@ -24,3 +24,4 @@
 2. Cần phân biệt rõ giữa domain gần đúng và điều kiện Python thực tế, giữa hành vi giao diện và hành vi cron/server action.
 3. Không tự thêm guard như `if not record: return` chỉ để che lỗi. Nếu dữ liệu hoặc luồng nghiệp vụ không hợp lệ, ưu tiên để lỗi được raise và giải thích nguyên nhân; core Odoo đã có cơ chế transaction và error handling.
 4. Không đề xuất commit giữa transaction, thao tác SQL trực tiếp hoặc giải pháp bỏ qua ORM nếu chưa phân tích rõ tính toàn vẹn dữ liệu.
+5. Không tự động bổ sung nhiều guard hoặc `raise UserError` khi người dùng không yêu cầu. Về bản chất, Odoo core đã có cơ chế kiểm tra, raise lỗi và rollback transaction khi nghiệp vụ không hợp lệ. Khi định nghĩa action mới, chỉ thêm `UserError` khi có yêu cầu từ người dùng
