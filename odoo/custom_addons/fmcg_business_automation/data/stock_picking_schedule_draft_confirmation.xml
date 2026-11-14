@@ -17,7 +17,7 @@ for picking in records:
         picking.activity_schedule(
             activity_type_id=activity_type.id,
             summary='Confirm draft stock picking',
-            user_id=env.user.id,
+            user_id=env.ref('fmcg_inventory_learning.user_inventory_manager_simulator').id,
         )
         ]]></field>
     </record>
