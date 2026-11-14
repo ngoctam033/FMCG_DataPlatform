@@ -46,7 +46,7 @@ if picking:
         <field name="code"><![CDATA[
 picking = env['stock.picking'].browse(record.res_id).exists()
 
-if picking:
+if picking and picking.state != 'done':
     picking.action_assign()
 
     if picking.state != 'assigned':
