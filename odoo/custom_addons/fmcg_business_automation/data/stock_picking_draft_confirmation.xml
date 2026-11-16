@@ -66,12 +66,17 @@ if picking and picking.state == 'draft':
             summary='Add missing Stock Move',
             user_id=record.user_id.id or env.user.id,
         )
-    else:
-        if picking.state == 'draft':
-            raise UserError(
-                'Picking %s vẫn đang ở trạng thái Draft sau khi xác nhận.'
-                % picking.name
-            )
+        # Activity này vừa bị archive khi người dùng bấm Done.
+        # Kích hoạt lại để sau khi bổ sung Stock Move,
+        # người dùng có thể tiếp tục Confirm Draft.
+        record.write({
+            'active': True,
+        })
+    elif picking.state == 'draft':
+        raise UserError(
+            'Picking %s vẫn đang ở trạng thái Draft sau khi xác nhận.'
+            % picking.name
+        )
         ]]></field>
     </record>
     <!-- 3. Automation: Activity Done -> Confirm Picking -->
