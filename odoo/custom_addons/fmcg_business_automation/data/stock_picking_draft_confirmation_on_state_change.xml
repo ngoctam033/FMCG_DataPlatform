@@ -21,7 +21,7 @@
         </field>
 
         <field name="action_server_ids"
-               eval="[(4, ref('action_schedule_confirm_draft_picking'))]"/>
+               eval="[(5, 0, 0)]"/>
 
         <field name="active" eval="False"/>
     </record>

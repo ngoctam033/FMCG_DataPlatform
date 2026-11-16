@@ -100,7 +100,7 @@ if picking and picking.state != 'done':
         <field name="filter_domain">
             [('state', '=', 'confirmed')]
         </field>
-        <field name="active" eval="True"/>
+        <field name="active" eval="False"/>
     </record>
 
     <record id="server_action_check_picking_availability_on_confirmed"
