@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="stock_picking_list_inherit_open_new_tab" model="ir.ui.view">
+        <field name="name">stock.picking.list.inherit.open.new.tab</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='priority']" position="before">
+                <button
+                    name="%(action_stock_picking_open_new_tab)d"
+                    type="action"
+                    icon="fa-external-link"
+                    string="Open"
+                    title="Open in New Tab"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

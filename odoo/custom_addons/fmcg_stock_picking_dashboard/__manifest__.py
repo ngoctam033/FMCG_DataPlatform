@@ -7,6 +7,7 @@
     "data": [
         'views/stock_picking_bulk_activity_action.xml',
         "views/stock_picking_dashboard_views.xml",
+        "views/stock_picking_views.xml",
     ],
     "assets": {
         "web.assets_backend": [

@@ -6,6 +6,7 @@
     'depends': [
         'stock',
         'base_automation',
+        'fmcg_business_automation',
         'product_expiry',
         'sale_management',
         'purchase',

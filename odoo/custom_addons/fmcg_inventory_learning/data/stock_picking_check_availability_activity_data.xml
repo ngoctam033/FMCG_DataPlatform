@@ -17,7 +17,8 @@
             <field name="usage">base_automation</field>
             <field name="base_automation_id" ref="automation_check_picking_availability_on_waiting"/>
             <field name="state">next_activity</field>
-            <field name="activity_type_id" ref="mail_activity_type_check_picking_availability"/>
+            <field name="activity_type_id"
+                   ref="fmcg_business_automation.mail_activity_type_check_picking_availability"/>
             <field name="activity_summary">Kiểm tra khả dụng của phiếu kho</field>
             <field name="activity_note">Vui lòng kiểm tra khả dụng và khả năng giữ hàng cho phiếu kho này.</field>
             <field name="activity_date_deadline_range">0</field>
