@@ -66,6 +66,42 @@ tracked_moves = picking.move_ids.filtered(
         and move.product_id.tracking in ('lot', 'serial')
 )
 
+# Với location bypass reservation, action_assign có thể tạo đủ quantity
+# nhưng không tự gắn Lot/Serial. Gắn các Lot/Serial hiện có tại đây.
+for move in tracked_moves:
+    missing_lines = move.move_line_ids.filtered_domain([
+        ('quantity', '>', 0),
+        ('lot_id', '=', False),
+    ])
+
+    if missing_lines:
+        existing_lots = env['stock.lot'].search([
+            ('product_id', '=', move.product_id.id),
+            '|',
+            ('company_id', '=', False),
+            ('company_id', '=', move.company_id.id),
+        ], order='id')
+
+        if move.product_id.tracking == 'lot':
+            if existing_lots:
+                missing_lines.write({
+                    'lot_id': existing_lots[0].id,
+                })
+
+        else:
+            available_serials = (
+                existing_lots
+                - picking.move_line_ids.lot_id
+            )
+
+            for move_line, serial in zip(
+                missing_lines,
+                available_serials,
+            ):
+                move_line.write({
+                    'lot_id': serial.id,
+                })
+
 incomplete_moves = tracked_moves.filtered(
     lambda move:
         move.product_uom.compare(
