@@ -109,7 +109,32 @@ if picking and picking.state == 'assigned':
         ).run()
 
     else:
-        picking.button_validate()
+        action_result = picking.button_validate()
+
+        if (
+            isinstance(action_result, dict)
+            and action_result.get('res_model') == 'stock.backorder.confirmation'
+        ):
+            create_backorder = (picking.id + record.id) % 2 == 0
+
+            if create_backorder:
+                activity_type = env.ref(
+                    'fmcg_business_automation.'
+                    'mail_activity_type_picking_create_backorder'
+                )
+                summary = 'Create backorder for remaining quantity'
+            else:
+                activity_type = env.ref(
+                    'fmcg_business_automation.'
+                    'mail_activity_type_picking_no_backorder'
+                )
+                summary = 'Complete transfer without backorder'
+
+            picking.activity_schedule(
+                activity_type_id=activity_type.id,
+                summary=summary,
+                user_id=record.user_id.id or env.user.id,
+            )
         ]]></field>
     </record>
 

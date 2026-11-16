@@ -17,6 +17,7 @@
         'data/stock_picking_generate_missing_moves.xml',
         'data/stock_picking_draft_confirmation.xml',
         'data/stock_picking_fill_missing_lot_serial.xml',
+        'data/stock_picking_backorder_activity.xml',
         'data/mail_activity_type_validate_assigned_picking.xml',
         'data/stock_picking_assign_existing_lot_serial.xml',
         'data/stock_picking_schedule_draft_confirmation.xml',

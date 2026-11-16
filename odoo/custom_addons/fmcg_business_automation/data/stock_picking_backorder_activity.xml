@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mail_activity_type_picking_create_backorder"
+            model="mail.activity.type">
+        <field name="name">Picking: Create Backorder</field>
+        <field name="summary">
+            Create backorder for remaining quantity
+        </field>
+        <field name="res_model">stock.picking</field>
+        <field name="icon">fa-code-fork</field>
+        <field name="sequence">60</field>
+    </record>
+
+    <record id="mail_activity_type_picking_no_backorder"
+            model="mail.activity.type">
+        <field name="name">Picking: No Backorder</field>
+        <field name="summary">
+            Complete transfer without backorder
+        </field>
+        <field name="res_model">stock.picking</field>
+        <field name="icon">fa-times-circle</field>
+        <field name="sequence">61</field>
+    </record>
+
+    <record id="action_picking_process_create_backorder"
+            model="ir.actions.server">
+        <field name="name">
+            Picking: Process Create Backorder On Activity Done
+        </field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+picking = env['stock.picking'].browse(record.res_id).exists()
+
+action_result = picking.button_validate()
+
+if (
+    isinstance(action_result, dict)
+    and action_result.get('res_model') == 'stock.backorder.confirmation'
+):
+    wizard_model = env[
+        'stock.backorder.confirmation'
+    ].with_context(
+        action_result.get('context') or {}
+    )
+
+    wizard_values = wizard_model.default_get([
+        'pick_ids',
+        'show_transfers',
+        'backorder_confirmation_line_ids',
+    ])
+    wizard = wizard_model.create(wizard_values)
+    wizard.process()
+        ]]></field>
+    </record>
+
+    <record id="action_picking_process_no_backorder"
+            model="ir.actions.server">
+        <field name="name">
+            Picking: Process No Backorder On Activity Done
+        </field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+picking = env['stock.picking'].browse(record.res_id).exists()
+
+action_result = picking.button_validate()
+
+if (
+    isinstance(action_result, dict)
+    and action_result.get('res_model') == 'stock.backorder.confirmation'
+):
+    wizard_model = env[
+        'stock.backorder.confirmation'
+    ].with_context(
+        action_result.get('context') or {}
+    )
+
+    wizard_values = wizard_model.default_get([
+        'pick_ids',
+        'show_transfers',
+        'backorder_confirmation_line_ids',
+    ])
+    wizard = wizard_model.create(wizard_values)
+    wizard.process_cancel_backorder()
+        ]]></field>
+    </record>
+
+    <record id="automation_picking_process_create_backorder"
+            model="base.automation">
+        <field name="name">
+            Picking: Process Create Backorder On Activity Done
+        </field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+               eval="[
+                   (
+                       'activity_type_id',
+                       '=',
+                       ref('mail_activity_type_picking_create_backorder')
+                   ),
+                   ('res_model', '=', 'stock.picking')
+               ]"/>
+        <field name="action_server_ids"
+               eval="[
+                   (
+                       4,
+                       ref('action_picking_process_create_backorder')
+                   )
+               ]"/>
+    </record>
+
+    <record id="automation_picking_process_no_backorder"
+            model="base.automation">
+        <field name="name">
+            Picking: Process No Backorder On Activity Done
+        </field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+               eval="[
+                   (
+                       'activity_type_id',
+                       '=',
+                       ref('mail_activity_type_picking_no_backorder')
+                   ),
+                   ('res_model', '=', 'stock.picking')
+               ]"/>
+        <field name="action_server_ids"
+               eval="[
+                   (
+                       4,
+                       ref('action_picking_process_no_backorder')
+                   )
+               ]"/>
+    </record>
+
+</odoo>
