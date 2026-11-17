@@ -92,7 +92,7 @@
             ('state', '=', 'confirmed'),
             ('picking_type_id.warehouse_id', '=',
              ref('fmcg_inventory_learning.warehouse_factory')),
-            ('picking_type_id.sequence_code', '=', 'STOR'),
+            ('picking_type_id.sequence_code', 'in', ['QC', 'STOR']),
             ('origin', '=', False),
             ('move_ids', '!=', False),
             ('move_line_ids', '=', False),
