@@ -75,6 +75,12 @@ if picking and picking.state not in ('done', 'cancel'):
                 'active': True,
                 'feedback': False,
             })
+    else:
+        picking.activity_schedule(
+            activity_type_id=env.ref(
+                'fmcg_business_automation.mail_activity_type_validate_assigned_picking'
+            ).id,
+        )
         ]]></field>
     </record>
 
