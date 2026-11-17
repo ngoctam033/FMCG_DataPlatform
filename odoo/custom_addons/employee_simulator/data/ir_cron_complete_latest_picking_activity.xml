@@ -60,4 +60,26 @@ for picking in pickings:
         <field name="interval_type">minutes</field>
         <field name="active" eval="False"/>
     </record>
+
+    <record id="ir_cron_complete_check_picking_availability_activities" model="ir.cron">
+        <field name="name">Phiếu kho: Hoàn tất hoạt động kiểm tra khả dụng</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="False"/>
+        <field name="code"><![CDATA[
+activity_type = env.ref(
+    'fmcg_business_automation.mail_activity_type_check_picking_availability'
+)
+domain = [
+    ('activity_type_id', '=', activity_type.id),
+    ('active', '=', True),
+]
+activities = model.search(domain, order='id asc')
+for activity in activities:
+    activity.action_feedback()
+        ]]></field>
+    </record>
 </odoo>
