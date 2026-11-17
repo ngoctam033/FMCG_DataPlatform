@@ -5,13 +5,20 @@
         <field name="model_id" ref="stock.model_stock_picking"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
+check_availability_type = env.ref(
+    'fmcg_business_automation.'
+    'mail_activity_type_check_picking_availability'
+)
+
 activity_type_ids = env['ir.model.data'].search([
     ('module', '=', 'fmcg_business_automation'),
     ('model', '=', 'mail.activity.type'),
+    ('res_id', '!=', check_availability_type.id),
 ]).mapped('res_id')
 
 pickings = env['stock.picking'].search([
     ('state', 'not in', ['done', 'cancel']),
+    ('activity_ids.activity_type_id', 'in', activity_type_ids),
 ], limit=50, order='create_date asc, id asc')
 
 for picking in pickings:
