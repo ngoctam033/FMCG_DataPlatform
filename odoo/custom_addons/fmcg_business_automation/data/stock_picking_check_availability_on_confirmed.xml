@@ -115,7 +115,7 @@ if picking and picking.state not in ('done', 'cancel'):
         <field name="filter_domain">
             [('state', '=', 'confirmed')]
         </field>
-        <field name="active" eval="False"/>
+        <field name="active" eval="True"/>
     </record>
 
     <record id="server_action_check_picking_availability_on_confirmed"
@@ -127,18 +127,34 @@ if picking and picking.state not in ('done', 'cancel'):
         <field name="usage">base_automation</field>
         <field name="base_automation_id"
             ref="automation_check_picking_availability_on_confirmed"/>
-        <field name="state">next_activity</field>
-        <field name="activity_type_id"
-            ref="mail_activity_type_check_picking_availability"/>
-        <field name="activity_summary">
-            Kiểm tra khả dụng của phiếu kho
-        </field>
-        <field name="activity_note">
-            Picking đã xác nhận nhưng chưa đủ hàng để reservation. Vui lòng kiểm tra tồn kho.
-        </field>
-        <field name="activity_date_deadline_range">0</field>
-        <field name="activity_date_deadline_range_type">days</field>
-        <field name="activity_user_type">generic</field>
-        <field name="activity_user_field_name">user_id</field>
+
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+activity_type = env.ref(
+    'fmcg_business_automation.'
+    'mail_activity_type_check_picking_availability'
+)
+
+for picking in records.filtered(
+    lambda picking: picking.state == 'confirmed'
+):
+    existing_activity = env['mail.activity'].search([
+        ('res_model', '=', 'stock.picking'),
+        ('res_id', '=', picking.id),
+        ('activity_type_id', '=', activity_type.id),
+        ('active', '=', True),
+    ], limit=1)
+
+    if not existing_activity:
+        picking.activity_schedule(
+            activity_type_id=activity_type.id,
+            summary='Kiểm tra khả dụng của phiếu kho',
+            note=(
+                'Picking đã xác nhận nhưng chưa đủ hàng để reservation. '
+                'Vui lòng kiểm tra tồn kho.'
+            ),
+            user_id=picking.user_id.id or env.user.id,
+        )
+        ]]></field>
     </record>
 </odoo>
