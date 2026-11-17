@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record
+            id="ir_cron_create_draft_shortage_receipts"
+            model="ir.cron"
+        >
+            <field name="name">Inventory: Create Draft Shortage Receipts</field>
+
+            <!-- model trong safe_eval là env['stock.warehouse.orderpoint'] -->
+            <field
+                name="model_id"
+                ref="stock.model_stock_warehouse_orderpoint"
+            />
+
+            <field name="state">code</field>
+
+            <field name="code"><![CDATA[
+# Nguồn dữ liệu của cron là Reordering Rules trong view Replenishment.
+orderpoints = model.search([
+    ("active", "=", True),
+    ("product_min_qty", ">", 0),
+])
+
+for orderpoint in orderpoints:
+    warehouse = orderpoint.warehouse_id
+    company = orderpoint.company_id
+    product = orderpoint.product_id
+    incoming_type = warehouse.in_type_id
+
+    if not incoming_type:
+        continue
+
+    # Nghiệp vụ này chủ động bù tồn kho vật lý lên Max.
+    # Không dùng qty_to_order/qty_forecast vì các nguồn cung như RFQ đang xử lý
+    # có thể làm qty_to_order = 0 dù On Hand vẫn thấp hơn Min.
+    if product.uom_id.compare(
+        orderpoint.qty_on_hand,
+        orderpoint.product_min_qty,
+    ) >= 0:
+        continue
+
+    target_qty = product.uom_id.round(max(
+        orderpoint.product_max_qty - orderpoint.qty_on_hand,
+        0.0,
+    ))
+
+    if product.uom_id.compare(target_qty, 0.0) <= 0:
+        continue
+
+    marker = "AUTO ORDERPOINT REPLENISHMENT [OP:%s]" % orderpoint.id
+    legacy_marker = "AUTO SHORTAGE REPLENISHMENT [WH:%s][PRODUCT:%s]" % (
+        warehouse.id,
+        product.id,
+    )
+
+    # Mỗi orderpoint chỉ có một Draft Receipt. Nhận cả marker cũ để lần
+    # upgrade đầu tiên không tạo trùng phiếu mà cron phiên bản trước đã tạo.
+    existing_picking = env["stock.picking"].with_company(company).search([
+        ("state", "=", "draft"),
+        ("picking_type_id", "=", incoming_type.id),
+        ("origin", "in", [marker, legacy_marker]),
+        ("move_ids.product_id", "=", product.id),
+    ], order="id desc", limit=1)
+
+    if existing_picking:
+        existing_move = existing_picking.move_ids.filtered(
+            lambda move: move.product_id == product
+        )[:1]
+
+        if existing_move:
+            existing_move.write({
+                "product_uom_qty": target_qty,
+                "product_uom": product.uom_id.id,
+                "location_id": incoming_type.default_location_src_id.id,
+                "location_dest_id": incoming_type.default_location_dest_id.id,
+                "origin": marker,
+            })
+            existing_picking.write({
+                "origin": marker,
+                "note": (
+                    "Automatically generated from Replenishment reordering "
+                    "rule %s. Target quantity: Max - On Hand."
+                ) % orderpoint.display_name,
+            })
+            continue
+
+    env["stock.picking"].with_company(company).create({
+            "picking_type_id": incoming_type.id,
+            "location_id": incoming_type.default_location_src_id.id,
+            "location_dest_id": incoming_type.default_location_dest_id.id,
+            "origin": marker,
+            "note": (
+                "Automatically generated from Replenishment reordering "
+                "rule %s. Target quantity: Max - On Hand."
+            ) % orderpoint.display_name,
+            "move_ids": [(0, 0, {
+                "product_id": product.id,
+                "product_uom": product.uom_id.id,
+                "product_uom_qty": target_qty,
+                "location_id": incoming_type.default_location_src_id.id,
+                "location_dest_id": incoming_type.default_location_dest_id.id,
+                "origin": marker,
+            })],
+        })
+            ]]></field>
+
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">30</field>
+            <field name="interval_type">minutes</field>
+
+            <field name="active" eval="False"/>
+        </record>
+</odoo>
