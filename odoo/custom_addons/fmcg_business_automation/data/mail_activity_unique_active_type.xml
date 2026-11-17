@@ -14,6 +14,7 @@ if record and record.res_model and record.res_id:
         ('res_model', '=', record.res_model),
         ('res_id', '=', record.res_id),
         ('activity_type_id', '=', record.activity_type_id.id),
+        ('active', '=', True),
     ], limit=1)
 
     if duplicate:
