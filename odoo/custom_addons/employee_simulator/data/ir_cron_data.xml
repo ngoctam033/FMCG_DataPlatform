@@ -5,7 +5,32 @@
         <field name="model_id" ref="stock.model_stock_picking"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-for picking_type in env['stock.picking.type'].search([]):
+allowed_sequence_codes = [
+    # Standard operations that may be created directly per warehouse.
+    'IN', 'OUT', 'INT',
+
+    # Manual receipts, quality decisions and stock dispositions.
+    'QHOLD', 'QREL', 'CRET', 'RPASS', 'RHOLD', 'RDMG',
+    'RTV', 'DMG', 'QPASS', 'QREJ', 'QDMG', 'NEXP',
+    'NPROM', 'DSCRP', 'ESCRP', 'RECALL', 'PKRET',
+    'PKCLN', 'PKRPR',
+
+    # Manual rework, repacking, relabeling and disposal decisions.
+    'DMGRWK', 'RCRWK', 'DMGRPK', 'RCLBL', 'RWREIN',
+    'RPREIN', 'RLREIN', 'RCSCRP', 'DMSCRP',
+]
+
+allowed_picking_type_domain = [
+    ('active', '=', True),
+    ('company_id', '=', env.ref(
+        'fmcg_inventory_learning.company_fmcg_manufacturing'
+    ).id),
+    ('sequence_code', 'in', allowed_sequence_codes),
+]
+
+for picking_type in env['stock.picking.type'].search(
+    allowed_picking_type_domain
+):
     env['stock.picking'].with_company(
         picking_type.company_id
     ).create([
