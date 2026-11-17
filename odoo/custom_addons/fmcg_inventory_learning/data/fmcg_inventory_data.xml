@@ -44,6 +44,58 @@
             <field name="product_max_qty">2500</field>
             <field name="trigger">auto</field>
         </record>
+        <!--
+            Factory replenishment rule for RM-CLEANING-BASE.
+
+            The legacy orderpoint above belongs to the holding company's WH/Stock.
+            FAC uses three-step receipts, so procurement must target FAC/Stock; the
+            warehouse routes then create Vendors -> Input -> Quality Control -> Stock.
+        -->
+        <record id="orderpoint_rm_cleaning_base_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-CLEANING-BASE')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id"
+                   model="stock.location"
+                   search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="purchase_stock.route_warehouse0_buy"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <!--
+            Demand-driven replenishment for purified water at FAC/Stock.
+
+            FAC/PICK demand decreases the forecast quantity at FAC/Stock.
+            With Min = Max = 0, Odoo proposes exactly enough quantity to
+            cover the negative forecast, without maintaining safety stock.
+        -->
+        <record id="orderpoint_rm_purified_water_fac"
+                model="stock.warehouse.orderpoint">
+            <field name="product_id"
+                search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+
+            <field name="company_id"
+                ref="company_fmcg_manufacturing"/>
+
+            <field name="warehouse_id"
+                ref="warehouse_factory"/>
+
+            <field name="location_id"
+                model="stock.location"
+                search="[
+                    ('complete_name', '=', 'FAC/Stock'),
+                    ('company_id', '=', ref('company_fmcg_manufacturing'))
+                ]"/>
+
+            <field name="route_id"
+                ref="purchase_stock.route_warehouse0_buy"/>
+
+            <field name="product_min_qty">0</field>
+            <field name="product_max_qty">0</field>
+
+            <field name="trigger">auto</field>
+        </record>
         <record id="orderpoint_rm_chili_paste" model="stock.warehouse.orderpoint">
             <field name="product_id" search="[('default_code', '=', 'RM-CHILI-PASTE')]"/>
             <field name="location_id" ref="stock.stock_location_stock"/>
@@ -156,5 +208,18 @@
             <field name="product_max_qty">500</field>
             <field name="trigger">auto</field>
         </record>
+    </data>
+
+    <!--
+        The legacy XML record is noupdate data and cannot be moved to another
+        company: Odoo explicitly forbids changing an orderpoint's company.
+        Archive it on installation/upgrade and keep the FAC rule above as the
+        active rule for this product.
+    -->
+    <data noupdate="0">
+        <function model="stock.warehouse.orderpoint" name="write">
+            <value eval="[ref('orderpoint_rm_cleaning_base')]"/>
+            <value eval="{'active': False}"/>
+        </function>
     </data>
 </odoo>
