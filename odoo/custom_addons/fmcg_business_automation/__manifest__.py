@@ -23,7 +23,7 @@
         'data/stock_picking_schedule_draft_confirmation.xml',
         'data/stock_picking_draft_confirmation_on_state_change.xml',
         'data/stock_picking_schedule_validate_on_assigned.xml',
-        'data/stock_picking_check_availability_on_confirmed.xml'
+        'data/stock_picking_cancellation_workflow.xml',
     ],
     'installable': True,
     'application': False,

@@ -46,26 +46,35 @@ if picking:
         <field name="code"><![CDATA[
 picking = env['stock.picking'].browse(record.res_id).exists()
 
-if picking and picking.state != 'done':
+if picking and picking.state not in ('done', 'cancel'):
     picking.action_assign()
 
     if picking.state != 'assigned':
-        env.ref(
-            'fmcg_business_automation.action_feedback_picking_availability'
-        ).with_context(
-            active_model='mail.activity',
-            active_id=record.id,
-            active_ids=[record.id],
-        ).run()
+        if picking.filtered_domain(
+            env.ref(
+                'fmcg_business_automation.ir_filter_stock_picking_cancellation_candidates'
+            )._get_eval_domain()
+        ):
+            env.ref(
+                'fmcg_business_automation.action_schedule_picking_cancellation_review'
+            ).with_context(
+                active_model='stock.picking',
+                active_id=picking.id,
+                active_ids=picking.ids,
+            ).run()
+        else:
+            env.ref(
+                'fmcg_business_automation.action_feedback_picking_availability'
+            ).with_context(
+                active_model='mail.activity',
+                active_id=record.id,
+                active_ids=[record.id],
+            ).run()
 
-        activity_type = env.ref(
-            'fmcg_business_automation.mail_activity_type_check_picking_availability'
-        )
-
-        record.write({
-            'active': True,
-            'feedback': False,
-        })
+            record.write({
+                'active': True,
+                'feedback': False,
+            })
         ]]></field>
     </record>
 
