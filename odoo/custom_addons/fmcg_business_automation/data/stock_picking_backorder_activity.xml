@@ -64,6 +64,10 @@ if (
         <field name="state">code</field>
         <field name="code"><![CDATA[
 picking = env['stock.picking'].browse(record.res_id).exists()
+company = picking.company_id
+
+# Validate Picking trong đúng Company.
+picking = picking.with_company(company)
 
 action_result = picking.button_validate()
 
@@ -73,7 +77,7 @@ if (
 ):
     wizard_model = env[
         'stock.backorder.confirmation'
-    ].with_context(
+    ].with_company(company).with_context(
         action_result.get('context') or {}
     )
 
@@ -83,7 +87,8 @@ if (
         'backorder_confirmation_line_ids',
     ])
     wizard = wizard_model.create(wizard_values)
-    wizard.process_cancel_backorder()
+    # Xử lý No Backorder trong cùng Company.
+    wizard.with_company(company).process_cancel_backorder()
         ]]></field>
     </record>
 
