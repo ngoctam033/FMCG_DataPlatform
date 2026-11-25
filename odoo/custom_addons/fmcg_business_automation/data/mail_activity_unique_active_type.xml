@@ -8,7 +8,8 @@
         <field name="model_id" ref="mail.model_mail_activity"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if record and record.res_model and record.res_id:
+if (record and record.res_model and record.res_id
+    and record.activity_type_id != env.ref('mail.mail_activity_data_warning')):
     duplicate = env['mail.activity'].search([
         ('id', '!=', record.id),
         ('res_model', '=', record.res_model),
