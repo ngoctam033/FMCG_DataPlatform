@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="ir_cron_scrap_expired_lots" model="ir.cron">
+        <field name="name">Inventory: Scrap Expired Lots and Serials</field>
+        <field name="model_id" ref="stock.model_stock_quant"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="state">code</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="active" eval="False"/>
+        <field name="code"><![CDATA[
+quants = model.search([
+    ('location_id.usage', '=', 'internal'),
+    ('quantity', '>', 0),
+    ('lot_id', '!=', False),
+])
+
+expired_quants = quants.filtered(lambda quant: quant.lot_id.product_expiry_alert)
+
+for quant in expired_quants:
+    scrap = env['stock.scrap'].with_company(quant.company_id).create({
+        'product_id': quant.product_id.id,
+        'lot_id': quant.lot_id.id,
+        'location_id': quant.location_id.id,
+        'package_id': quant.package_id.id,
+        'owner_id': quant.owner_id.id,
+        'scrap_qty': quant.quantity,
+    })
+    scrap.action_validate()
+        ]]></field>
+    </record>
+</odoo>
