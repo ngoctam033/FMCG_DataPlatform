@@ -11,6 +11,8 @@
     'data': [
         'data/stock_move_validate_positive_demand.xml',
         'data/ir_filter_stock_picking_missing_lot_serial.xml',
+        'data/ir_filters_stock_move_line_incoming_packages.xml',
+        'data/action_check_incoming_a1_unpackaged.xml',
         'data/stock_picking_feedback_templates.xml',
         'data/mail_activity_unique_active_type.xml',
         'data/stock_picking_fill_done_quantity_activity.xml',

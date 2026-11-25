@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_check_incoming_a1_unpackaged"
+            model="ir.actions.server">
+
+        <field name="name">[A1] Check Incoming Unpackaged Goods</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+        <field name="state">code</field>
+
+        <field name="code"><![CDATA[
+filter_a1 = env.ref(
+    'fmcg_business_automation.ir_filter_incoming_a1_unpackaged'
+)
+
+domain = filter_a1._get_eval_domain()
+
+move_lines = env['stock.move.line'].search(domain)
+
+if not move_lines:
+    raise UserError(
+        "[A1] No stock.move.line records found matching the filter domain."
+    )
+        ]]></field>
+    </record>
+</odoo>

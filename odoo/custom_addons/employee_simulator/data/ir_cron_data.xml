@@ -37,6 +37,9 @@ for picking_type in env['stock.picking.type'].search(
         {'picking_type_id': picking_type.id}
         for _ in range(5)
     ])
+env.ref(
+    'fmcg_business_automation.action_check_incoming_a1_unpackaged'
+).run()
         ]]></field>
         <field name="user_id" ref="base.user_root"/>
         <field name="interval_number">1</field>
