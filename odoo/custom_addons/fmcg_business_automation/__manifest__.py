@@ -28,6 +28,7 @@
         'data/stock_picking_draft_confirmation_on_state_change.xml',
         'data/stock_picking_schedule_validate_on_assigned.xml',
         'data/stock_shortage_replenishment_cron.xml',
+        'data/stock_picking_check_availability_on_confirmed.xml',
         'data/stock_picking_cancellation_workflow.xml',
         'data/stock_picking_batch_confirmation_workflow.xml',
         'data/stock_picking_wave_workflow.xml',
