@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="mail_activity_type_purchase_order_confirm_draft" model="mail.activity.type">
+        <field name="name">Xác nhận đơn mua hàng</field>
+        <field name="summary">Kiểm tra và xác nhận RFQ</field>
+        <field name="res_model">purchase.order</field>
+        <field name="icon">fa-check</field>
+        <field name="default_note" type="html">
+            <p>Kiểm tra nhà cung cấp, sản phẩm, số lượng, đơn giá và ngày giao hàng.
+                Bấm Done khi đủ điều kiện xác nhận đơn.</p>
+        </field>
+    </record>
+
+    <record id="action_schedule_purchase_order_confirm_activity" model="ir.actions.server">
+        <field name="name">Đơn mua hàng: Gắn activity xác nhận RFQ</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record and record.state == 'draft':
+    activity_xmlid = 'fmcg_business_automation.mail_activity_type_purchase_order_confirm_draft'
+    activity_type = env.ref(activity_xmlid)
+    existing_activity = record.activity_ids.filtered_domain([
+        ('active', '=', True),
+        ('activity_type_id', '=', activity_type.id),
+    ])
+    if not existing_activity:
+        record.activity_schedule(
+            activity_xmlid,
+            user_id=(record.user_id or env.user).id,
+        )
+        ]]></field>
+    </record>
+
+    <record id="automation_schedule_purchase_order_confirm_activity_on_create" model="base.automation">
+        <field name="name">Đơn mua hàng: Gắn activity khi tạo RFQ nháp</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[('state', '=', 'draft')]</field>
+        <field name="action_server_ids" eval="[Command.link(ref('action_schedule_purchase_order_confirm_activity'))]"/>
+    </record>
+
+    <record id="action_confirm_purchase_order_on_activity_done" model="ir.actions.server">
+        <field name="name">Đơn mua hàng: Xác nhận khi hoàn tất activity</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record and record.res_model == 'purchase.order':
+    order = env['purchase.order'].with_user(env.uid).browse(record.res_id).exists()
+    if order and order.state in ('draft', 'sent'):
+        product_lines = order.order_line.filtered_domain([
+            ('display_type', '=', False),
+            ('is_downpayment', '=', False),
+            ('product_id', '!=', False),
+        ])
+        if not product_lines:
+            raise UserError('Thêm ít nhất một dòng sản phẩm trước khi xác nhận đơn mua hàng.')
+
+        order.with_context(validate_analytic=True).button_confirm()
+        ]]></field>
+    </record>
+
+    <record id="automation_confirm_purchase_order_on_activity_done" model="base.automation">
+        <field name="name">Đơn mua hàng: Xác nhận khi bấm Done activity</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_pre_domain">[('active', '=', True)]</field>
+        <field name="filter_domain"
+               eval="[
+                   ('active', '=', False),
+                   ('res_model', '=', 'purchase.order'),
+                   ('activity_type_id', '=', ref('mail_activity_type_purchase_order_confirm_draft')),
+               ]"/>
+        <field name="action_server_ids" eval="[Command.link(ref('action_confirm_purchase_order_on_activity_done'))]"/>
+    </record>
+</odoo>
