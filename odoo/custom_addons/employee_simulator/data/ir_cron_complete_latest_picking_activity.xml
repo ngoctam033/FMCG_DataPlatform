@@ -5,6 +5,29 @@
         <field name="model_id" ref="stock.model_stock_picking"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
+purchase_activity_type_ids = env['mail.activity.type'].search([
+    ('res_model', '=', 'purchase.order'),
+]).ids
+
+purchase_activity_domain = [
+    ('active', '=', True),
+    ('res_model', '=', 'purchase.order'),
+    ('activity_type_id', 'in', purchase_activity_type_ids),
+]
+
+purchase_orders = env['purchase.order'].search([
+    ('state', '!=', 'cancel'),
+    ('activity_ids', 'any', purchase_activity_domain),
+], limit=50, order='create_date asc, id asc')
+
+for purchase_order in purchase_orders:
+    purchase_activity = env['mail.activity'].search(
+        purchase_activity_domain + [('res_id', '=', purchase_order.id)],
+        order='create_date desc, id desc',
+        limit=1,
+    )
+    if purchase_activity:
+        purchase_activity.action_feedback()
 check_availability_type = env.ref(
     'fmcg_business_automation.'
     'mail_activity_type_check_picking_availability'
