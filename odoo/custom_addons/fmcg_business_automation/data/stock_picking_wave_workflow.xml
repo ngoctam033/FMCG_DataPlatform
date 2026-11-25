@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Batch picking by product is the standard high-volume scenario:
+             collect one SKU for multiple customer deliveries in one wave.
+             Keep auto-confirm disabled so the Review and Confirm activities
+             remain real workflow gates. -->
+        <function model="stock.picking.type" name="write">
+            <value model="stock.picking.type"
+                   eval="obj().env['stock.picking.type'].search([
+                       ('code', '=', 'outgoing'),
+                   ]).ids"/>
+            <value eval="{
+                'auto_batch': True,
+                'batch_auto_confirm': False,
+                'batch_group_by_partner': False,
+                'batch_group_by_destination': False,
+                'batch_group_by_src_loc': False,
+                'batch_group_by_dest_loc': False,
+                'wave_group_by_product': True,
+                'wave_group_by_category': False,
+                'wave_group_by_location': False,
+            }"/>
+        </function>
+
+        <!-- Activity types -->
+        <record id="mail_activity_type_review_transfer_wave"
+                model="mail.activity.type">
+            <field name="name">Wave: Review</field>
+            <field name="summary">Review automatically generated wave transfer</field>
+            <field name="res_model">stock.picking.batch</field>
+            <field name="icon">fa-search</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="mail_activity_type_confirm_transfer_wave"
+                model="mail.activity.type">
+            <field name="name">Wave: Confirm</field>
+            <field name="summary">Confirm reviewed wave transfer</field>
+            <field name="res_model">stock.picking.batch</field>
+            <field name="icon">fa-check-circle</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="mail_activity_type_validate_transfer_wave"
+                model="mail.activity.type">
+            <field name="name">Wave: Validate</field>
+            <field name="summary">Validate confirmed wave transfer</field>
+            <field name="res_model">stock.picking.batch</field>
+            <field name="icon">fa-check-square-o</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <!-- Wave created -> Review activity -->
+        <record id="action_schedule_review_transfer_wave"
+                model="ir.actions.server">
+            <field name="name">Wave: Schedule Review On Create</field>
+            <field name="model_id" ref="stock_picking_batch.model_stock_picking_batch"/>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+review_activity_type = env.ref(
+    'fmcg_business_automation.mail_activity_type_review_transfer_wave'
+)
+
+for wave in records:
+    wave.activity_schedule(
+        activity_type_id=review_activity_type.id,
+        summary='Review generated wave transfer %s' % wave.name,
+        user_id=env.user.id,
+    )
+            ]]></field>
+        </record>
+
+        <record id="automation_schedule_review_transfer_wave"
+                model="base.automation">
+            <field name="name">Wave: Schedule Review On Create</field>
+            <field name="model_id" ref="stock_picking_batch.model_stock_picking_batch"/>
+            <field name="trigger">on_create</field>
+            <field name="filter_domain">[('is_wave', '=', True)]</field>
+            <field name="action_server_ids"
+                   eval="[Command.link(ref('action_schedule_review_transfer_wave'))]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Review activity done -> Confirm activity -->
+        <record id="action_schedule_confirm_transfer_wave"
+                model="ir.actions.server">
+            <field name="name">Wave: Schedule Confirmation After Review</field>
+            <field name="model_id" ref="mail.model_mail_activity"/>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+wave = env['stock.picking.batch'].browse(record.res_id)
+confirm_activity_type = env.ref(
+    'fmcg_business_automation.mail_activity_type_confirm_transfer_wave'
+)
+
+wave.activity_schedule(
+    activity_type_id=confirm_activity_type.id,
+    summary='Confirm reviewed wave transfer %s' % wave.name,
+    user_id=record.user_id.id,
+)
+            ]]></field>
+        </record>
+
+        <record id="automation_schedule_confirm_transfer_wave"
+                model="base.automation">
+            <field name="name">Wave: Schedule Confirmation On Review Done</field>
+            <field name="model_id" ref="mail.model_mail_activity"/>
+            <field name="trigger">on_archive</field>
+            <field name="filter_domain"
+                   eval="[
+                       ('activity_type_id', '=', ref('mail_activity_type_review_transfer_wave')),
+                       ('res_model', '=', 'stock.picking.batch'),
+                   ]"/>
+            <field name="action_server_ids"
+                   eval="[Command.link(ref('action_schedule_confirm_transfer_wave'))]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Confirm activity done -> Confirm wave -> Validate activity -->
+        <record id="action_confirm_transfer_wave"
+                model="ir.actions.server">
+            <field name="name">Wave: Confirm On Activity Done</field>
+            <field name="model_id" ref="mail.model_mail_activity"/>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+wave = env['stock.picking.batch'].browse(record.res_id)
+validate_activity_type = env.ref(
+    'fmcg_business_automation.mail_activity_type_validate_transfer_wave'
+)
+
+wave.action_confirm()
+wave.activity_schedule(
+    activity_type_id=validate_activity_type.id,
+    summary='Validate confirmed wave transfer %s' % wave.name,
+    user_id=record.user_id.id,
+)
+            ]]></field>
+        </record>
+
+        <record id="automation_confirm_transfer_wave"
+                model="base.automation">
+            <field name="name">Wave: Confirm On Confirmation Activity Done</field>
+            <field name="model_id" ref="mail.model_mail_activity"/>
+            <field name="trigger">on_archive</field>
+            <field name="filter_domain"
+                   eval="[
+                       ('activity_type_id', '=', ref('mail_activity_type_confirm_transfer_wave')),
+                       ('res_model', '=', 'stock.picking.batch'),
+                   ]"/>
+            <field name="action_server_ids"
+                   eval="[Command.link(ref('action_confirm_transfer_wave'))]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Validate activity done -> Validate every picking in the wave -->
+        <record id="action_validate_transfer_wave"
+                model="ir.actions.server">
+            <field name="name">Wave: Validate On Activity Done</field>
+            <field name="model_id" ref="mail.model_mail_activity"/>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+wave = env['stock.picking.batch'].browse(record.res_id)
+wave.action_done()
+wave._compute_state()
+            ]]></field>
+        </record>
+
+        <record id="automation_validate_transfer_wave"
+                model="base.automation">
+            <field name="name">Wave: Validate On Validation Activity Done</field>
+            <field name="model_id" ref="mail.model_mail_activity"/>
+            <field name="trigger">on_archive</field>
+            <field name="filter_domain"
+                   eval="[
+                       ('activity_type_id', '=', ref('mail_activity_type_validate_transfer_wave')),
+                       ('res_model', '=', 'stock.picking.batch'),
+                   ]"/>
+            <field name="action_server_ids"
+                   eval="[Command.link(ref('action_validate_transfer_wave'))]"/>
+            <field name="active" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

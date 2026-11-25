@@ -6,6 +6,8 @@
     'author': 'FMCG Data Platform',
     'depends': [
         'stock',
+        'stock_picking_batch',
+        'purchase',
         'base_automation',
     ],
     'data': [
@@ -28,6 +30,7 @@
         'data/stock_shortage_replenishment_cron.xml',
         'data/stock_picking_cancellation_workflow.xml',
         'data/stock_picking_batch_confirmation_workflow.xml',
+        'data/stock_picking_wave_workflow.xml',
         'data/purchase_order_confirm_activity.xml',
         'data/stock_scrap_expired_lots_cron.xml',
     ],
