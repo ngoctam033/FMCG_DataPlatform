@@ -37,6 +37,18 @@ if picking and not picking.move_ids:
         ]]></field>
     </record>
 
+    <record id="ir_filter_draft_picking_company_context"
+            model="ir.filters">
+        <field name="name">Picking: Draft - Company Context Check</field>
+        <field name="model_id">stock.picking</field>
+        <field name="domain">[
+            ('state', '=', 'draft'),
+            ('company_id', '!=', False),
+            ('picking_type_id.company_id', '!=', False)
+        ]</field>
+        <field name="is_default" eval="False"/>
+    </record>
+
     <record id="action_confirm_draft_picking"
             model="ir.actions.server">
         <field name="name">
@@ -48,7 +60,20 @@ if picking and not picking.move_ids:
 picking = env['stock.picking'].browse(record.res_id).exists()
 
 if picking and picking.state == 'draft':
-    picking.action_confirm()
+
+    filter_record = env.ref(
+        'fmcg_business_automation.ir_filter_draft_picking_company_context'
+    )
+
+    matching_picking = env['stock.picking'].search(
+        [('id', '=', picking.id)] + filter_record._get_eval_domain()
+    )
+
+    if matching_picking and picking.company_id != env.company:
+        picking.with_company(picking.company_id).action_confirm()
+    else:
+        picking.action_confirm()
+
     if not picking.move_ids:
         env.ref(
             'fmcg_business_automation.action_feedback_picking_missing_moves'
