@@ -39,12 +39,12 @@ if picking and not picking.move_ids:
 
     <record id="ir_filter_draft_picking_company_context"
             model="ir.filters">
-        <field name="name">Picking: Draft - Company Context Check</field>
+        <field name="name">Picking - Company Context</field>
         <field name="model_id">stock.picking</field>
         <field name="domain">[
-            ('state', '=', 'draft'),
+            ('state', 'in', ['draft', 'assigned', 'confirmed']),
             ('company_id', '!=', False),
-            ('picking_type_id.company_id', '!=', False)
+            ('move_ids', '!=', False)
         ]</field>
         <field name="is_default" eval="False"/>
     </record>
