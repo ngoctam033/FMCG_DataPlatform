@@ -28,6 +28,42 @@ for purchase_order in purchase_orders:
     )
     if purchase_activity:
         purchase_activity.action_feedback()
+
+batch_activity_type_ids = [
+    env.ref(
+        'fmcg_business_automation.mail_activity_type_review_transfer_batch'
+    ).id,
+    env.ref(
+        'fmcg_business_automation.mail_activity_type_confirm_transfer_batch'
+    ).id,
+    env.ref(
+        'fmcg_business_automation.mail_activity_type_validate_transfer_batch'
+    ).id,
+    env.ref(
+        'fmcg_business_automation.mail_activity_type_cancel_transfer_batch'
+    ).id,
+]
+batches = env['stock.picking.batch'].search([
+    ('is_wave', '=', False),
+    ('state', 'not in', ['done', 'cancel']),
+], limit=50, order='create_date asc, id asc')
+
+for batch in batches:
+    activity = env['mail.activity'].search([
+        ('active', '=', True),
+        ('res_model', '=', 'stock.picking.batch'),
+        ('res_id', '=', batch.id),
+        ('activity_type_id', 'in', batch_activity_type_ids),
+    ], order='create_date desc, id desc', limit=1)
+
+    if not activity:
+        raise UserError(
+            'Batch %s (state: %s) chưa hoàn tất nhưng không có '
+            'Activity workflow để xử lý.'
+            % (batch.display_name, batch.state)
+        )
+
+    activity.action_feedback()
 check_availability_type = env.ref(
     'fmcg_business_automation.'
     'mail_activity_type_check_picking_availability'
