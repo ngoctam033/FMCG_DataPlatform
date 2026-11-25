@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Structural manufacturing data is synchronized on every module upgrade. -->
+    <data noupdate="0">
+        <!-- Allow the global Manufacture route to replenish FAC/Stock. -->
+        <record id="warehouse_factory" model="stock.warehouse">
+            <field name="buy_to_resupply" eval="True"/>
+            <field name="manufacture_to_resupply" eval="True"/>
+        </record>
+
+        <!-- Finished goods remain MTO and can be replenished through an MO at FAC. -->
+        <function model="product.template" name="write">
+            <value eval="[
+                ref('product_bev_tea_peach_450'),
+                ref('product_food_noodle_beef_75'),
+                ref('product_cond_chili_250'),
+                ref('product_home_dish_750'),
+                ref('product_home_laundry_3l'),
+            ]"/>
+            <value eval="{
+                'route_ids': [Command.set([
+                    ref('stock.route_warehouse0_mto'),
+                    ref('mrp.route_warehouse0_manufacture'),
+                ])],
+            }"/>
+        </function>
+
+        <!-- Peach tea: one 450 ml bottle. -->
+        <record id="bom_product_bev_tea_peach_450" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_bev_tea_peach_450"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_bottle"/>
+            <field name="type">normal</field>
+        </record>
+        <record id="bom_line_product_bev_tea_peach_450_water" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_tea_peach_450"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="product_qty">0.43</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record>
+        <record id="bom_line_product_bev_tea_peach_450_seasoning" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_tea_peach_450"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-SEASONING')]"/>
+            <field name="product_qty">0.01</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record>
+        <record id="bom_line_product_bev_tea_peach_450_bottle" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_tea_peach_450"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-BOTTLE-GENERIC')]"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record>
+
+        <!-- Beef noodle: one 75 g packet. -->
+        <record id="bom_product_food_noodle_beef_75" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_food_noodle_beef_75"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_packet"/>
+            <field name="type">normal</field>
+        </record>
+        <record id="bom_line_product_food_noodle_beef_75_flour" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_noodle_beef_75"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-WHEAT-FLOUR')]"/>
+            <field name="product_qty">0.06</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record>
+        <record id="bom_line_product_food_noodle_beef_75_seasoning" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_noodle_beef_75"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-SEASONING')]"/>
+            <field name="product_qty">0.01</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record>
+        <record id="bom_line_product_food_noodle_beef_75_oil" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_noodle_beef_75"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-VEG-OIL')]"/>
+            <!-- 5 ml preserves 0.005 L without the litre UoM's 0.01 rounding. -->
+            <field name="product_qty">5</field>
+            <field name="product_uom_id" ref="uom.product_uom_milliliter"/>
+        </record>
+        <record id="bom_line_product_food_noodle_beef_75_pouch" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_food_noodle_beef_75"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-POUCH-GENERIC')]"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record>
+
+        <!-- Chili sauce: one 250 g bottle. -->
+        <record id="bom_product_cond_chili_250" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_cond_chili_250"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_bottle"/>
+            <field name="type">normal</field>
+        </record>
+        <record id="bom_line_product_cond_chili_250_paste" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_cond_chili_250"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-CHILI-PASTE')]"/>
+            <field name="product_qty">0.2</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record>
+        <record id="bom_line_product_cond_chili_250_water" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_cond_chili_250"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="product_qty">0.04</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record>
+        <record id="bom_line_product_cond_chili_250_seasoning" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_cond_chili_250"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-SEASONING')]"/>
+            <field name="product_qty">0.01</field>
+            <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+        </record>
+        <record id="bom_line_product_cond_chili_250_bottle" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_cond_chili_250"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-BOTTLE-GENERIC')]"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record>
+
+        <!-- Dishwashing liquid: one 750 ml bottle. -->
+        <record id="bom_product_home_dish_750" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_home_dish_750"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_bottle"/>
+            <field name="type">normal</field>
+        </record>
+        <record id="bom_line_product_home_dish_750_cleaning_base" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_dish_750"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-CLEANING-BASE')]"/>
+            <field name="product_qty">0.72</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record>
+        <record id="bom_line_product_home_dish_750_water" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_dish_750"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="product_qty">0.03</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record>
+        <record id="bom_line_product_home_dish_750_bottle" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_dish_750"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-BOTTLE-GENERIC')]"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record>
+
+        <!-- Laundry detergent: one 3 litre bottle. -->
+        <record id="bom_product_home_laundry_3l" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_home_laundry_3l"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_bottle"/>
+            <field name="type">normal</field>
+        </record>
+        <record id="bom_line_product_home_laundry_3l_cleaning_base" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_laundry_3l"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-CLEANING-BASE')]"/>
+            <field name="product_qty">2.85</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record>
+        <record id="bom_line_product_home_laundry_3l_water" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_laundry_3l"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="product_qty">0.15</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record>
+        <record id="bom_line_product_home_laundry_3l_bottle" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_home_laundry_3l"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-BOTTLE-GENERIC')]"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record>
+
+        <!-- Archive only the legacy manual 0/0 Cola rule at the Holding WH. -->
+        <function model="stock.warehouse.orderpoint" name="write">
+            <value model="stock.warehouse.orderpoint" eval="obj().env['stock.warehouse.orderpoint'].search([
+                ('product_id.default_code', '=', 'BEV-COLA-330'),
+                ('location_id', '=', ref('stock.stock_location_stock')),
+                ('trigger', '=', 'manual'),
+                ('product_min_qty', '=', 0.0),
+                ('product_max_qty', '=', 0.0),
+                ('active', '=', True),
+            ]).ids"/>
+            <value eval="{'active': False}"/>
+        </function>
+    </data>
+</odoo>

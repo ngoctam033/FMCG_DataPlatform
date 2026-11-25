@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Keep the cola supply policy synchronized on module upgrades. -->
+    <data noupdate="0">
+        <!--
+            BEV-COLA-330 is a manufactured finished good. MTO propagates the
+            sales demand back to the source warehouse; Manufacture provides
+            the rule that replenishes that warehouse by creating an MO.
+        -->
+        <function model="product.template" name="write">
+            <value eval="[ref('product_bev_cola_330')]"/>
+            <value eval="{
+                'route_ids': [Command.set([
+                    ref('stock.route_warehouse0_mto'),
+                    ref('mrp.route_warehouse0_manufacture'),
+                ])],
+            }"/>
+        </function>
+
+        <record id="bom_product_bev_cola_330" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product_bev_cola_330"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom_can"/>
+            <field name="type">normal</field>
+        </record>
+
+        <record id="bom_line_product_bev_cola_330_purified_water" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_cola_330"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-PURIFIED-WATER')]"/>
+            <field name="product_qty">0.31</field>
+            <field name="product_uom_id" ref="uom.product_uom_litre"/>
+        </record>
+
+        <record id="bom_line_product_bev_cola_330_seasoning" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_cola_330"/>
+            <field name="product_id" search="[('default_code', '=', 'RM-SEASONING')]"/>
+            <!-- 15 g preserves 0.015 kg without the kg UoM's 0.01 rounding. -->
+            <field name="product_qty">15</field>
+            <field name="product_uom_id" ref="uom.product_uom_gram"/>
+        </record>
+
+        <record id="bom_line_product_bev_cola_330_can" model="mrp.bom.line">
+            <field name="bom_id" ref="bom_product_bev_cola_330"/>
+            <field name="product_id" search="[('default_code', '=', 'PM-CAN-330')]"/>
+            <field name="product_qty">1.0</field>
+            <field name="product_uom_id" ref="uom.product_uom_unit"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Min/Max policies are initial data so planners can tune them after install. -->
+    <data noupdate="1">
+        <!-- ============================================================ -->
+        <!-- FINISHED GOODS AT FAC: replenish negative forecast by MO.   -->
+        <!-- ============================================================ -->
+        <record id="orderpoint_fg_bev_tea_peach_450_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'BEV-TEA-PEACH-450')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="mrp.route_warehouse0_manufacture"/>
+            <field name="product_min_qty">0</field>
+            <field name="product_max_qty">0</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_fg_bev_cola_330_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'BEV-COLA-330')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="mrp.route_warehouse0_manufacture"/>
+            <field name="product_min_qty">0</field>
+            <field name="product_max_qty">0</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_fg_food_noodle_beef_75_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'FOOD-NOODLE-BEEF-75')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="mrp.route_warehouse0_manufacture"/>
+            <field name="product_min_qty">0</field>
+            <field name="product_max_qty">0</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_fg_cond_chili_250_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'COND-CHILI-250')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="mrp.route_warehouse0_manufacture"/>
+            <field name="product_min_qty">0</field>
+            <field name="product_max_qty">0</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_fg_home_dish_750_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'HOME-DISH-750')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="mrp.route_warehouse0_manufacture"/>
+            <field name="product_min_qty">0</field>
+            <field name="product_max_qty">0</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_fg_home_laundry_3l_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'HOME-LAUNDRY-3L')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="mrp.route_warehouse0_manufacture"/>
+            <field name="product_min_qty">0</field>
+            <field name="product_max_qty">0</field>
+            <field name="trigger">auto</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- FINISHED GOODS AT CDC: replenish from FAC by internal route. -->
+        <!-- ============================================================ -->
+        <record id="orderpoint_fg_bev_tea_peach_450_cdc" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'BEV-TEA-PEACH-450')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_cdc"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" model="stock.route" search="[('supplier_wh_id', '=', ref('warehouse_factory')), ('supplied_wh_id', '=', ref('warehouse_cdc'))]"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_fg_bev_cola_330_cdc" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'BEV-COLA-330')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_cdc"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" model="stock.route" search="[('supplier_wh_id', '=', ref('warehouse_factory')), ('supplied_wh_id', '=', ref('warehouse_cdc'))]"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_fg_food_noodle_beef_75_cdc" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'FOOD-NOODLE-BEEF-75')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_cdc"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" model="stock.route" search="[('supplier_wh_id', '=', ref('warehouse_factory')), ('supplied_wh_id', '=', ref('warehouse_cdc'))]"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_fg_cond_chili_250_cdc" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'COND-CHILI-250')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_cdc"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" model="stock.route" search="[('supplier_wh_id', '=', ref('warehouse_factory')), ('supplied_wh_id', '=', ref('warehouse_cdc'))]"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_fg_home_dish_750_cdc" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'HOME-DISH-750')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_cdc"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" model="stock.route" search="[('supplier_wh_id', '=', ref('warehouse_factory')), ('supplied_wh_id', '=', ref('warehouse_cdc'))]"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_fg_home_laundry_3l_cdc" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'HOME-LAUNDRY-3L')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_cdc"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'CDC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" model="stock.route" search="[('supplier_wh_id', '=', ref('warehouse_factory')), ('supplied_wh_id', '=', ref('warehouse_cdc'))]"/>
+            <field name="product_min_qty">50</field>
+            <field name="product_max_qty">200</field>
+            <field name="trigger">auto</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- RAW/PACKAGING MATERIALS AT FAC: replenish by RFQ.           -->
+        <!-- ============================================================ -->
+        <record id="orderpoint_rm_wheat_flour_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-WHEAT-FLOUR')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="purchase_stock.route_warehouse0_buy"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_rm_seasoning_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-SEASONING')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="purchase_stock.route_warehouse0_buy"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_rm_veg_oil_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-VEG-OIL')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="purchase_stock.route_warehouse0_buy"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_rm_chili_paste_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'RM-CHILI-PASTE')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="purchase_stock.route_warehouse0_buy"/>
+            <field name="product_min_qty">500</field>
+            <field name="product_max_qty">2500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_pm_bottle_generic_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'PM-BOTTLE-GENERIC')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="purchase_stock.route_warehouse0_buy"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_pm_can_330_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'PM-CAN-330')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="purchase_stock.route_warehouse0_buy"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+        <record id="orderpoint_pm_pouch_generic_fac" model="stock.warehouse.orderpoint">
+            <field name="product_id" search="[('default_code', '=', 'PM-POUCH-GENERIC')]"/>
+            <field name="company_id" ref="company_fmcg_manufacturing"/>
+            <field name="warehouse_id" ref="warehouse_factory"/>
+            <field name="location_id" model="stock.location" search="[('complete_name', '=', 'FAC/Stock'), ('company_id', '=', ref('company_fmcg_manufacturing'))]"/>
+            <field name="route_id" ref="purchase_stock.route_warehouse0_buy"/>
+            <field name="product_min_qty">100</field>
+            <field name="product_max_qty">500</field>
+            <field name="trigger">auto</field>
+        </record>
+    </data>
+</odoo>
