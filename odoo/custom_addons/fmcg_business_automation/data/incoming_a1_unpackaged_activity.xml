@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. Activity Type -->
+    <record id="activity_type_incoming_a1_unpackaged"
+            model="mail.activity.type">
+        <field name="name">[A1] Incoming - Unpackaged Goods</field>
+    </record>
+
+    <!-- 2. Server Action: Schedule Activity -->
+    <record id="action_schedule_incoming_a1"
+            model="ir.actions.server">
+        <field name="name">Incoming A1: Schedule Activity</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+activity_type = env.ref(
+    'fmcg_business_automation.activity_type_incoming_a1_unpackaged'
+)
+
+for line in records:
+    line.picking_id.activity_schedule(
+        activity_type_id=activity_type.id,
+        user_id=env.user.id,
+        summary='A1: Incoming Unpackaged Goods',
+        note='Verify incoming goods without source or destination package.'
+    )
+        ]]></field>
+    </record>
+
+    <!-- 3. Automation: Detect A1 Move Line -->
+    <record id="automation_detect_incoming_a1"
+            model="base.automation">
+        <field name="name">Incoming A1: Detect Unpackaged Goods</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[
+            ('picking_id.picking_type_id.code', '=', 'incoming'),
+            ('package_id', '=', False),
+            ('result_package_id', '=', False)
+        ]</field>
+        <field name="action_server_ids"
+               eval="[(4, ref('action_schedule_incoming_a1'))]"/>
+    </record>
+
+    <!-- 4. Server Action: Process A1 -->
+    <record id="action_process_incoming_a1"
+            model="ir.actions.server">
+        <field name="name">Incoming A1: Process Unpackaged Goods</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+activity_type = env.ref(
+    'fmcg_business_automation.activity_type_incoming_a1_unpackaged'
+)
+
+for activity in records:
+    if activity.activity_type_id != activity_type:
+        continue
+
+    picking = env['stock.picking'].browse(activity.res_id)
+
+    lines = picking.move_line_ids.filtered(
+        lambda line:
+            not line.package_id
+            and not line.result_package_id
+    )
+
+    lines.write({
+        'package_id': False,
+        'result_package_id': False,
+    })
+
+    picking.message_post(
+        body='[A1] Incoming unpackaged goods scenario completed.'
+    )
+        ]]></field>
+    </record>
+
+    <!-- 5. Automation: Complete A1 Activity -->
+    <record id="automation_complete_incoming_a1"
+            model="base.automation">
+        <field name="name">Incoming A1: Complete Activity</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+            eval="[
+                ('activity_type_id', '=',
+                    ref('fmcg_business_automation.activity_type_incoming_a1_unpackaged')),
+                ('res_model', '=', 'stock.picking')
+            ]"/>
+        <field name="action_server_ids"
+               eval="[(4, ref('action_process_incoming_a1'))]"/>
+    </record>
+</odoo>
