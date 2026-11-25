@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ==============================================================
+         1. ACTIVITY TYPES
+         ============================================================== -->
+
+    <record id="mail_activity_type_review_transfer_batch"
+            model="mail.activity.type">
+        <field name="name">Batch: Review</field>
+        <field name="summary">
+            Review automatically generated batch transfer
+        </field>
+        <field name="res_model">stock.picking.batch</field>
+        <field name="icon">fa-search</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="mail_activity_type_confirm_transfer_batch"
+            model="mail.activity.type">
+        <field name="name">Batch: Confirm</field>
+        <field name="summary">
+            Confirm reviewed batch transfer
+        </field>
+        <field name="res_model">stock.picking.batch</field>
+        <field name="icon">fa-check-circle</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="mail_activity_type_validate_transfer_batch"
+            model="mail.activity.type">
+        <field name="name">Batch: Validate</field>
+        <field name="summary">Validate confirmed batch transfer</field>
+        <field name="res_model">stock.picking.batch</field>
+        <field name="icon">fa-check-square-o</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <record id="mail_activity_type_cancel_transfer_batch"
+            model="mail.activity.type">
+        <field name="name">Batch: Cancel</field>
+        <field name="summary">Cancel confirmed batch transfer</field>
+        <field name="res_model">stock.picking.batch</field>
+        <field name="icon">fa-times-circle</field>
+        <field name="sequence">40</field>
+    </record>
+
+
+    <!-- ==============================================================
+         2. SERVER ACTION
+         Review Activity Done -> Schedule Confirm Activity
+         ============================================================== -->
+
+    <record id="action_schedule_confirm_transfer_batch"
+            model="ir.actions.server">
+        <field name="name">
+            Batch: Schedule Confirmation After Review
+        </field>
+
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+
+        <field name="code"><![CDATA[
+batch = env['stock.picking.batch'].browse(record.res_id)
+
+confirm_activity_type = env.ref(
+    'fmcg_business_automation.'
+    'mail_activity_type_confirm_transfer_batch'
+)
+
+batch.activity_schedule(
+    activity_type_id=confirm_activity_type.id,
+    summary='Confirm reviewed batch transfer %s' % batch.name,
+    user_id=record.user_id.id,
+)
+        ]]></field>
+    </record>
+
+
+    <!-- ==============================================================
+         3. BASE AUTOMATION
+         Archive Review Activity -> Run Schedule Confirm Action
+         ============================================================== -->
+
+    <record id="automation_schedule_confirm_transfer_batch"
+            model="base.automation">
+        <field name="name">
+            Batch: Schedule Confirmation On Review Done
+        </field>
+
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+
+        <field name="filter_domain"
+               eval="[
+                   (
+                       'activity_type_id',
+                       '=',
+                       ref('mail_activity_type_review_transfer_batch')
+                   ),
+                   ('res_model', '=', 'stock.picking.batch')
+               ]"/>
+
+        <field name="action_server_ids"
+               eval="[
+                   (6, 0, [
+                       ref('action_schedule_confirm_transfer_batch')
+                   ])
+               ]"/>
+
+        <field name="active" eval="True"/>
+    </record>
+
+
+    <!-- ==============================================================
+         4. SERVER ACTION
+         Confirm Activity Done -> Confirm Batch
+         ============================================================== -->
+
+    <record id="action_confirm_transfer_batch"
+            model="ir.actions.server">
+        <field name="name">
+            Batch: Confirm On Activity Done
+        </field>
+
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+
+        <field name="code"><![CDATA[
+batch = env['stock.picking.batch'].browse(record.res_id)
+
+if batch.state == 'draft':
+    batch.action_confirm()
+
+if batch.state == 'in_progress':
+    roll = int(time.time() * 1000000) % 10
+
+    if roll == 0:
+        next_activity_type = env.ref(
+            'fmcg_business_automation.'
+            'mail_activity_type_cancel_transfer_batch'
+        )
+        next_summary = 'Cancel confirmed batch transfer %s' % batch.name
+        decision = 'Cancel'
+    else:
+        next_activity_type = env.ref(
+            'fmcg_business_automation.'
+            'mail_activity_type_validate_transfer_batch'
+        )
+        next_summary = 'Validate confirmed batch transfer %s' % batch.name
+        decision = 'Validate'
+
+    batch.activity_schedule(
+        activity_type_id=next_activity_type.id,
+        summary=next_summary,
+        user_id=record.user_id.id,
+    )
+
+    batch.message_post(
+        body=(
+            'Batch transfer confirmation activity was completed. '
+            'The simulated next decision is %s '
+            '(roll: %s; Cancel=0, Validate=1-9).'
+            % (decision, roll)
+        ),
+        message_type='comment',
+        subtype_xmlid='mail.mt_note',
+    )
+
+elif batch.state in ('done', 'cancel'):
+    batch.message_post(
+        body=(
+            'Batch confirmation activity was completed after '
+            'the batch had already reached terminal state "%s". '
+            'No confirmation or subsequent decision was executed.'
+            % batch.state
+        ),
+        message_type='comment',
+        subtype_xmlid='mail.mt_note',
+    )
+        ]]></field>
+    </record>
+
+
+    <!-- ==============================================================
+         5. BASE AUTOMATION
+         Archive Confirm Activity -> Run Confirm Batch Action
+         ============================================================== -->
+
+    <record id="automation_confirm_transfer_batch"
+            model="base.automation">
+        <field name="name">
+            Batch: Confirm On Confirmation Activity Done
+        </field>
+
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+
+        <field name="filter_domain"
+               eval="[
+                   (
+                       'activity_type_id',
+                       '=',
+                       ref('mail_activity_type_confirm_transfer_batch')
+                   ),
+                   ('res_model', '=', 'stock.picking.batch')
+               ]"/>
+
+        <field name="action_server_ids"
+               eval="[
+                   (6, 0, [
+                       ref('action_confirm_transfer_batch')
+                   ])
+               ]"/>
+
+        <field name="active" eval="True"/>
+    </record>
+
+
+    <!-- ==============================================================
+         6. SERVER ACTION + AUTOMATION
+         Archive Validate Activity -> Validate Batch
+         ============================================================== -->
+
+    <record id="action_validate_transfer_batch"
+            model="ir.actions.server">
+        <field name="name">Batch: Validate On Activity Done</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+batch = env['stock.picking.batch'].browse(record.res_id)
+
+missing_lot_filter = env.ref(
+    'fmcg_business_automation.'
+    'ir_filter_stock_picking_missing_lot_serial'
+)
+
+missing_lot_pickings = batch.picking_ids.filtered_domain(
+    missing_lot_filter._get_eval_domain()
+)
+
+validate_activity_type = env.ref(
+    'fmcg_business_automation.'
+    'mail_activity_type_validate_assigned_picking'
+)
+fill_lot_activity_type = env.ref(
+    'fmcg_business_automation.'
+    'mail_activity_type_picking_fill_missing_lot_serial'
+)
+assign_lot_activity_type = env.ref(
+    'fmcg_business_automation.'
+    'mail_activity_type_picking_assign_existing_lot_serial'
+)
+
+lot_activity_type_ids = [
+    validate_activity_type.id,
+    fill_lot_activity_type.id,
+    assign_lot_activity_type.id,
+]
+
+if missing_lot_pickings:
+    for picking in missing_lot_pickings:
+        activities = env['mail.activity'].search([
+            ('active', '=', True),
+            ('res_model', '=', 'stock.picking'),
+            ('res_id', '=', picking.id),
+            ('activity_type_id', 'in', lot_activity_type_ids),
+        ], order='create_date asc, id asc')
+
+        if activities:
+            activities.action_feedback()
+        else:
+            picking.activity_schedule(
+                activity_type_id=fill_lot_activity_type.id,
+                summary='Fill missing Lot/Serial',
+                user_id=record.user_id.id,
+            )
+
+    # Batch chưa đủ điều kiện Validate.
+    # Mở lại activity để lần chạy sau kiểm tra lại.
+    record.write({
+        'active': True,
+        'feedback': False,
+    })
+
+else:
+    batch.action_done()
+    batch._compute_state()
+
+    batch.message_post(
+        body=(
+            'Batch transfer was validated automatically after '
+            'all child pickings had complete Lot/Serial information.'
+        ),
+        message_type='comment',
+        subtype_xmlid='mail.mt_note',
+    )
+        ]]></field>
+    </record>
+
+    <record id="automation_validate_transfer_batch"
+            model="base.automation">
+        <field name="name">Batch: Validate On Activity Done</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+               eval="[
+                   (
+                       'activity_type_id',
+                       '=',
+                       ref('mail_activity_type_validate_transfer_batch')
+                   ),
+                   ('res_model', '=', 'stock.picking.batch')
+               ]"/>
+        <field name="action_server_ids"
+               eval="[(6, 0, [ref('action_validate_transfer_batch')])]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+
+    <!-- ==============================================================
+         7. SERVER ACTION + AUTOMATION
+         Archive Cancel Activity -> Cancel Batch
+         ============================================================== -->
+
+    <record id="action_cancel_transfer_batch"
+            model="ir.actions.server">
+        <field name="name">Batch: Cancel On Activity Done</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+batch = env['stock.picking.batch'].browse(record.res_id)
+
+batch.action_cancel()
+
+batch.message_post(
+    body=(
+        'Batch transfer was cancelled automatically after '
+        'the Cancel activity was completed.'
+    ),
+    message_type='comment',
+    subtype_xmlid='mail.mt_note',
+)
+        ]]></field>
+    </record>
+
+    <record id="automation_cancel_transfer_batch"
+            model="base.automation">
+        <field name="name">Batch: Cancel On Activity Done</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="trigger">on_archive</field>
+        <field name="filter_domain"
+               eval="[
+                   (
+                       'activity_type_id',
+                       '=',
+                       ref('mail_activity_type_cancel_transfer_batch')
+                   ),
+                   ('res_model', '=', 'stock.picking.batch')
+               ]"/>
+        <field name="action_server_ids"
+               eval="[(6, 0, [ref('action_cancel_transfer_batch')])]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+
+    <!-- ==============================================================
+         8. CRON
+         Ready Transfers -> Draft Batch -> Review Activity
+
+         Transfers được nhóm theo:
+         - Company
+         - Operation Type
+
+         Việc nhóm này là điều kiện nghiệp vụ bắt buộc của Batch Transfer,
+         không phải defensive guard.
+         ============================================================== -->
+
+    <record id="ir_cron_create_transfer_batches_for_review"
+            model="ir.cron">
+        <field name="name">
+            Inventory Demo: Create Transfer Batches For Review
+        </field>
+
+        <field
+            name="model_id"
+            ref="stock.model_stock_picking"
+        />
+
+        <field name="state">code</field>
+
+        <field name="code"><![CDATA[
+review_activity_type = env.ref(
+    'fmcg_business_automation.'
+    'mail_activity_type_review_transfer_batch'
+)
+
+pickings = model.search([
+    ('state', '=', 'assigned'),
+    ('batch_id', '=', False),
+], order='company_id, picking_type_id, scheduled_date, id')
+
+companies = pickings.mapped('company_id')
+
+for company in companies:
+    company_pickings = pickings.filtered(
+        lambda picking: picking.company_id == company
+    )
+
+    picking_types = company_pickings.mapped('picking_type_id')
+
+    for picking_type in picking_types:
+        batch_pickings = company_pickings.filtered(
+            lambda picking:
+                picking.picking_type_id == picking_type
+        )
+
+        batch = env['stock.picking.batch'].with_company(company).create({
+            'company_id': company.id,
+            'picking_type_id': picking_type.id,
+            'user_id': env.user.id,
+            'description': (
+                'Demo batch generated by cron for %s'
+                % picking_type.display_name
+            ),
+            'picking_ids': [
+                (6, 0, batch_pickings.ids),
+            ],
+        })
+
+        batch.activity_schedule(
+            activity_type_id=review_activity_type.id,
+            summary='Review generated batch transfer %s' % batch.name,
+            user_id=env.user.id,
+        )
+
+        batch.message_post(
+            body=(
+                'Batch transfer was generated automatically from '
+                'Ready transfers by the learning cron.'
+            ),
+            message_type='comment',
+            subtype_xmlid='mail.mt_note',
+        )
+        ]]></field>
+
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+
+        <!-- Bật thủ công sau khi chuẩn bị dữ liệu demo -->
+        <field name="active" eval="False"/>
+    </record>
+
+</odoo>

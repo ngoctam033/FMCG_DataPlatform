@@ -27,6 +27,7 @@
         'data/stock_picking_schedule_validate_on_assigned.xml',
         'data/stock_shortage_replenishment_cron.xml',
         'data/stock_picking_cancellation_workflow.xml',
+        'data/stock_picking_batch_confirmation_workflow.xml',
         'data/purchase_order_confirm_activity.xml',
         'data/stock_scrap_expired_lots_cron.xml',
     ],
