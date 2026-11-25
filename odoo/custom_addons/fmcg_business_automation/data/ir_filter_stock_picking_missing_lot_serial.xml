@@ -30,7 +30,9 @@
             ('state', 'not in', ['done', 'cancel']),
             '|',
             '&amp;',
+                '&amp;',
             ('picking_type_id.use_existing_lots', '=', True),
+                    ('picking_type_id.use_create_lots', '=', False),
             ('move_ids', 'any', [
                 ('product_id.tracking', 'in', ['lot', 'serial']),
                 ('move_line_ids', 'any', [
